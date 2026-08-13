@@ -44,3 +44,7 @@ next-env.d.ts
 
 # local test artifacts
 /e2e-tmp.mjs
+
+# editor skill copies installed by prisma init
+/.agents
+/.windsurf

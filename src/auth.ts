@@ -17,6 +17,8 @@ const googleConfigured = Boolean(
 
 const config: NextAuthConfig = {
   adapter: PrismaAdapter(prisma),
+  // The deployment origin is supplied by the host (Vercel sets it per request).
+  trustHost: true,
   // Credentials sign-in cannot use database sessions, so the whole app uses JWT.
   session: { strategy: "jwt" },
   pages: { signIn: "/signin" },

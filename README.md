@@ -89,7 +89,17 @@ Leave `AUTH_URL` unset in production. `trustHost: true` in [`src/auth.ts`](src/a
 
 ## Adding content
 
-All exam content is typed TypeScript in `src/content/exams/`. One file per exam, matching the `Exam` interface in [`src/content/types.ts`](src/content/types.ts). To add a question, append to the `questions` array:
+Each exam is a directory under `src/content/exams/` with three files:
+
+| File | Holds |
+| --- | --- |
+| `index.ts` | Exam metadata, skill-area domains and weights, resources, study path |
+| `questions.ts` | The question bank |
+| `flashcards.ts` | The flashcard deck |
+
+Current bank: **60 questions per exam** (180 total) and 52 / 40 / 46 flashcards for AZ-500 / SC-401 / SC-200. Every domain holds enough questions to satisfy its weighted mock-exam quota, so mock papers run at their full 40-question length.
+
+To add a question, append to the array in the exam's `questions.ts`:
 
 ```ts
 {
@@ -105,9 +115,17 @@ All exam content is typed TypeScript in `src/content/exams/`. One file per exam,
 }
 ```
 
-Flashcards, resources, and study-path modules follow the same pattern in the same file. Everything else — practice filters, mock exam weighting, dashboard breakdowns — picks up new content automatically. No database changes are needed.
+Flashcards go in `flashcards.ts`; resources and study-path modules live in `index.ts`. Everything else — practice filters, mock exam weighting, dashboard breakdowns — picks up new content automatically. No database changes are needed.
 
-To add a whole new exam, create `src/content/exams/<code>.ts` and register it in [`src/content/index.ts`](src/content/index.ts).
+To add a whole new exam, create `src/content/exams/<code>/` with the three files above and register it in [`src/content/index.ts`](src/content/index.ts).
+
+### Validating the bank
+
+Before committing a batch of new content, check referential integrity — unknown domain ids, correct answers that aren't options, single-answer questions with two keys, and whether each domain still has enough questions for its mock quota:
+
+```bash
+npx tsx validate-content.ts
+```
 
 ### Content sourcing
 

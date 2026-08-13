@@ -1,6 +1,6 @@
-import { az500 } from "./exams/az-500";
-import { sc200 } from "./exams/sc-200";
-import { sc401 } from "./exams/sc-401";
+import { az500 } from "./exams/az-500/index";
+import { sc200 } from "./exams/sc-200/index";
+import { sc401 } from "./exams/sc-401/index";
 import type { Exam, ExamId, Flashcard, Question } from "./types";
 
 export const exams: Exam[] = [az500, sc401, sc200];

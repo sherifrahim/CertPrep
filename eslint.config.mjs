@@ -15,9 +15,12 @@ const eslintConfig = [
     ignores: [
       "node_modules/**",
       ".next/**",
+      ".vercel/**",
       "out/**",
       "build/**",
       "next-env.d.ts",
+      // Prisma-generated client — not ours to lint.
+      "src/generated/**",
     ],
   },
 ];

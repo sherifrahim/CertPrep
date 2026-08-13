@@ -1,0 +1,323 @@
+import type { Flashcard } from "../../types";
+
+export const az500Flashcards: Flashcard[] = [
+  // ---------------------------------------------------------------- identity
+  {
+    id: "az500-c1",
+    domainId: "identity",
+    front: "When do you need a custom Azure role instead of a built-in role?",
+    back: "When no built-in role matches the required permissions closely enough to satisfy least privilege. Custom roles define Actions, NotActions, DataActions, NotDataActions, and AssignableScopes, and are stored in Microsoft Entra ID.",
+  },
+  {
+    id: "az500-c2",
+    domainId: "identity",
+    front: "System-assigned vs user-assigned managed identity",
+    back: "System-assigned is tied to one resource's lifecycle and is deleted with it. User-assigned is a standalone resource that can be attached to many resources and survives independently — grant its role once, reuse everywhere.",
+  },
+  {
+    id: "az500-c3",
+    domainId: "identity",
+    front: "What does PIM 'eligible' mean?",
+    back: "The user holds no permissions until they activate the role, optionally requiring MFA, justification, ticket number, or approval, for a limited time window. This removes standing access.",
+  },
+  {
+    id: "az500-c13",
+    domainId: "identity",
+    front: "How does Azure RBAC resolve multiple role assignments?",
+    back: "Additively — effective permissions are the union of every assignment at or above the resource's scope. Only a deny assignment (from Blueprints or managed apps) subtracts, and deny always wins over allow.",
+  },
+  {
+    id: "az500-c14",
+    domainId: "identity",
+    front: "Azure RBAC roles vs Microsoft Entra roles",
+    back: "Azure RBAC governs Azure resources (management groups → subscriptions → resource groups → resources). Entra roles govern the directory and M365. A Global Administrator has no Azure resource access until they elevate access in Entra properties.",
+  },
+  {
+    id: "az500-c15",
+    domainId: "identity",
+    front: "Which Conditional Access cloud app covers the Azure portal, CLI, and PowerShell?",
+    back: "Microsoft Azure Management. Targeting it applies the policy to the whole ARM control plane in one assignment.",
+  },
+  {
+    id: "az500-c16",
+    domainId: "identity",
+    front: "Delegated vs application permissions",
+    back: "Delegated: the app acts on behalf of a signed-in user, limited by that user's own rights; some need admin consent. Application: the app acts as itself with no user present, and always requires tenant admin consent.",
+  },
+  {
+    id: "az500-c17",
+    domainId: "identity",
+    front: "App registration vs enterprise application (service principal)",
+    back: "The app registration is the global definition of the application in its home tenant. The enterprise application is the service principal — the local instance in each tenant that holds permission grants, assignments, and sign-in policy.",
+  },
+  {
+    id: "az500-c18",
+    domainId: "identity",
+    front: "What is workload identity federation?",
+    back: "A trust between Entra and an external issuer (GitHub Actions, Kubernetes, another cloud) so an external token is exchanged for an Entra token. It removes stored client secrets entirely — nothing to rotate or leak.",
+  },
+  {
+    id: "az500-c19",
+    domainId: "identity",
+    front: "What does an access review do?",
+    back: "Recurring recertification of group membership, app assignment, or role assignment. Reviewers approve or deny, and you can auto-apply results — including removing access when reviewers don't respond.",
+  },
+  {
+    id: "az500-c20",
+    domainId: "identity",
+    front: "AssignableScopes vs Actions in a custom role",
+    back: "AssignableScopes = where the role may be assigned. Actions = which control-plane operations it grants. NotActions = subtractions from Actions. DataActions = data-plane operations such as reading blob contents.",
+  },
+
+  // ----------------------------------------------------------------- network
+  {
+    id: "az500-c4",
+    domainId: "network",
+    front: "Service endpoint vs private endpoint",
+    back: "Service endpoint keeps traffic on the Microsoft backbone but the PaaS service keeps its public IP and it cannot be used from on-premises. Private endpoint gives the service a private IP inside your VNet, reachable from on-premises over VPN or ExpressRoute.",
+  },
+  {
+    id: "az500-c5",
+    domainId: "network",
+    front: "NSG rule evaluation order",
+    back: "Rules are evaluated by priority (100–4096, lowest number first), but only rules matching source, destination, port, and protocol count. First match wins and evaluation stops. Defaults allow VNet-to-VNet and deny all other inbound.",
+  },
+  {
+    id: "az500-c6",
+    domainId: "network",
+    front: "Azure Firewall vs Application Gateway WAF vs Front Door WAF",
+    back: "Azure Firewall: regional L3–L7 network firewall for egress and east-west. Application Gateway WAF: regional L7 reverse proxy. Front Door WAF: global edge L7 with CDN and global load balancing.",
+  },
+  {
+    id: "az500-c21",
+    domainId: "network",
+    front: "How do you force spoke egress through a hub firewall?",
+    back: "A user-defined route for 0.0.0.0/0 with next hop type 'Virtual appliance' set to the firewall's private IP, applied to the spoke subnets. This overrides the default system route to the internet.",
+  },
+  {
+    id: "az500-c22",
+    domainId: "network",
+    front: "Application security group (ASG) vs service tag",
+    back: "ASG groups your own NICs by workload role so NSG rules follow VMs instead of IPs. Service tags are Microsoft-maintained address ranges for Azure services (Storage, Sql, AzureCloud) used as rule sources or destinations.",
+  },
+  {
+    id: "az500-c23",
+    domainId: "network",
+    front: "What are Virtual Network Manager security admin rules?",
+    back: "Centrally authored rules evaluated *before* NSGs and not overridable by network owners. Use them for organization-wide guardrails such as always blocking inbound RDP/SSH from the internet.",
+  },
+  {
+    id: "az500-c24",
+    domainId: "network",
+    front: "Private Link service vs private endpoint",
+    back: "Private Link service is what a *provider* publishes in front of a Standard Load Balancer. A private endpoint is what a *consumer* creates to connect to it — or to an Azure PaaS service — using a private IP.",
+  },
+  {
+    id: "az500-c25",
+    domainId: "network",
+    front: "What does a service endpoint policy prevent?",
+    back: "Data exfiltration to arbitrary Azure service instances. It restricts service-endpoint traffic from a subnet to a named allowlist of resources — for example only your own storage accounts.",
+  },
+  {
+    id: "az500-c26",
+    domainId: "network",
+    front: "Network Watcher: which tool for which question?",
+    back: "Effective security rules = what NSG rules actually apply to a NIC. NSG flow logs = what traffic was allowed/denied. Connection troubleshoot/monitor = can A reach B. Packet capture = full payloads.",
+  },
+  {
+    id: "az500-c27",
+    domainId: "network",
+    front: "Which P2S VPN tunnel type supports Entra ID authentication?",
+    back: "OpenVPN (SSL/TLS) only. IKEv2 and SSTP support certificate or RADIUS authentication instead.",
+  },
+  {
+    id: "az500-c28",
+    domainId: "network",
+    front: "Azure Firewall Premium-only features",
+    back: "TLS inspection, signature-based IDPS, URL filtering, and web categories. Standard already provides FQDN application rules, network rules with service tags, and threat intelligence filtering.",
+  },
+  {
+    id: "az500-c29",
+    domainId: "network",
+    front: "App Service: VNet integration vs private endpoint",
+    back: "VNet integration = outbound, lets the app call into your network. Private endpoint = inbound, gives the app a private address so you can disable public access. Many designs need both.",
+  },
+  {
+    id: "az500-c30",
+    domainId: "network",
+    front: "What is a secured virtual hub?",
+    back: "A Virtual WAN hub with Azure Firewall (or a supported partner NVA) deployed inside it, managed centrally through Azure Firewall Manager, inspecting branch-to-VNet, VNet-to-VNet, and internet traffic.",
+  },
+
+  // ----------------------------------------------------------------- compute
+  {
+    id: "az500-c7",
+    domainId: "compute",
+    front: "Azure Bastion vs just-in-time VM access",
+    back: "Bastion provides RDP/SSH over TLS from the portal to VMs with no public IP. JIT leaves the public endpoint in place but opens the NSG port only on approved request for a limited time. Often used together.",
+  },
+  {
+    id: "az500-c8",
+    domainId: "compute",
+    front: "Azure Disk Encryption vs encryption at host",
+    back: "ADE uses BitLocker or dm-crypt inside the guest OS and requires a key vault. Encryption at host encrypts on the Azure host before data reaches storage, covers temp disks and caches, and needs no in-guest agent.",
+  },
+  {
+    id: "az500-c9",
+    domainId: "compute",
+    front: "Which storage protections defend against accidental or malicious deletion?",
+    back: "Soft delete (recoverable window), versioning (previous versions retained), point-in-time restore, and immutability policies — locked WORM retention or legal hold, which even owners cannot bypass.",
+  },
+  {
+    id: "az500-c31",
+    domainId: "compute",
+    front: "The three SAS types",
+    back: "User delegation SAS — signed with an Entra-issued key, revocable, recommended for blobs. Service SAS — signed with the account key, scoped to one service. Account SAS — account key, spans services. Prefer user delegation.",
+  },
+  {
+    id: "az500-c32",
+    domainId: "compute",
+    front: "How do you stop storage account keys being used at all?",
+    back: "Set allowSharedKeyAccess to false on the account. Every request must then authenticate with Microsoft Entra ID and be authorized by Azure RBAC — SAS tokens signed with the account key stop working too.",
+  },
+  {
+    id: "az500-c33",
+    domainId: "compute",
+    front: "What makes an AKS cluster 'private'?",
+    back: "The managed API server gets a private endpoint in your virtual network, so kubectl and the control plane are reachable only from that network or peered/connected networks — never the public internet.",
+  },
+  {
+    id: "az500-c34",
+    domainId: "compute",
+    front: "AKS: network policy vs NSG",
+    back: "Network policies control pod-to-pod traffic using label selectors inside the cluster. NSGs apply to the node subnet and cannot distinguish individual pods. Use network policies for microsegmentation.",
+  },
+  {
+    id: "az500-c35",
+    domainId: "compute",
+    front: "How should AKS authenticate to ACR?",
+    back: "Attach the registry to the cluster so the kubelet managed identity holds AcrPull. No image pull secret, no registry admin account (which should stay disabled).",
+  },
+  {
+    id: "az500-c36",
+    domainId: "compute",
+    front: "Azure Files identity-based authentication",
+    back: "Lets clients use AD DS, Microsoft Entra Domain Services, or Entra Kerberos identities against SMB shares, combining share-level Azure RBAC with directory-level NTFS ACLs — instead of the account key.",
+  },
+  {
+    id: "az500-c37",
+    domainId: "compute",
+    front: "TDE service-managed key vs customer-managed key (BYOK)",
+    back: "Service-managed: Microsoft creates and rotates the protector. Customer-managed: the TDE protector is your key in Key Vault, so revoking or disabling it makes the database inaccessible — the control auditors usually want.",
+  },
+  {
+    id: "az500-c38",
+    domainId: "compute",
+    front: "TDE vs Always Encrypted vs dynamic data masking",
+    back: "TDE encrypts at rest, transparent to queries. Always Encrypted encrypts in the client driver so the engine and DBAs never see plaintext. Dynamic data masking only obfuscates results for non-privileged users; stored data is unchanged.",
+  },
+  {
+    id: "az500-c39",
+    domainId: "compute",
+    front: "What does confidential disk encryption add?",
+    back: "For confidential VMs, the OS disk is encrypted with a key bound to a hardware-protected TPM inside the trusted execution environment, so the key never leaves the confidential boundary — protecting against a compromised host.",
+  },
+  {
+    id: "az500-c40",
+    domainId: "compute",
+    front: "How does JIT VM access actually work?",
+    back: "Management ports stay denied in the NSG. On an approved request, Defender for Cloud inserts a time-limited allow rule scoped to the requester's source IP and port, then removes it when the window expires.",
+  },
+
+  // ---------------------------------------------------------------- defender
+  {
+    id: "az500-c10",
+    domainId: "defender",
+    front: "Azure Policy effects, from least to most restrictive",
+    back: "Audit and AuditIfNotExists report only. Modify and DeployIfNotExists remediate. Deny blocks non-compliant deployments outright. Disabled turns the assignment off.",
+  },
+  {
+    id: "az500-c11",
+    domainId: "defender",
+    front: "What is Defender for Cloud secure score?",
+    back: "A weighted percentage of completed security controls across assessed resources. Each control groups related recommendations and only awards points when every recommendation in it is satisfied for that resource.",
+  },
+  {
+    id: "az500-c12",
+    domainId: "defender",
+    front: "Sentinel analytics rule types",
+    back: "Scheduled (your KQL, your cadence), NRT (fixed one-minute runs), Microsoft security (promote other Microsoft alerts to incidents), Fusion (ML multistage attacks), Threat intelligence (indicator matching), and Anomaly rules.",
+  },
+  {
+    id: "az500-c41",
+    domainId: "defender",
+    front: "Why doesn't DeployIfNotExists fix existing resources?",
+    back: "It evaluates on resource create or update. Bringing already-deployed resources into compliance requires a remediation task, and the policy assignment needs a managed identity with permission to deploy.",
+  },
+  {
+    id: "az500-c42",
+    domainId: "defender",
+    front: "Policy definition vs initiative",
+    back: "A definition is one rule. An initiative (policy set) bundles many definitions so they are assigned and reported as a unit — the Microsoft cloud security benchmark and regulatory standards are initiatives.",
+  },
+  {
+    id: "az500-c43",
+    domainId: "defender",
+    front: "Key Vault: RBAC model vs access policies",
+    back: "Azure RBAC brings data-plane access under standard role assignments with scope inheritance, PIM, and access reviews — the recommended model. Access policies are a legacy per-vault list with no inheritance.",
+  },
+  {
+    id: "az500-c44",
+    domainId: "defender",
+    front: "Key Vault soft delete vs purge protection",
+    back: "Soft delete makes deleted objects recoverable for a retention period. Purge protection additionally blocks anyone from purging them early. Together they make deletion genuinely reversible.",
+  },
+  {
+    id: "az500-c45",
+    domainId: "defender",
+    front: "What is agentless machine scanning?",
+    back: "Defender for Servers snapshots the VM disk and analyses it out of band for software inventory, vulnerabilities, secrets, and malware — no in-guest agent to deploy, and no performance impact on the workload.",
+  },
+  {
+    id: "az500-c46",
+    domainId: "defender",
+    front: "How does Defender for Cloud cover AWS and GCP?",
+    back: "Through a multicloud connector that assumes a role in the foreign account to read configuration, producing recommendations and secure score. Azure Arc extends server-level protections onto the individual machines.",
+  },
+  {
+    id: "az500-c47",
+    domainId: "defender",
+    front: "Workflow automation in Defender for Cloud",
+    back: "Triggers a Logic App when alerts or recommendations match your conditions — post to Teams, open a ticket, call any connector. Continuous export, by contrast, ships data to a workspace or Event Hub without acting.",
+  },
+  {
+    id: "az500-c48",
+    domainId: "defender",
+    front: "What is a data collection rule (DCR)?",
+    back: "The configuration that tells the Azure Monitor Agent what to collect (including XPath filters for specific Windows event IDs), how to transform it, and which workspaces or tables receive it.",
+  },
+  {
+    id: "az500-c49",
+    domainId: "defender",
+    front: "Sentinel roles",
+    back: "Reader = view only. Responder = manage incidents. Contributor = author rules, workbooks, playbooks. Playbook Operator = run playbooks. None of them grant the ability to assign permissions — that needs Owner or User Access Administrator.",
+  },
+  {
+    id: "az500-c50",
+    domainId: "defender",
+    front: "What does Defender EASM do?",
+    back: "Discovers your internet-facing attack surface the way an attacker would — domains, hosts, IPs, certificates — including shadow IT you did not know existed, then reports exposures on those assets.",
+  },
+  {
+    id: "az500-c51",
+    domainId: "defender",
+    front: "Sentinel watchlist vs threat intelligence",
+    back: "Watchlists are your own reference data (VIP users, high-value assets, approved ranges) joined into queries. Threat intelligence holds external IOCs used by TI-matching analytics rules.",
+  },
+  {
+    id: "az500-c52",
+    domainId: "defender",
+    front: "How do you protect backups from a rogue administrator?",
+    back: "Multi-user authorization with a Resource Guard in a separate subscription or tenant, so destructive vault operations need a second approval. Combine with soft delete and immutable vault settings.",
+  },
+];

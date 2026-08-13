@@ -75,6 +75,18 @@ DATABASE_URL="<your-production-url>" npx prisma migrate deploy
 
 The generated Prisma client lives in `src/generated/prisma` and is gitignored, which is why `prisma generate` runs in both `build` and `postinstall`.
 
+### Deploying with the Vercel CLI
+
+Git-based deploys are unaffected by this, but `vercel deploy` from the command line **uploads your local `.env`**, and a shipped `.env` overrides the project environment variables. That pins `AUTH_URL` to `http://localhost:3000` and breaks the post-sign-in redirect in production.
+
+A `.vercelignore` does not fix it — Vercel puts `.env` in its upload manifest and the build fails if the file is then missing. Move it aside for the duration of the deploy instead:
+
+```bash
+mv .env .env.bak && vercel deploy --prod && mv .env.bak .env
+```
+
+Leave `AUTH_URL` unset in production. `trustHost: true` in [`src/auth.ts`](src/auth.ts) makes Auth.js infer the origin from the request, so the same build works on any domain.
+
 ## Adding content
 
 All exam content is typed TypeScript in `src/content/exams/`. One file per exam, matching the `Exam` interface in [`src/content/types.ts`](src/content/types.ts). To add a question, append to the `questions` array:

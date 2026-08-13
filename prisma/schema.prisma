@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String?
+  createdAt     DateTime  @default(now())
+
+  accounts  Account[]
+  sessions  Session[]
+  attempts  Attempt[]
+  cardStats CardProgress[]
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @id
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+enum AttemptMode {
+  PRACTICE
+  MOCK
+}
+
+/// One completed quiz or mock exam run. Per-question results live in `answers`
+/// as JSON because they are only ever read back with the attempt itself.
+model Attempt {
+  id          String      @id @default(cuid())
+  userId      String
+  examId      String
+  mode        AttemptMode
+  domainIds   String[]
+  totalCount  Int
+  correctCount Int
+  scorePercent Int
+  passed      Boolean
+  durationSec Int
+  answers     Json
+  createdAt   DateTime    @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, examId, createdAt])
+}
+
+/// Leitner-box scheduling state for a single flashcard, per user.
+model CardProgress {
+  id           String   @id @default(cuid())
+  userId       String
+  examId       String
+  cardId       String
+  box          Int      @default(1)
+  timesSeen    Int      @default(0)
+  timesCorrect Int      @default(0)
+  dueAt        DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, cardId])
+  @@index([userId, examId, dueAt])
+}

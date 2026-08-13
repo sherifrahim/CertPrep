@@ -1,0 +1,136 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+:root {
+  --bg: #f7f8fb;
+  --surface: #ffffff;
+  --surface-2: #f1f3f9;
+  --border: #dfe3ed;
+  --text: #14161d;
+  --muted: #5b6376;
+  --accent: #2563eb;
+  --accent-soft: #e8effd;
+  --accent-text: #1d4ed8;
+  --ok: #15803d;
+  --ok-soft: #e7f6ec;
+  --bad: #be123c;
+  --bad-soft: #fdeaee;
+  --warn: #a16207;
+  --warn-soft: #fdf4e3;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b0d12;
+    --surface: #12151d;
+    --surface-2: #1a1e29;
+    --border: #262c3a;
+    --text: #e9ecf3;
+    --muted: #99a2b8;
+    --accent: #5b8def;
+    --accent-soft: #17233d;
+    --accent-text: #9dbaf7;
+    --ok: #4ade80;
+    --ok-soft: #10241a;
+    --bad: #fb7185;
+    --bad-soft: #2b1218;
+    --warn: #fbbf24;
+    --warn-soft: #2a2010;
+  }
+}
+
+[data-accent="azure"] {
+  --accent: #2563eb;
+  --accent-soft: #e8effd;
+  --accent-text: #1d4ed8;
+}
+[data-accent="violet"] {
+  --accent: #7c3aed;
+  --accent-soft: #f1e9fe;
+  --accent-text: #6d28d9;
+}
+[data-accent="teal"] {
+  --accent: #0d9488;
+  --accent-soft: #e0f4f1;
+  --accent-text: #0f766e;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-accent="azure"] {
+    --accent: #5b8def;
+    --accent-soft: #17233d;
+    --accent-text: #a3c0fa;
+  }
+  [data-accent="violet"] {
+    --accent: #a78bfa;
+    --accent-soft: #221a3a;
+    --accent-text: #c9b6fd;
+  }
+  [data-accent="teal"] {
+    --accent: #2dd4bf;
+    --accent-soft: #0e2b28;
+    --accent-text: #7fe8db;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--border);
+  --color-ink: var(--text);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-text: var(--accent-text);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+@layer components {
+  .card {
+    @apply rounded-xl border border-line bg-surface;
+  }
+  .btn,
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply text-white;
+    background: var(--accent);
+  }
+  .btn-primary:hover:not(:disabled) {
+    filter: brightness(1.08);
+  }
+  .btn-secondary {
+    @apply border border-line bg-surface text-ink hover:bg-surface-2;
+  }
+  .btn-ghost {
+    @apply text-muted hover:bg-surface-2 hover:text-ink;
+  }
+  .field {
+    @apply w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink outline-none;
+  }
+  .field:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-line bg-surface-2 px-2.5 py-1 text-xs font-medium text-muted;
+  }
+}

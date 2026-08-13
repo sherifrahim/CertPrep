@@ -23,7 +23,11 @@ const config: NextAuthConfig = {
   session: { strategy: "jwt" },
   pages: { signIn: "/signin" },
   providers: [
-    ...(googleConfigured ? [Google({ allowDangerousEmailAccountLinking: true })] : []),
+    // No automatic account linking by email. Credentials sign-up does not verify
+    // the address, so auto-linking would let someone who registered a password
+    // against an email they don't own inherit the real owner's Google account.
+    // Auth.js raises OAuthAccountNotLinked instead, which /signin explains.
+    ...(googleConfigured ? [Google] : []),
     Credentials({
       credentials: {
         email: { label: "Email", type: "email" },

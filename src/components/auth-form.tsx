@@ -8,9 +8,11 @@ type Props = {
   mode: "signin" | "signup";
   action: (state: AuthFormState, formData: FormData) => Promise<AuthFormState>;
   googleAction?: () => Promise<void>;
+  /** Message derived from an Auth.js ?error= code on the sign-in URL. */
+  providerError?: string;
 };
 
-export function AuthForm({ mode, action, googleAction }: Props) {
+export function AuthForm({ mode, action, googleAction, providerError }: Props) {
   const [state, formAction, pending] = useActionState(action, undefined);
   const isSignUp = mode === "signup";
 
@@ -24,6 +26,12 @@ export function AuthForm({ mode, action, googleAction }: Props) {
           ? "Save your quiz scores, mock exam history, and flashcard progress across devices."
           : "Pick up where you left off."}
       </p>
+
+      {providerError && (
+        <p className="mt-5 rounded-lg border border-line bg-warn-soft px-3 py-2 text-sm text-warn">
+          {providerError}
+        </p>
+      )}
 
       {googleAction ? (
         <>

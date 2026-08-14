@@ -54,9 +54,29 @@ npm run dev
 
 The site is at http://localhost:3000. Stop the database with `npm run db:stop`.
 
-### Google sign-in (optional)
+### Google sign-in
 
-Leave `AUTH_GOOGLE_ID` and `AUTH_GOOGLE_SECRET` blank and the Google button is hidden — email/password still works. To enable it, create an OAuth client at [Google Cloud Console](https://console.cloud.google.com/apis/credentials) and set the authorized redirect URI to `http://localhost:3000/api/auth/callback/google` (and your production URL alongside it).
+Leave `AUTH_GOOGLE_ID` and `AUTH_GOOGLE_SECRET` blank and the Google button is hidden — email/password still works. To enable it, create a **Web application** OAuth client at [Google Cloud Console](https://console.cloud.google.com/apis/credentials) with:
+
+*Authorized JavaScript origins* — the bare domains:
+
+```
+https://<your-domain>
+http://localhost:3000
+```
+
+*Authorized redirect URIs* — same domains with the callback path appended:
+
+```
+https://<your-domain>/api/auth/callback/google
+http://localhost:3000/api/auth/callback/google
+```
+
+A missing or misspelled redirect URI produces `Error 400: redirect_uri_mismatch` at sign-in. Preview deployments get random URLs that will not be in this list, so Google sign-in works on production and localhost only unless you add more.
+
+While the Google consent screen is in **Testing** mode, only accounts listed as test users can sign in; click **Publish app** to open it to everyone.
+
+**Accounts are not linked across providers by email.** Credentials sign-up does not verify the address, so auto-linking would let someone who registered a password against an address they do not own inherit the real owner's Google account. Someone who signed up with a password and then tries Google gets an explanatory message on `/signin` rather than a silent merge. Adding verified email would make safe linking possible.
 
 ## Deploying to Vercel
 
@@ -84,6 +104,8 @@ A `.vercelignore` does not fix it — Vercel puts `.env` in its upload manifest 
 ```bash
 mv .env .env.bak && vercel deploy --prod && mv .env.bak .env
 ```
+
+`vercel link` also writes a `.env.local` holding a `VERCEL_OIDC_TOKEN`. That one is harmless because it sets no key the app reads, but if you ever put app settings in `.env.local`, move it aside too — Next.js gives it higher precedence than `.env`.
 
 Leave `AUTH_URL` unset in production. `trustHost: true` in [`src/auth.ts`](src/auth.ts) makes Auth.js infer the origin from the request, so the same build works on any domain.
 

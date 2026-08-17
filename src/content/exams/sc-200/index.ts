@@ -1,7 +1,9 @@
 import type { Exam } from "../../types";
 import { sc200Questions } from "./questions";
 import { sc200ScenarioQuestions } from "./questions-scenario";
+import { sc200ExtraQuestions } from "./questions-extra";
 import { sc200Flashcards } from "./flashcards";
+import { sc200ExtraFlashcards } from "./flashcards-extra";
 
 export const sc200: Exam = {
   id: "sc-200",
@@ -80,8 +82,8 @@ export const sc200: Exam = {
     },
   ],
 
-  questions: [...sc200Questions, ...sc200ScenarioQuestions],
-  flashcards: sc200Flashcards,
+  questions: [...sc200Questions, ...sc200ScenarioQuestions, ...sc200ExtraQuestions],
+  flashcards: [...sc200Flashcards, ...sc200ExtraFlashcards],
 
   resources: [
     {

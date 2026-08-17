@@ -1,7 +1,32 @@
 "use client";
 
 import Link from "next/link";
+import { YES_NO_OPTIONS, type Question } from "@/content/types";
 import type { GradedResult } from "@/lib/actions/progress-actions";
+
+/** Renders a set of answer ids as readable text for any question format. */
+function describeAnswer(question: Question, ids: string[]): string {
+  if (ids.length === 0) return "no answer";
+
+  switch (question.type) {
+    case "meets-goal":
+      return YES_NO_OPTIONS.find((o) => o.id === ids[0])?.text ?? ids[0];
+    case "ordering": {
+      const byId = new Map((question.steps ?? []).map((s) => [s.id, s.text]));
+      return ids.map((id, i) => `${i + 1}. ${byId.get(id) ?? id}`).join("  ");
+    }
+    case "statements": {
+      const chosen = new Set(ids);
+      return (question.statements ?? [])
+        .map((s) => `${s.text} — ${chosen.has(s.id) ? "Yes" : "No"}`)
+        .join("; ");
+    }
+    default:
+      return ids
+        .map((id) => (question.options ?? []).find((o) => o.id === id)?.text ?? id)
+        .join("; ");
+  }
+}
 
 type Props = {
   result: GradedResult;
@@ -120,20 +145,17 @@ export function ResultSummary({ result, domainNames, passPercent, retryHref }: P
               if (!question) return null;
               return (
                 <li key={answer.questionId} className="border-t border-line pt-4 first:border-0 first:pt-0">
+                  {question.scenario && (
+                    <p className="mb-2 whitespace-pre-line text-sm text-muted">
+                      {question.scenario}
+                    </p>
+                  )}
                   <p className="text-sm font-medium">{question.prompt}</p>
                   <p className="mt-2 text-sm text-bad">
-                    You answered:{" "}
-                    {answer.selected.length
-                      ? answer.selected
-                          .map((id) => question.options.find((o) => o.id === id)?.text ?? id)
-                          .join("; ")
-                      : "no answer"}
+                    You answered: {describeAnswer(question, answer.selected)}
                   </p>
                   <p className="mt-1 text-sm text-ok">
-                    Correct:{" "}
-                    {answer.correct
-                      .map((id) => question.options.find((o) => o.id === id)?.text ?? id)
-                      .join("; ")}
+                    Correct: {describeAnswer(question, answer.correct)}
                   </p>
                   <p className="mt-2 text-sm text-muted">{question.explanation}</p>
                   {question.reference && (

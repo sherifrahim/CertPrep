@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getExam } from "@/content";
 import { MockRunner, type MockQuestion } from "@/components/quiz/mock-runner";
-import { buildMockPaper, seedFrom } from "@/lib/quiz";
+import { buildMockPaper, seedFrom, shuffle } from "@/lib/quiz";
 
 export const metadata = { title: "Mock exam" };
 
@@ -21,17 +21,23 @@ export default async function MockPage({
   const domainNames = Object.fromEntries(exam.domains.map((d) => [d.id, d.name]));
 
   if (query.start === "1") {
-    const paper = buildMockPaper(exam, seedFrom(`${examId}-mock-${Date.now()}`));
-    const stripped: MockQuestion[] = paper.map(
-      ({ id, domainId, type, prompt, options, difficulty }) => ({
-        id,
-        domainId,
-        type,
-        prompt,
-        options,
-        difficulty,
-      }),
-    );
+    const seed = seedFrom(`${examId}-mock-${Date.now()}`);
+    const paper = buildMockPaper(exam, seed);
+    // Strip every trace of the answer key: no `correct`, no per-statement flags,
+    // and steps reordered so their array position is not the sequence.
+    const stripped: MockQuestion[] = paper.map((q) => ({
+      id: q.id,
+      domainId: q.domainId,
+      type: q.type,
+      prompt: q.prompt,
+      difficulty: q.difficulty,
+      ...(q.scenario ? { scenario: q.scenario } : {}),
+      ...(q.options ? { options: q.options } : {}),
+      ...(q.statements
+        ? { statements: q.statements.map(({ id, text }) => ({ id, text })) }
+        : {}),
+      ...(q.steps ? { steps: shuffle(q.steps, seed + seedFrom(q.id)) } : {}),
+    }));
 
     return (
       <div className="mx-auto max-w-3xl px-4 py-10">

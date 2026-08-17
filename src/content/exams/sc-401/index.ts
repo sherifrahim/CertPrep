@@ -1,5 +1,6 @@
 import type { Exam } from "../../types";
 import { sc401Questions } from "./questions";
+import { sc401ScenarioQuestions } from "./questions-scenario";
 import { sc401Flashcards } from "./flashcards";
 
 export const sc401: Exam = {
@@ -84,7 +85,7 @@ export const sc401: Exam = {
     },
   ],
 
-  questions: sc401Questions,
+  questions: [...sc401Questions, ...sc401ScenarioQuestions],
   flashcards: sc401Flashcards,
 
   resources: [

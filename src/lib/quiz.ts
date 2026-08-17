@@ -1,4 +1,4 @@
-import type { Exam, Question } from "@/content/types";
+import { YES_NO_OPTIONS, type Exam, type Question } from "@/content/types";
 
 /** Fisher-Yates using a seeded PRNG so a given attempt id always rebuilds the same paper. */
 export function shuffle<T>(items: T[], seed: number): T[] {
@@ -22,9 +22,22 @@ export function seedFrom(text: string): number {
 }
 
 export function isCorrect(question: Question, selected: string[]): boolean {
+  // Sequence questions are only right when every step is in the right place.
+  if (question.type === "ordering") {
+    return (
+      selected.length === question.correct.length &&
+      question.correct.every((id, i) => selected[i] === id)
+    );
+  }
   if (selected.length !== question.correct.length) return false;
   const chosen = new Set(selected);
   return question.correct.every((id) => chosen.has(id));
+}
+
+/** The choices a learner picks between, whatever the underlying format. */
+export function optionsFor(question: Question): { id: string; text: string }[] {
+  if (question.type === "meets-goal") return YES_NO_OPTIONS;
+  return question.options ?? [];
 }
 
 export function scoreOf(correctCount: number, total: number): number {

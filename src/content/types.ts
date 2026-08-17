@@ -1,10 +1,23 @@
 export type ExamId = "az-500" | "sc-200" | "sc-401";
 
-export type QuestionType = "single" | "multi";
+/**
+ * Mirrors the item formats Microsoft actually uses:
+ * - `single` / `multi`   — standard multiple choice
+ * - `meets-goal`         — a repeated scenario with a proposed solution, answered Yes/No
+ * - `statements`         — hot-area style, Yes/No judged per statement
+ * - `ordering`           — drag-and-drop, arrange steps into the correct sequence
+ */
+export type QuestionType = "single" | "multi" | "meets-goal" | "statements" | "ordering";
 
 export interface QuestionOption {
   id: string;
   text: string;
+}
+
+export interface QuestionStatement {
+  id: string;
+  text: string;
+  correct: boolean;
 }
 
 export interface Question {
@@ -12,13 +25,33 @@ export interface Question {
   domainId: string;
   type: QuestionType;
   prompt: string;
-  options: QuestionOption[];
-  /** Option ids that make up a fully correct answer. */
+  /**
+   * Background shown above the prompt. Microsoft repeats an identical scenario
+   * across several `meets-goal` items, each proposing a different solution.
+   */
+  scenario?: string;
+  /** Choices for `single` and `multi`. Yes/No items supply their own. */
+  options?: QuestionOption[];
+  /** Statements for `statements` items, each judged Yes or No. */
+  statements?: QuestionStatement[];
+  /** Steps for `ordering` items, listed here in the correct sequence. */
+  steps?: QuestionOption[];
+  /**
+   * A fully correct answer.
+   * `single`/`multi` — option ids. `meets-goal` — ["yes"] or ["no"].
+   * `statements` — ids of statements that are true.
+   * `ordering` — step ids in the correct order (order is significant).
+   */
   correct: string[];
   explanation: string;
   difficulty: 1 | 2 | 3;
   reference?: { label: string; url: string };
 }
+
+export const YES_NO_OPTIONS: QuestionOption[] = [
+  { id: "yes", text: "Yes — the solution meets the goal" },
+  { id: "no", text: "No — the solution does not meet the goal" },
+];
 
 export interface Flashcard {
   id: string;

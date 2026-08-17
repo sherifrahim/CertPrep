@@ -1,5 +1,6 @@
 import type { Exam } from "../../types";
 import { az500Questions } from "./questions";
+import { az500ScenarioQuestions } from "./questions-scenario";
 import { az500Flashcards } from "./flashcards";
 
 export const az500: Exam = {
@@ -98,7 +99,7 @@ export const az500: Exam = {
     },
   ],
 
-  questions: az500Questions,
+  questions: [...az500Questions, ...az500ScenarioQuestions],
   flashcards: az500Flashcards,
 
   resources: [

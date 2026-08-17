@@ -3,11 +3,21 @@
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import type { Question } from "@/content/types";
 import { submitAttempt, type GradedResult } from "@/lib/actions/progress-actions";
-import { OptionList } from "./option-list";
+import { QuestionBody } from "./question-body";
 import { ResultSummary } from "./result-summary";
+import { formatLabel } from "./format-label";
 
-/** The mock paper is sent without answer keys; grading happens server-side. */
-export type MockQuestion = Omit<Question, "correct" | "explanation" | "reference">;
+/**
+ * The mock paper is sent without answer keys; grading happens server-side.
+ * `statements` drops each statement's `correct` flag, and `steps` are shuffled
+ * upstream so their array order does not give the sequence away.
+ */
+export type MockQuestion = Omit<
+  Question,
+  "correct" | "explanation" | "reference" | "statements"
+> & {
+  statements?: { id: string; text: string }[];
+};
 
 type Props = {
   examId: string;
@@ -137,9 +147,7 @@ export function MockRunner({
             Question {index + 1} of {questions.length}
           </span>
           <span className="chip">{domainNames[question.domainId] ?? question.domainId}</span>
-          <span className="chip">
-            {question.type === "multi" ? "Choose all that apply" : "Single answer"}
-          </span>
+          <span className="chip">{formatLabel(question.type)}</span>
           <button
             type="button"
             onClick={() => setFlagged((f) => ({ ...f, [question.id]: !f[question.id] }))}
@@ -151,13 +159,9 @@ export function MockRunner({
           </button>
         </div>
 
-        <h2 className="mt-4 text-base font-medium leading-relaxed">{question.prompt}</h2>
-
-        <div className="mt-5">
-          <OptionList
-            name={question.id}
-            options={question.options}
-            type={question.type}
+        <div className="mt-4">
+          <QuestionBody
+            question={question}
             selected={selections[question.id] ?? []}
             onChange={(next) => setSelections((s) => ({ ...s, [question.id]: next }))}
           />

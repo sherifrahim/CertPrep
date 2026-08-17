@@ -4,8 +4,9 @@ import { useState, useTransition } from "react";
 import type { Question } from "@/content/types";
 import { isCorrect } from "@/lib/quiz";
 import { submitAttempt, type GradedResult } from "@/lib/actions/progress-actions";
-import { OptionList } from "./option-list";
+import { QuestionBody } from "./question-body";
 import { ResultSummary } from "./result-summary";
+import { formatLabel, hasAnswer } from "./format-label";
 
 type Props = {
   examId: string;
@@ -81,21 +82,15 @@ export function PracticeRunner({
       <div className="card p-6">
         <div className="flex flex-wrap items-center gap-2 text-xs">
           <span className="chip">{domainNames[question.domainId] ?? question.domainId}</span>
-          <span className="chip">
-            {question.type === "multi" ? "Choose all that apply" : "Single answer"}
-          </span>
+          <span className="chip">{formatLabel(question.type)}</span>
           <span className="chip">
             {["Foundational", "Intermediate", "Advanced"][question.difficulty - 1]}
           </span>
         </div>
 
-        <h2 className="mt-4 text-base font-medium leading-relaxed">{question.prompt}</h2>
-
-        <div className="mt-5">
-          <OptionList
-            name={question.id}
-            options={question.options}
-            type={question.type}
+        <div className="mt-4">
+          <QuestionBody
+            question={question}
             selected={selected}
             onChange={(next) => setSelections((s) => ({ ...s, [question.id]: next }))}
             revealed={isChecked ? { correct: question.correct } : null}
@@ -131,7 +126,7 @@ export function PracticeRunner({
           {!isChecked ? (
             <button
               type="button"
-              disabled={selected.length === 0}
+              disabled={!hasAnswer(question.type, selected)}
               onClick={() => setChecked((c) => ({ ...c, [question.id]: true }))}
               className="btn-primary"
             >

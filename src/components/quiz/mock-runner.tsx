@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import type { Question } from "@/content/types";
 import { submitAttempt, type GradedResult } from "@/lib/actions/progress-actions";
+import { clearMockSession, loadMockSession, saveMockSession } from "@/lib/mock-session";
 import { QuestionBody } from "./question-body";
 import { ResultSummary } from "./result-summary";
 import { formatLabel } from "./format-label";
@@ -26,6 +27,8 @@ type Props = {
   durationMin: number;
   passPercent: number;
   retryHref: string;
+  /** Restore the saved paper and answers instead of starting the supplied one. */
+  resume?: boolean;
 };
 
 function formatClock(seconds: number) {
@@ -36,21 +39,43 @@ function formatClock(seconds: number) {
 
 export function MockRunner({
   examId,
-  questions,
+  questions: freshQuestions,
   domainNames,
   durationMin,
   passPercent,
   retryHref,
+  resume = false,
 }: Props) {
+  // A resumed attempt has to wait for localStorage, which is unavailable during
+  // server rendering, so hydration happens in an effect.
+  const [hydrated, setHydrated] = useState(!resume);
+  const [questions, setQuestions] = useState<MockQuestion[]>(freshQuestions);
   const [index, setIndex] = useState(0);
   const [selections, setSelections] = useState<Record<string, string[]>>({});
   const [flagged, setFlagged] = useState<Record<string, boolean>>({});
   const [remaining, setRemaining] = useState(durationMin * 60);
   const [result, setResult] = useState<GradedResult | null>(null);
   const [confirming, setConfirming] = useState(false);
+  const [resumed, setResumed] = useState(false);
   const [pending, startTransition] = useTransition();
-  const startedAt = useRef(Date.now());
   const submittedRef = useRef(false);
+
+  useEffect(() => {
+    if (!resume) {
+      // Starting fresh replaces any half-finished paper for this exam.
+      clearMockSession(examId);
+      return;
+    }
+    const saved = loadMockSession(examId);
+    if (saved) {
+      setQuestions(saved.questions);
+      setSelections(saved.selections);
+      setFlagged(saved.flagged);
+      setRemaining(saved.remainingSec);
+      setResumed(true);
+    }
+    setHydrated(true);
+  }, [resume, examId]);
 
   const question = questions[index];
   const answeredCount = Object.values(selections).filter((s) => s.length > 0).length;
@@ -58,11 +83,13 @@ export function MockRunner({
   const finish = useCallback(() => {
     if (submittedRef.current) return;
     submittedRef.current = true;
+    clearMockSession(examId);
     startTransition(async () => {
       const graded = await submitAttempt({
         examId,
         mode: "MOCK",
-        durationSec: Math.round((Date.now() - startedAt.current) / 1000),
+        // Time actually spent working, so a paused resume is not counted.
+        durationSec: Math.max(0, durationMin * 60 - remaining),
         responses: questions.map((q) => ({
           questionId: q.id,
           selected: selections[q.id] ?? [],
@@ -70,10 +97,10 @@ export function MockRunner({
       });
       setResult(graded);
     });
-  }, [examId, questions, selections]);
+  }, [examId, questions, selections, durationMin, remaining]);
 
   useEffect(() => {
-    if (result) return;
+    if (result || !hydrated) return;
     const timer = setInterval(() => {
       setRemaining((value) => {
         if (value <= 1) {
@@ -85,7 +112,33 @@ export function MockRunner({
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, [finish, result]);
+  }, [finish, result, hydrated]);
+
+  // Persist after every change so an abrupt close loses at most a second.
+  useEffect(() => {
+    if (!hydrated || result || submittedRef.current || remaining <= 0) return;
+    saveMockSession({ examId, remainingSec: remaining, questions, selections, flagged });
+  }, [hydrated, result, examId, remaining, questions, selections, flagged]);
+
+  if (!hydrated) {
+    return <p className="card p-6 text-sm text-muted">Restoring your exam…</p>;
+  }
+
+  // Reached by opening a resume link on a device or browser with nothing saved.
+  if (questions.length === 0) {
+    return (
+      <div className="card p-6">
+        <h2 className="font-semibold">No saved exam found</h2>
+        <p className="mt-2 text-sm text-muted">
+          An in-progress exam is stored in the browser you took it in, so it is not available on
+          another device or after clearing site data.
+        </p>
+        <a href={`/exams/${examId}/mock`} className="btn-primary mt-4">
+          Back to mock exam
+        </a>
+      </div>
+    );
+  }
 
   if (result) {
     return (
@@ -102,6 +155,11 @@ export function MockRunner({
 
   return (
     <div className="space-y-4">
+      {resumed && (
+        <p className="card border-accent bg-accent-soft p-3 text-sm">
+          Resumed your in-progress exam. The countdown was paused while you were away.
+        </p>
+      )}
       <div className="card sticky top-14 z-10 flex flex-wrap items-center gap-3 p-3">
         <span
           className={`rounded-lg px-3 py-1.5 font-mono text-lg font-semibold tabular-nums ${

@@ -7,6 +7,7 @@ import { getExam } from "@/content";
 import type { Question } from "@/content/types";
 import { isCorrect, scoreOf } from "@/lib/quiz";
 import { prisma } from "@/lib/prisma";
+import { BOX_INTERVAL_DAYS } from "@/lib/review";
 
 const submissionSchema = z.object({
   examId: z.string(),
@@ -125,8 +126,6 @@ const cardReviewSchema = z.object({
   cardId: z.string(),
   remembered: z.boolean(),
 });
-
-const BOX_INTERVAL_DAYS = [0, 1, 3, 7, 16, 35];
 
 export async function recordCardReview(input: unknown): Promise<{ saved: boolean }> {
   const parsed = cardReviewSchema.safeParse(input);

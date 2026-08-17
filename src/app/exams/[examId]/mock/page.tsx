@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getExam } from "@/content";
 import { MockRunner, type MockQuestion } from "@/components/quiz/mock-runner";
+import { MockResumeBanner } from "@/components/quiz/mock-resume-banner";
 import { buildMockPaper, seedFrom, shuffle } from "@/lib/quiz";
 
 export const metadata = { title: "Mock exam" };
@@ -19,6 +20,24 @@ export default async function MockPage({
   if (!exam) notFound();
 
   const domainNames = Object.fromEntries(exam.domains.map((d) => [d.id, d.name]));
+
+  // Resuming reuses the paper saved in the browser, so the server does not
+  // build a new one — the runner swaps in the stored questions on hydration.
+  if (query.resume === "1") {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-10">
+        <MockRunner
+          examId={exam.id}
+          questions={[]}
+          domainNames={domainNames}
+          durationMin={exam.mock.durationMin}
+          passPercent={exam.mock.passPercent}
+          retryHref={`/exams/${exam.id}/mock?start=1`}
+          resume
+        />
+      </div>
+    );
+  }
 
   if (query.start === "1") {
     const seed = seedFrom(`${examId}-mock-${Date.now()}`);
@@ -58,6 +77,7 @@ export default async function MockPage({
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
+      <MockResumeBanner examId={exam.id} />
       <h1 className="text-2xl font-semibold tracking-tight">Mock exam</h1>
       <p className="mt-2 text-muted">
         A timed paper that mirrors the real exam: no feedback until you submit, a countdown you

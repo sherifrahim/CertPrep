@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { exams, getExam } from "@/content";
 import { prisma } from "@/lib/prisma";
 import type { GradedAnswer } from "@/lib/actions/progress-actions";
+import { getDueSummary } from "@/lib/review";
 
 export const metadata = { title: "Dashboard" };
 
@@ -11,6 +12,9 @@ export default async function DashboardPage() {
   const session = await auth();
   const userId = session?.user?.id;
   if (!userId) redirect("/signin");
+
+  const dueSummary = await getDueSummary();
+  const totalDue = dueSummary.reduce((n, e) => n + e.due, 0);
 
   const [attempts, cardStats] = await Promise.all([
     prisma.attempt.findMany({
@@ -61,6 +65,48 @@ export default async function DashboardPage() {
           ? "You have not completed any quizzes yet."
           : `${attempts.length} recorded ${attempts.length === 1 ? "attempt" : "attempts"}.`}
       </p>
+
+      <section className="card mt-6 p-5">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="font-semibold">Review queue</h2>
+          <p className="text-sm text-muted">
+            {totalDue > 0
+              ? `${totalDue} card${totalDue === 1 ? "" : "s"} due for review`
+              : "Nothing due right now"}
+          </p>
+        </div>
+        <p className="mt-1 text-sm text-muted">
+          Cards you answer correctly move to a longer interval; ones you miss come back tomorrow.
+        </p>
+        <ul className="mt-4 space-y-2">
+          {dueSummary.map((row) => {
+            const ready = row.due + row.fresh;
+            return (
+              <li
+                key={row.examId}
+                className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-lg border border-line p-3 text-sm"
+              >
+                <span className="w-16 shrink-0 font-semibold">{row.code}</span>
+                <span className="text-muted">
+                  <strong className="text-ink">{row.due}</strong> due ·{" "}
+                  <strong className="text-ink">{row.fresh}</strong> new ·{" "}
+                  <strong className="text-ink">{row.mastered}</strong>/{row.total} mastered
+                </span>
+                <Link
+                  href={
+                    ready > 0
+                      ? `/exams/${row.examId}/flashcards?mode=due`
+                      : `/exams/${row.examId}/flashcards`
+                  }
+                  className={`${ready > 0 ? "btn-primary" : "btn-secondary"} ml-auto text-xs`}
+                >
+                  {ready > 0 ? `Review ${ready}` : "Study deck"}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
 
       {attempts.length === 0 ? (
         <div className="card mt-6 p-6">

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Flashcard } from "@/content/types";
 import { recordCardReview } from "@/lib/actions/progress-actions";
 
@@ -11,20 +11,41 @@ type Props = {
   domainNames: Record<string, string>;
   signedIn: boolean;
   restartHref: string;
+  reviewMode?: boolean;
 };
 
-export function FlashcardDeck({ examId, cards, domainNames, signedIn, restartHref }: Props) {
+export function FlashcardDeck({
+  examId,
+  cards,
+  domainNames,
+  signedIn,
+  restartHref,
+  reviewMode = false,
+}: Props) {
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [known, setKnown] = useState<string[]>([]);
   const [review, setReview] = useState<string[]>([]);
 
+  // Reviews are written as you go so a card is never lost, but the deck does not
+  // wait on each round trip. Outstanding writes are settled when the deck ends.
+  const writes = useRef<Promise<unknown>[]>([]);
+  const [saving, setSaving] = useState(false);
+
   const card = cards[index];
   const done = index >= cards.length;
 
+  useEffect(() => {
+    if (!done || writes.current.length === 0) return;
+    setSaving(true);
+    Promise.allSettled(writes.current).finally(() => setSaving(false));
+  }, [done]);
+
   function mark(remembered: boolean) {
     if (signedIn) {
-      void recordCardReview({ examId, cardId: card.id, remembered });
+      writes.current.push(
+        recordCardReview({ examId, cardId: card.id, remembered }).catch(() => undefined),
+      );
     }
     if (remembered) setKnown((k) => [...k, card.id]);
     else setReview((r) => [...r, card.id]);
@@ -35,12 +56,19 @@ export function FlashcardDeck({ examId, cards, domainNames, signedIn, restartHre
   if (done) {
     return (
       <div className="card p-6 text-center">
-        <h2 className="text-xl font-semibold">Deck complete</h2>
+        <h2 className="text-xl font-semibold">
+          {reviewMode ? "Review complete" : "Deck complete"}
+        </h2>
         <p className="mt-2 text-muted">
           You knew {known.length} of {cards.length}.
-          {review.length > 0 && ` ${review.length} came back for another round.`}
+          {review.length > 0 && ` ${review.length} will come back sooner.`}
         </p>
-        {!signedIn && (
+        {signedIn ? (
+          <p className="mt-3 text-sm text-muted">
+            Cards you knew moved up a box and are scheduled further out. Ones you missed reset to
+            box 1 and return tomorrow.
+          </p>
+        ) : (
           <p className="mt-4 text-sm text-muted">
             <Link href="/signin" className="text-accent-text underline">
               Sign in
@@ -48,9 +76,10 @@ export function FlashcardDeck({ examId, cards, domainNames, signedIn, restartHre
             to have cards scheduled by how well you know them.
           </p>
         )}
-        <div className="mt-6 flex justify-center gap-2">
+        {saving && <p className="mt-3 text-xs text-muted">Saving your progress…</p>}
+        <div className="mt-6 flex flex-wrap justify-center gap-2">
           <Link href={restartHref} className="btn-primary">
-            Run the deck again
+            {reviewMode ? "Check for more due cards" : "Run the deck again"}
           </Link>
           <Link href={`/exams/${examId}`} className="btn-secondary">
             Back to exam

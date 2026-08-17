@@ -12,11 +12,26 @@ Built with Next.js 15 (App Router), Tailwind CSS v4, Prisma 7 + Postgres, and Au
 | Study path | `/exams/[examId]/study` | Modules with outcomes, estimated hours, and linked reading |
 | Practice quiz | `/exams/[examId]/practice` | Filter by skill area, per-question explanation and doc link |
 | Flashcards | `/exams/[examId]/flashcards` | Leitner-box scheduling (5 boxes, 1/3/7/16/35-day intervals) |
+| Review queue | `/exams/[examId]/flashcards?mode=due` | Studies only cards that are due plus ones never seen |
 | Mock exam | `/exams/[examId]/mock` | Timed, domain-weighted, flag-for-review, full result breakdown |
 | Resources | `/exams/[examId]/resources` | External links only — nothing is re-hosted |
 | Dashboard | `/dashboard` | Score history, per-domain accuracy, weakest areas |
 
 Answers are graded **server-side**. Mock exam papers are sent to the browser with the answer keys and explanations stripped out; the review content only comes back after submission.
+
+### Question formats
+
+Beyond single- and multiple-answer items, the bank supports the formats Microsoft actually uses — see `QuestionType` in [`src/content/types.ts`](src/content/types.ts):
+
+- `meets-goal` — one scenario repeated across several items, each proposing a different solution, answered Yes/No
+- `statements` — a scenario with several statements, each judged Yes or No (hot-area equivalent)
+- `ordering` — arrange steps into the correct sequence (drag-and-drop equivalent)
+
+For `statements` the per-statement `correct` flags are stripped before the paper reaches the browser, and for `ordering` the steps are reshuffled server-side, since the stored array order *is* the answer.
+
+### In-progress mock exams
+
+A running mock is saved to `localStorage` by [`src/lib/mock-session.ts`](src/lib/mock-session.ts), so closing the tab does not destroy the paper. The countdown is stored as remaining seconds rather than a start timestamp, which means **the clock pauses while the exam is not open** — chosen so an interruption does not cost the attempt. It also means the timer can be paused by closing the tab; acceptable for self-study, but worth knowing. Sessions expire after 7 days and are cleared on submit.
 
 ## Local setup
 

@@ -44,15 +44,24 @@ export function scoreOf(correctCount: number, total: number): number {
   return total === 0 ? 0 : Math.round((correctCount / total) * 100);
 }
 
+/**
+ * Questions usable outside a case study. Case study items depend on a scenario
+ * that only the case study runner shows, so they never enter these pools.
+ */
+export function standaloneQuestions(exam: Exam): Question[] {
+  return exam.questions.filter((q) => !q.caseStudyId);
+}
+
 export function pickPracticeQuestions(
   exam: Exam,
   domainIds: string[],
   count: number,
   seed: number,
 ): Question[] {
+  const available = standaloneQuestions(exam);
   const pool = domainIds.length
-    ? exam.questions.filter((q) => domainIds.includes(q.domainId))
-    : exam.questions;
+    ? available.filter((q) => domainIds.includes(q.domainId))
+    : available;
   return shuffle(pool, seed).slice(0, count);
 }
 
@@ -63,13 +72,14 @@ export function pickPracticeQuestions(
 export function buildMockPaper(exam: Exam, seed: number): Question[] {
   const target = exam.mock.questionCount;
   const totalWeight = exam.domains.reduce((sum, d) => sum + d.weightValue, 0);
+  const available = standaloneQuestions(exam);
   const picked: Question[] = [];
   const used = new Set<string>();
 
   for (const domain of exam.domains) {
     const quota = Math.round((domain.weightValue / totalWeight) * target);
     const pool = shuffle(
-      exam.questions.filter((q) => q.domainId === domain.id),
+      available.filter((q) => q.domainId === domain.id),
       seed + seedFrom(domain.id),
     );
     for (const question of pool.slice(0, quota)) {
@@ -79,7 +89,7 @@ export function buildMockPaper(exam: Exam, seed: number): Question[] {
   }
 
   const filler = shuffle(
-    exam.questions.filter((q) => !used.has(q.id)),
+    available.filter((q) => !used.has(q.id)),
     seed,
   );
   for (const question of filler) {

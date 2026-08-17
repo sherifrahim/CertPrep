@@ -2,6 +2,7 @@ import type { Exam } from "../../types";
 import { sc200Questions } from "./questions";
 import { sc200ScenarioQuestions } from "./questions-scenario";
 import { sc200ExtraQuestions } from "./questions-extra";
+import { sc200CaseStudies, sc200CaseStudyQuestions } from "./case-studies";
 import { sc200Flashcards } from "./flashcards";
 import { sc200ExtraFlashcards } from "./flashcards-extra";
 
@@ -82,7 +83,8 @@ export const sc200: Exam = {
     },
   ],
 
-  questions: [...sc200Questions, ...sc200ScenarioQuestions, ...sc200ExtraQuestions],
+  questions: [...sc200Questions, ...sc200ScenarioQuestions, ...sc200ExtraQuestions, ...sc200CaseStudyQuestions],
+  caseStudies: sc200CaseStudies,
   flashcards: [...sc200Flashcards, ...sc200ExtraFlashcards],
 
   resources: [

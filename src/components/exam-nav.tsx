@@ -8,6 +8,7 @@ const sections = [
   { slug: "study", label: "Study path" },
   { slug: "practice", label: "Practice" },
   { slug: "flashcards", label: "Flashcards" },
+  { slug: "case-studies", label: "Case studies" },
   { slug: "mock", label: "Mock exam" },
   { slug: "resources", label: "Resources" },
 ];

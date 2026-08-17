@@ -33,7 +33,8 @@ for (const exam of exams) {
     seenQuestionIds.add(q.id);
 
     if (!domainIds.has(q.domainId)) fail(`${q.id}: unknown domainId "${q.domainId}"`);
-    perDomain[q.domainId] = (perDomain[q.domainId] ?? 0) + 1;
+    // Only standalone questions count toward the weighted mock quota.
+    if (!q.caseStudyId) perDomain[q.domainId] = (perDomain[q.domainId] ?? 0) + 1;
 
     if (q.type === "single" || q.type === "multi") {
       const options = q.options ?? [];
@@ -93,6 +94,31 @@ for (const exam of exams) {
     if (!q.explanation || q.explanation.length < 40) fail(`${q.id}: explanation missing or too short`);
     if (![1, 2, 3].includes(q.difficulty)) fail(`${q.id}: difficulty must be 1, 2, or 3`);
     if (q.reference && !q.reference.url.startsWith("https://")) fail(`${q.id}: reference is not https`);
+  }
+
+  // Case studies: ids resolve, every study has questions, every question's study exists.
+  const caseIds = new Set(exam.caseStudies.map((c) => c.id));
+  if (caseIds.size !== exam.caseStudies.length) fail("duplicate case study ids");
+  for (const study of exam.caseStudies) {
+    if (study.sections.length === 0) fail(`${study.id}: case study has no sections`);
+    for (const section of study.sections) {
+      if (!section.heading || !section.body) fail(`${study.id}: section missing heading or body`);
+    }
+    const linked = exam.questions.filter((q) => q.caseStudyId === study.id);
+    if (linked.length < 2) fail(`${study.id}: only ${linked.length} question(s) linked`);
+  }
+  for (const q of exam.questions) {
+    if (q.caseStudyId && !caseIds.has(q.caseStudyId)) {
+      fail(`${q.id}: unknown caseStudyId "${q.caseStudyId}"`);
+    }
+  }
+
+  // The mock quota check above must only count questions a mock can actually draw.
+  const standalone = exam.questions.filter((q) => !q.caseStudyId);
+  if (standalone.length < exam.mock.questionCount) {
+    fail(
+      `standalone pool smaller than mock size (${standalone.length} < ${exam.mock.questionCount})`,
+    );
   }
 
   for (const card of exam.flashcards) {

@@ -5,6 +5,7 @@ import { exams, getExam } from "@/content";
 import { prisma } from "@/lib/prisma";
 import type { GradedAnswer } from "@/lib/actions/progress-actions";
 import { getDueSummary } from "@/lib/review";
+import { getDrillSummary } from "@/lib/drill";
 
 export const metadata = { title: "Dashboard" };
 
@@ -13,8 +14,9 @@ export default async function DashboardPage() {
   const userId = session?.user?.id;
   if (!userId) redirect("/signin");
 
-  const dueSummary = await getDueSummary();
+  const [dueSummary, drillSummary] = await Promise.all([getDueSummary(), getDrillSummary()]);
   const totalDue = dueSummary.reduce((n, e) => n + e.due, 0);
+  const totalDrill = drillSummary.reduce((n, e) => n + e.count, 0);
 
   const [attempts, cardStats] = await Promise.all([
     prisma.attempt.findMany({
@@ -107,6 +109,41 @@ export default async function DashboardPage() {
           })}
         </ul>
       </section>
+
+      {totalDrill > 0 && (
+        <section className="card mt-4 p-5">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="font-semibold">Wrong-answer drill</h2>
+            <p className="text-sm text-muted">
+              {totalDrill} question{totalDrill === 1 ? "" : "s"} to re-attempt
+            </p>
+          </div>
+          <p className="mt-1 text-sm text-muted">
+            Questions whose most recent answer was wrong. Getting one right removes it.
+          </p>
+          <ul className="mt-4 space-y-2">
+            {drillSummary
+              .filter((row) => row.count > 0)
+              .map((row) => (
+                <li
+                  key={row.examId}
+                  className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-lg border border-line p-3 text-sm"
+                >
+                  <span className="w-16 shrink-0 font-semibold">{row.code}</span>
+                  <span className="text-muted">
+                    <strong className="text-ink">{row.count}</strong> to re-attempt
+                  </span>
+                  <Link
+                    href={`/exams/${row.examId}/practice?mode=missed`}
+                    className="btn-primary ml-auto text-xs"
+                  >
+                    Drill {row.count}
+                  </Link>
+                </li>
+              ))}
+          </ul>
+        </section>
+      )}
 
       {attempts.length === 0 ? (
         <div className="card mt-6 p-6">

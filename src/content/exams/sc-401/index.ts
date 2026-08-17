@@ -2,6 +2,7 @@ import type { Exam } from "../../types";
 import { sc401Questions } from "./questions";
 import { sc401ScenarioQuestions } from "./questions-scenario";
 import { sc401ExtraQuestions } from "./questions-extra";
+import { sc401CaseStudies, sc401CaseStudyQuestions } from "./case-studies";
 import { sc401Flashcards } from "./flashcards";
 import { sc401ExtraFlashcards } from "./flashcards-extra";
 
@@ -87,7 +88,8 @@ export const sc401: Exam = {
     },
   ],
 
-  questions: [...sc401Questions, ...sc401ScenarioQuestions, ...sc401ExtraQuestions],
+  questions: [...sc401Questions, ...sc401ScenarioQuestions, ...sc401ExtraQuestions, ...sc401CaseStudyQuestions],
+  caseStudies: sc401CaseStudies,
   flashcards: [...sc401Flashcards, ...sc401ExtraFlashcards],
 
   resources: [

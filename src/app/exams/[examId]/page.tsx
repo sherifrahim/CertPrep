@@ -79,7 +79,9 @@ export default async function ExamOverviewPage({
         {[
           { href: `/exams/${exam.id}/practice`, title: "Practice quiz", body: `${exam.questions.length} questions with explanations` },
           { href: `/exams/${exam.id}/flashcards`, title: "Flashcards", body: `${exam.flashcards.length} cards, spaced repetition` },
+          { href: `/exams/${exam.id}/case-studies`, title: "Case studies", body: `${exam.caseStudies.length} linked scenario${exam.caseStudies.length === 1 ? "" : "s"}` },
           { href: `/exams/${exam.id}/mock`, title: "Mock exam", body: `${exam.mock.durationMin}-minute timed paper` },
+          { href: `/exams/${exam.id}/practice?mode=missed`, title: "Wrong-answer drill", body: "Re-attempt what you missed" },
           { href: `/exams/${exam.id}/resources`, title: "Resources", body: `${exam.resources.length} free links` },
         ].map((item) => (
           <Link key={item.href} href={item.href} className="card p-4 transition-shadow hover:shadow-md">

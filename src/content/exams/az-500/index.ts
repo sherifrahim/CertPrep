@@ -2,6 +2,7 @@ import type { Exam } from "../../types";
 import { az500Questions } from "./questions";
 import { az500ScenarioQuestions } from "./questions-scenario";
 import { az500ExtraQuestions } from "./questions-extra";
+import { az500CaseStudies, az500CaseStudyQuestions } from "./case-studies";
 import { az500Flashcards } from "./flashcards";
 import { az500ExtraFlashcards } from "./flashcards-extra";
 
@@ -101,7 +102,8 @@ export const az500: Exam = {
     },
   ],
 
-  questions: [...az500Questions, ...az500ScenarioQuestions, ...az500ExtraQuestions],
+  questions: [...az500Questions, ...az500ScenarioQuestions, ...az500ExtraQuestions, ...az500CaseStudyQuestions],
+  caseStudies: az500CaseStudies,
   flashcards: [...az500Flashcards, ...az500ExtraFlashcards],
 
   resources: [

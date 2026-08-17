@@ -13,6 +13,8 @@ Built with Next.js 15 (App Router), Tailwind CSS v4, Prisma 7 + Postgres, and Au
 | Practice quiz | `/exams/[examId]/practice` | Filter by skill area, per-question explanation and doc link |
 | Flashcards | `/exams/[examId]/flashcards` | Leitner-box scheduling (5 boxes, 1/3/7/16/35-day intervals) |
 | Review queue | `/exams/[examId]/flashcards?mode=due` | Studies only cards that are due plus ones never seen |
+| Case studies | `/exams/[examId]/case-studies` | A long shared scenario with linked questions, background always on screen |
+| Wrong-answer drill | `/exams/[examId]/practice?mode=missed` | Re-asks questions whose most recent answer was wrong |
 | Mock exam | `/exams/[examId]/mock` | Timed, domain-weighted, flag-for-review, full result breakdown |
 | Resources | `/exams/[examId]/resources` | External links only — nothing is re-hosted |
 | Dashboard | `/dashboard` | Score history, per-domain accuracy, weakest areas |
@@ -28,6 +30,14 @@ Beyond single- and multiple-answer items, the bank supports the formats Microsof
 - `ordering` — arrange steps into the correct sequence (drag-and-drop equivalent)
 
 For `statements` the per-statement `correct` flags are stripped before the paper reaches the browser, and for `ordering` the steps are reshuffled server-side, since the stored array order *is* the answer.
+
+### Case studies
+
+Defined in each exam's `case-studies.ts` and linked from questions by `caseStudyId`. Such questions are **excluded from practice and mock pools** by `standaloneQuestions()` in [`src/lib/quiz.ts`](src/lib/quiz.ts), because they are unanswerable without their scenario. They are also excluded from the wrong-answer drill for the same reason.
+
+### Wrong-answer drill
+
+[`src/lib/drill.ts`](src/lib/drill.ts) walks a user's attempts newest-first and keeps the **most recent** outcome per question. A question enters the drill when that outcome is wrong and leaves as soon as you answer it correctly, so the set shrinks as you improve rather than accumulating forever.
 
 ### In-progress mock exams
 

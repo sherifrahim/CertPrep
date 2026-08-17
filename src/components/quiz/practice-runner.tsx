@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import type { Question } from "@/content/types";
+import type { CaseStudy, Question } from "@/content/types";
+import { CaseStudyPanel } from "./case-study-panel";
 import { isCorrect } from "@/lib/quiz";
 import { submitAttempt, type GradedResult } from "@/lib/actions/progress-actions";
 import { QuestionBody } from "./question-body";
@@ -14,6 +15,8 @@ type Props = {
   domainNames: Record<string, string>;
   passPercent: number;
   retryHref: string;
+  /** Shown above every question when running a case study. */
+  caseStudy?: CaseStudy;
 };
 
 export function PracticeRunner({
@@ -22,6 +25,7 @@ export function PracticeRunner({
   domainNames,
   passPercent,
   retryHref,
+  caseStudy,
 }: Props) {
   const [index, setIndex] = useState(0);
   const [selections, setSelections] = useState<Record<string, string[]>>({});
@@ -63,6 +67,7 @@ export function PracticeRunner({
 
   return (
     <div className="space-y-4">
+      {caseStudy && <CaseStudyPanel caseStudy={caseStudy} />}
       <div className="flex items-center justify-between gap-4 text-sm text-muted">
         <span>
           Question {index + 1} of {questions.length}

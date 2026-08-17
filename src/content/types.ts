@@ -20,10 +20,31 @@ export interface QuestionStatement {
   correct: boolean;
 }
 
+export interface CaseStudySection {
+  heading: string;
+  body: string;
+}
+
+/**
+ * A long shared scenario with several linked questions, mirroring the case study
+ * section of the real exam where the background stays available while you answer.
+ */
+export interface CaseStudy {
+  id: string;
+  title: string;
+  summary: string;
+  sections: CaseStudySection[];
+}
+
 export interface Question {
   id: string;
   domainId: string;
   type: QuestionType;
+  /**
+   * Set when the question belongs to a case study. Such questions are excluded
+   * from practice and mock pools, since they make no sense without the scenario.
+   */
+  caseStudyId?: string;
   prompt: string;
   /**
    * Background shown above the prompt. Microsoft repeats an identical scenario
@@ -122,6 +143,7 @@ export interface Exam {
   mock: MockConfig;
   domains: Domain[];
   questions: Question[];
+  caseStudies: CaseStudy[];
   flashcards: Flashcard[];
   resources: Resource[];
   studyPath: StudyModule[];

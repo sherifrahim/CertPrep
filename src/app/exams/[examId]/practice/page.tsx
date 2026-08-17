@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getExam } from "@/content";
 import { PracticeRunner } from "@/components/quiz/practice-runner";
-import { pickPracticeQuestions, seedFrom } from "@/lib/quiz";
+import { pickPracticeQuestions, seedFrom, shuffle, standaloneQuestions } from "@/lib/quiz";
+import { getDrillSet } from "@/lib/drill";
 
 export const metadata = { title: "Practice quiz" };
 
@@ -27,6 +28,65 @@ export default async function PracticePage({
   const selectedDomains = toArray(query.domain).filter((id) => validDomainIds.has(id));
   const requestedCount = Number(query.count);
   const domainNames = Object.fromEntries(exam.domains.map((d) => [d.id, d.name]));
+
+  // Drill mode re-asks only the questions you last got wrong.
+  if (query.mode === "missed") {
+    const drill = await getDrillSet(examId);
+    const questions = shuffle(drill.questions, seedFrom(`${examId}-drill-${Date.now()}`));
+
+    if (!drill.signedIn) {
+      return (
+        <div className="mx-auto max-w-3xl px-4 py-10">
+          <div className="card p-6 text-sm text-muted">
+            <p className="font-medium text-ink">Sign in to drill your mistakes</p>
+            <p className="mt-2">
+              The drill is built from questions you previously answered incorrectly, so it needs your
+              attempt history.
+            </p>
+            <Link href="/signin" className="btn-primary mt-4">
+              Sign in
+            </Link>
+          </div>
+        </div>
+      );
+    }
+
+    if (questions.length === 0) {
+      return (
+        <div className="mx-auto max-w-3xl px-4 py-10">
+          <div className="card p-6 text-sm text-muted">
+            <p className="font-medium text-ink">Nothing to drill</p>
+            <p className="mt-2">
+              You have no outstanding wrong answers for {exam.code}. Questions appear here when your
+              most recent answer was incorrect, and leave once you get them right.
+            </p>
+            <Link href={`/exams/${examId}/practice`} className="btn-primary mt-4">
+              Practice instead
+            </Link>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-10">
+        <div className="mb-4">
+          <h1 className="text-2xl font-semibold tracking-tight">Wrong-answer drill</h1>
+          <p className="mt-1 text-sm text-muted">
+            {questions.length} question{questions.length === 1 ? "" : "s"} you last answered
+            incorrectly. Getting one right removes it from the drill.
+          </p>
+        </div>
+        <PracticeRunner
+          examId={exam.id}
+          questions={questions}
+          domainNames={domainNames}
+          passPercent={exam.mock.passPercent}
+          retryHref={`/exams/${exam.id}/practice?mode=missed&r=${Date.now()}`}
+        />
+      </div>
+    );
+  }
 
   if (query.start === "1") {
     const count = Number.isFinite(requestedCount) && requestedCount > 0 ? requestedCount : 10;
@@ -69,8 +129,10 @@ export default async function PracticePage({
     );
   }
 
-  const availableCounts = [5, 10, 20, exam.questions.length].filter(
-    (n, i, arr) => n <= exam.questions.length && arr.indexOf(n) === i,
+  // Counts reflect the pool practice actually draws from, which excludes case studies.
+  const pool = standaloneQuestions(exam);
+  const availableCounts = [5, 10, 20, 40, pool.length].filter(
+    (n, i, arr) => n <= pool.length && arr.indexOf(n) === i,
   );
 
   return (
@@ -89,7 +151,7 @@ export default async function PracticePage({
           <p className="mt-1 text-sm text-muted">Leave all unchecked to draw from every area.</p>
           <div className="mt-3 space-y-2">
             {exam.domains.map((domain) => {
-              const count = exam.questions.filter((q) => q.domainId === domain.id).length;
+              const count = pool.filter((q) => q.domainId === domain.id).length;
               return (
                 <label
                   key={domain.id}

@@ -1,4 +1,4 @@
-export type ExamId = "az-500" | "sc-200" | "sc-401";
+export type ExamId = "az-500" | "sc-200" | "sc-401" | "sc-500";
 
 /**
  * Mirrors the item formats Microsoft actually uses:
@@ -140,6 +140,8 @@ export interface Exam {
   studyGuideUrl: string;
   /** ISO date the exam retires, when Microsoft has announced one. */
   retiresOn?: string;
+  /** Exam that supersedes this one, shown on the retirement banner. */
+  replacedBy?: ExamId;
   mock: MockConfig;
   domains: Domain[];
   questions: Question[];

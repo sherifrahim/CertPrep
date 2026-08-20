@@ -2,9 +2,9 @@ import { auth } from "@/auth";
 import { exams, getExam } from "@/content";
 import type { Flashcard } from "@/content/types";
 import { prisma } from "@/lib/prisma";
+import { BOX_INTERVAL_DAYS, formatWhen, nextSchedule } from "@/lib/scheduling";
 
-/** Days a card waits before its next review, indexed by Leitner box (1–5). */
-export const BOX_INTERVAL_DAYS = [0, 1, 3, 7, 16, 35];
+export { BOX_INTERVAL_DAYS, formatWhen, nextSchedule };
 
 export type ReviewQueue = {
   /** Reviewed before and now due. */
@@ -109,13 +109,3 @@ export async function getDueSummary(): Promise<ExamDueSummary[]> {
   });
 }
 
-/** "in 3 days", "tomorrow", "in 4 hours" — for telling users when to come back. */
-export function formatWhen(date: Date): string {
-  const ms = date.getTime() - Date.now();
-  if (ms <= 0) return "now";
-  const hours = Math.round(ms / 3_600_000);
-  if (hours < 1) return "in under an hour";
-  if (hours < 24) return `in ${hours} hour${hours === 1 ? "" : "s"}`;
-  const days = Math.round(hours / 24);
-  return days === 1 ? "tomorrow" : `in ${days} days`;
-}

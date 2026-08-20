@@ -7,7 +7,7 @@ import { getExam } from "@/content";
 import type { Question } from "@/content/types";
 import { isCorrect, scoreOf } from "@/lib/quiz";
 import { prisma } from "@/lib/prisma";
-import { BOX_INTERVAL_DAYS } from "@/lib/review";
+import { nextSchedule } from "@/lib/review";
 
 const submissionSchema = z.object({
   examId: z.string(),
@@ -140,9 +140,7 @@ export async function recordCardReview(input: unknown): Promise<{ saved: boolean
     where: { userId_cardId: { userId, cardId } },
   });
 
-  const currentBox = existing?.box ?? 1;
-  const nextBox = remembered ? Math.min(currentBox + 1, 5) : 1;
-  const dueAt = new Date(Date.now() + BOX_INTERVAL_DAYS[nextBox] * 86_400_000);
+  const { box: nextBox, dueAt } = nextSchedule(existing?.box, remembered);
 
   await prisma.cardProgress.upsert({
     where: { userId_cardId: { userId, cardId } },

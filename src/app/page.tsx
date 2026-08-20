@@ -34,15 +34,16 @@ export default function HomePage() {
       <section className="py-16 sm:py-24">
         <p className="chip">Microsoft security certifications</p>
         <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">
-          Everything you need to pass AZ-500, SC-401, and SC-200.
+          Everything you need to pass Microsoft's security certifications.
         </h1>
         <p className="mt-4 max-w-2xl text-lg text-muted">
           Practice questions with real explanations, flashcards that schedule themselves, timed mock
-          exams weighted to the official objectives, and a curated set of free study material.
+          exams weighted to the official objectives, and a curated set of free study material —
+          for SC-500, SC-401, and SC-200.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
-          <Link href="/exams/az-500" className="btn-primary">
-            Start with AZ-500
+          <Link href="/exams/sc-500" className="btn-primary">
+            Start with SC-500
           </Link>
           <Link href="/signup" className="btn-secondary">
             Create a free account
@@ -52,7 +53,9 @@ export default function HomePage() {
 
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {exams.map((exam) => {
-          const retiring = exam.retiresOn && new Date(exam.retiresOn) > new Date();
+          const retiresOn = exam.retiresOn ? new Date(exam.retiresOn) : null;
+          const retiring = retiresOn && retiresOn > new Date();
+          const retired = retiresOn && retiresOn <= new Date();
           return (
             <Link
               key={exam.id}
@@ -66,7 +69,12 @@ export default function HomePage() {
                 </span>
                 {retiring && (
                   <span className="rounded-md bg-warn-soft px-2 py-1 text-xs font-medium text-warn">
-                    Retires {new Date(exam.retiresOn!).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                    Retires {retiresOn!.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                  </span>
+                )}
+                {retired && (
+                  <span className="rounded-md bg-surface-2 px-2 py-1 text-xs font-medium text-muted">
+                    Retired
                   </span>
                 )}
               </div>

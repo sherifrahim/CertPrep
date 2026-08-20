@@ -19,6 +19,7 @@ export const az500: Exam = {
   studyGuideUrl:
     "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-500",
   retiresOn: "2026-08-31",
+  replacedBy: "sc-500",
   mock: { questionCount: 40, durationMin: 60, passPercent: 70 },
 
   domains: [

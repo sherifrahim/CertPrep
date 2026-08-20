@@ -23,6 +23,7 @@ export default async function ExamOverviewPage({
   if (!exam) notFound();
 
   const retiresOn = exam.retiresOn ? new Date(exam.retiresOn) : null;
+  const successor = exam.replacedBy ? getExam(exam.replacedBy) : undefined;
   const daysLeft = retiresOn
     ? Math.ceil((retiresOn.getTime() - Date.now()) / 86_400_000)
     : null;
@@ -41,11 +42,27 @@ export default async function ExamOverviewPage({
             — {daysLeft} {daysLeft === 1 ? "day" : "days"} away.
           </p>
           <p className="mt-1 text-sm text-muted">
-            Check the{" "}
-            <a href={exam.officialUrl} className="underline" target="_blank" rel="noreferrer">
-              official exam page
-            </a>{" "}
-            for the replacement certification path before booking.
+            {successor ? (
+              <>
+                {successor.code} ({successor.title}) supersedes it.{" "}
+                <Link href={`/exams/${successor.id}`} className="underline">
+                  Study {successor.code} instead
+                </Link>
+                , or check the{" "}
+                <a href={exam.officialUrl} className="underline" target="_blank" rel="noreferrer">
+                  official exam page
+                </a>
+                .
+              </>
+            ) : (
+              <>
+                Check the{" "}
+                <a href={exam.officialUrl} className="underline" target="_blank" rel="noreferrer">
+                  official exam page
+                </a>{" "}
+                for the replacement certification path before booking.
+              </>
+            )}
           </p>
         </div>
       )}

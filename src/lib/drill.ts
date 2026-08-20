@@ -3,12 +3,8 @@ import { exams, getExam } from "@/content";
 import type { Question } from "@/content/types";
 import type { GradedAnswer } from "@/lib/actions/progress-actions";
 import { prisma } from "@/lib/prisma";
+import { pickLatestWrong } from "@/lib/scheduling";
 
-/**
- * Question ids whose *most recent* answer was wrong. Using only the latest
- * outcome means a question leaves the drill as soon as you get it right, and
- * comes back if you get it wrong again later.
- */
 async function latestWrongIds(userId: string, examId?: string): Promise<Set<string>> {
   const attempts = await prisma.attempt.findMany({
     where: { userId, ...(examId ? { examId } : {}) },
@@ -17,18 +13,9 @@ async function latestWrongIds(userId: string, examId?: string): Promise<Set<stri
     take: 200,
   });
 
-  const seen = new Set<string>();
-  const wrong = new Set<string>();
-
-  for (const attempt of attempts) {
-    for (const answer of attempt.answers as unknown as GradedAnswer[]) {
-      if (seen.has(answer.questionId)) continue; // an earlier (newer) attempt already decided
-      seen.add(answer.questionId);
-      if (!answer.wasCorrect) wrong.add(answer.questionId);
-    }
-  }
-
-  return wrong;
+  return pickLatestWrong(
+    attempts.map((a) => ({ answers: a.answers as unknown as GradedAnswer[] })),
+  );
 }
 
 export type DrillSet = {

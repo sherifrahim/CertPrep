@@ -1,9 +1,11 @@
 import { az500 } from "./exams/az-500/index";
 import { sc200 } from "./exams/sc-200/index";
 import { sc401 } from "./exams/sc-401/index";
+import { sc500 } from "./exams/sc-500/index";
 import type { Exam, ExamId, Flashcard, Question } from "./types";
 
-export const exams: Exam[] = [az500, sc401, sc200];
+// SC-500 leads: it is the successor to AZ-500, which retires 2026-08-31.
+export const exams: Exam[] = [sc500, sc401, sc200, az500];
 
 const byId = new Map<string, Exam>(exams.map((exam) => [exam.id, exam]));
 

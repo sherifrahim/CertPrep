@@ -1,6 +1,6 @@
 # CertPrep
 
-Exam preparation site for the Microsoft security certifications **AZ-500**, **SC-401**, and **SC-200**: practice quizzes, flashcards, timed mock exams, study paths, and curated links to free study material.
+Exam preparation site for the Microsoft security certifications **SC-500**, **SC-401**, and **SC-200** (plus **AZ-500**, which SC-500 supersedes): practice quizzes, flashcards, timed mock exams, study paths, and curated links to free study material.
 
 Built with Next.js 15 (App Router), Tailwind CSS v4, Prisma 7 + Postgres, and Auth.js v5.
 
@@ -17,7 +17,8 @@ Built with Next.js 15 (App Router), Tailwind CSS v4, Prisma 7 + Postgres, and Au
 | Wrong-answer drill | `/exams/[examId]/practice?mode=missed` | Re-asks questions whose most recent answer was wrong |
 | Mock exam | `/exams/[examId]/mock` | Timed, domain-weighted, flag-for-review, full result breakdown |
 | Resources | `/exams/[examId]/resources` | External links only — nothing is re-hosted |
-| Dashboard | `/dashboard` | Score history, per-domain accuracy, weakest areas |
+| Dashboard | `/dashboard` | Readiness score, review queue, drill, score history, weakest areas |
+| Password reset | `/forgot-password` | Single-use token, one-hour expiry, no account enumeration |
 
 Answers are graded **server-side**. Mock exam papers are sent to the browser with the answer keys and explanations stripped out; the review content only comes back after submission.
 
@@ -38,6 +39,20 @@ Options are reordered per session by `randomiseQuestion()` in [`src/lib/quiz.ts`
 This matters because the bank was authored with the key overwhelmingly first — 93% of single-answer questions had it at position A — which let a learner score well by always picking the first option. Randomisation makes position uninformative regardless of how future questions are authored.
 
 Ordering questions store their steps in the correct sequence, so they are always reshuffled and explicitly never presented already solved. Yes/No items keep their fixed order.
+
+### Exam readiness
+
+[`src/lib/readiness.ts`](src/lib/readiness.ts) weights your per-domain accuracy by each domain's official share of the exam, so a mock dominated by one area does not skew the estimate. Domains with no evidence are **excluded rather than counted as zero**, and reported separately — "80% across two of four areas" is not the same as being ready. "Ready" requires a margin above the pass mark, because the real exam is harder than practice.
+
+### Tests
+
+```bash
+npm test
+```
+
+62 vitest cases over the pure logic and the content bank: shuffle uniformity, grading across all five question formats, answer randomisation, mock composition, Leitner scheduling, drill selection, reset-token handling, and readiness weighting. Pure logic lives in [`src/lib/scheduling.ts`](src/lib/scheduling.ts), [`src/lib/password-reset.ts`](src/lib/password-reset.ts), and [`src/lib/readiness.ts`](src/lib/readiness.ts) so it is testable without a database.
+
+`npm run validate:content` additionally checks the content bank's referential integrity.
 
 ### Case studies
 

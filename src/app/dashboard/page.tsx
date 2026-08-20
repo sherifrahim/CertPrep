@@ -6,6 +6,8 @@ import { prisma } from "@/lib/prisma";
 import type { GradedAnswer } from "@/lib/actions/progress-actions";
 import { getDueSummary } from "@/lib/review";
 import { getDrillSummary } from "@/lib/drill";
+import { computeReadiness, type DomainStat } from "@/lib/readiness";
+import { ReadinessCard } from "@/components/readiness-card";
 
 export const metadata = { title: "Dashboard" };
 
@@ -43,6 +45,19 @@ export default async function DashboardPage() {
     }
   }
 
+  // Readiness reuses the per-domain tallies, weighted by official exam percentages.
+  const readinessByExam = exams.map((exam) => {
+    const stats: DomainStat[] = exam.domains.map((d) => {
+      const entry = domainTotals.get(`${exam.id}:${d.id}`);
+      return { domainId: d.id, correct: entry?.correct ?? 0, total: entry?.total ?? 0 };
+    });
+    return {
+      exam,
+      readiness: computeReadiness(exam.domains, stats, exam.mock.passPercent),
+    };
+  });
+  const hasAnyReadiness = readinessByExam.some((r) => r.readiness.score !== null);
+
   const weakest = [...domainTotals.entries()]
     .filter(([, stats]) => stats.total >= 3)
     .map(([key, stats]) => {
@@ -67,6 +82,29 @@ export default async function DashboardPage() {
           ? "You have not completed any quizzes yet."
           : `${attempts.length} recorded ${attempts.length === 1 ? "attempt" : "attempts"}.`}
       </p>
+
+      {hasAnyReadiness && (
+        <section className="mt-6">
+          <h2 className="text-lg font-semibold">Exam readiness</h2>
+          <p className="mt-1 text-sm text-muted">
+            Your accuracy in each skill area, weighted by that area&apos;s share of the real exam.
+            Areas you have not practised are excluded rather than counted as zero.
+          </p>
+          <div className="mt-4 grid gap-4 lg:grid-cols-2">
+            {readinessByExam
+              .filter((r) => r.readiness.score !== null)
+              .map(({ exam, readiness }) => (
+                <ReadinessCard
+                  key={exam.id}
+                  examId={exam.id}
+                  code={exam.code}
+                  readiness={readiness}
+                  passPercent={exam.mock.passPercent}
+                />
+              ))}
+          </div>
+        </section>
+      )}
 
       <section className="card mt-6 p-5">
         <div className="flex flex-wrap items-baseline justify-between gap-2">

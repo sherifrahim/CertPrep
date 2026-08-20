@@ -136,6 +136,20 @@ Mail goes through Resend when `RESEND_API_KEY` is set. **Without it the message 
 
 Accounts created through Google have no password, so there is nothing to reset; the confirmation screen says so and points at Google sign-in.
 
+### Rate limiting
+
+Sign-in, sign-up, and password reset are throttled by [`src/lib/rate-limit.ts`](src/lib/rate-limit.ts) using a fixed window stored in **Postgres, not process memory** — serverless instances do not share memory, so an in-process counter resets on cold start and is bypassed by spreading requests across instances.
+
+Counters are keyed by IP *and* identifier: one noisy address cannot lock out everyone behind a shared NAT, and one attacker cannot spray many addresses freely. The sign-in counter is cleared inside `authorize()` when the password verifies — the only point where success is unambiguous, since both success and failure leave the server action by throwing a redirect.
+
+The limiter **fails open**: if the counter cannot be read or written, the request proceeds rather than locking everyone out of sign-in over a database blip.
+
+### Security headers
+
+Set in [`next.config.ts`](next.config.ts) for every route: CSP, HSTS, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, and `Permissions-Policy`. `X-Powered-By` is disabled.
+
+The CSP keeps `'unsafe-inline'` on `script-src` because Next.js injects inline bootstrap scripts; removing it needs nonce-based CSP via middleware. The other directives still carry most of the value — `frame-ancestors 'none'`, `object-src 'none'`, and `base-uri 'self'`.
+
 ## Deploying to Vercel
 
 1. Push the repository to GitHub and import it in Vercel.

@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { signIn, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { consume } from "@/lib/rate-limit";
 
 export type AuthFormState = { error?: string } | undefined;
 
@@ -18,9 +19,18 @@ export async function signInWithCredentials(
   _prev: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+
+  const limit = await consume("signIn", email);
+  if (!limit.allowed) {
+    return {
+      error: `Too many sign-in attempts. Try again in ${Math.ceil(limit.retryAfterSec / 60)} minute(s).`,
+    };
+  }
+
   try {
     await signIn("credentials", {
-      email: String(formData.get("email") ?? "").trim().toLowerCase(),
+      email,
       password: String(formData.get("password") ?? ""),
       redirectTo: "/dashboard",
     });
@@ -28,6 +38,9 @@ export async function signInWithCredentials(
     if (error instanceof AuthError) {
       return { error: "That email and password combination is not recognised." };
     }
+    // Both success and failure leave via a thrown redirect, so this branch
+    // cannot tell them apart. The counter is cleared in `authorize()` instead,
+    // at the one point where the password is known to be correct.
     throw error;
   }
 }
@@ -47,6 +60,13 @@ export async function signUpWithCredentials(
   }
 
   const { name, email, password } = parsed.data;
+
+  const limit = await consume("signUp", email);
+  if (!limit.allowed) {
+    return {
+      error: `Too many sign-up attempts. Try again in ${Math.ceil(limit.retryAfterSec / 60)} minute(s).`,
+    };
+  }
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {

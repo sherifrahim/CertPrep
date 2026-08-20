@@ -1,18 +1,31 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/site-header";
+import { siteUrl } from "@/lib/site";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
+const title = "CertPrep — SC-500, SC-401 and SC-200 exam preparation";
+const description =
+  "Practice quizzes, flashcards, timed mock exams, case studies, and curated free resources for the Microsoft SC-500, SC-401, and SC-200 security certifications.";
+
 export const metadata: Metadata = {
-  title: {
-    default: "CertPrep — AZ-500, SC-401 and SC-200 exam preparation",
-    template: "%s · CertPrep",
+  metadataBase: new URL(siteUrl()),
+  title: { default: title, template: "%s · CertPrep" },
+  description,
+  applicationName: "CertPrep",
+  keywords: ["SC-500", "SC-401", "SC-200", "AZ-500", "Microsoft security certification", "practice exam"],
+  openGraph: {
+    type: "website",
+    siteName: "CertPrep",
+    title,
+    description,
+    url: siteUrl(),
   },
-  description:
-    "Practice quizzes, flashcards, timed mock exams, study paths, and curated free resources for the Microsoft AZ-500, SC-401, and SC-200 security certifications.",
+  twitter: { card: "summary_large_image", title, description },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -5,6 +5,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { reset as resetRateLimit } from "@/lib/rate-limit";
 
 export const credentialsSchema = z.object({
   email: z.string().email("Enter a valid email address"),
@@ -44,6 +45,10 @@ const config: NextAuthConfig = {
 
         const valid = await bcrypt.compare(parsed.data.password, user.passwordHash);
         if (!valid) return null;
+
+        // Correct password: clear the throttle so honest users who mistyped a
+        // few times are not left locked out for the rest of the window.
+        await resetRateLimit("signIn", user.email);
 
         return { id: user.id, name: user.name, email: user.email, image: user.image };
       },

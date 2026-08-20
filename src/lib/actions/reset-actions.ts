@@ -1,9 +1,9 @@
 "use server";
 
-import { headers } from "next/headers";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { consume } from "@/lib/rate-limit";
 import { sendMail } from "@/lib/mailer";
 import {
   createResetToken,
@@ -29,27 +29,6 @@ const resetSchema = z
     path: ["confirm"],
   });
 
-/** Crude in-process throttle. Enough to blunt scripted abuse of the reset form. */
-const attempts = new Map<string, { count: number; resetAt: number }>();
-const WINDOW_MS = 15 * 60 * 1000;
-const MAX_PER_WINDOW = 5;
-
-function rateLimited(key: string): boolean {
-  const now = Date.now();
-  const entry = attempts.get(key);
-  if (!entry || entry.resetAt < now) {
-    attempts.set(key, { count: 1, resetAt: now + WINDOW_MS });
-    return false;
-  }
-  entry.count += 1;
-  return entry.count > MAX_PER_WINDOW;
-}
-
-async function requestKey(email: string): Promise<string> {
-  const forwarded = (await headers()).get("x-forwarded-for") ?? "unknown";
-  return `${forwarded.split(",")[0].trim()}:${email}`;
-}
-
 export async function requestPasswordReset(
   _prev: ResetFormState,
   formData: FormData,
@@ -60,7 +39,8 @@ export async function requestPasswordReset(
   if (!parsed.success) return { sent: true };
 
   const { email } = parsed.data;
-  if (await requestKey(email).then(rateLimited)) return { sent: true };
+  // Silently drop over-limit requests: the response must not differ.
+  if (!(await consume("passwordReset", email)).allowed) return { sent: true };
 
   const user = await prisma.user.findUnique({ where: { email } });
 

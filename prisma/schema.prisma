@@ -115,3 +115,16 @@ model PasswordResetToken {
 
   @@index([userId])
 }
+
+/// Fixed-window rate limit counter.
+///
+/// Stored in Postgres rather than process memory because serverless instances
+/// do not share memory — an in-process counter would reset on every cold start
+/// and be trivially bypassed by spreading requests across instances.
+model RateLimit {
+  key       String   @id
+  count     Int      @default(0)
+  expiresAt DateTime
+
+  @@index([expiresAt])
+}

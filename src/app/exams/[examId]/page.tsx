@@ -8,9 +8,14 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ examId: string }> }) {
   const exam = getExam((await params).examId);
-  return exam
-    ? { title: `${exam.code} — ${exam.title}`, description: exam.description }
-    : {};
+  if (!exam) return {};
+  const title = `${exam.code} — ${exam.title}`;
+  return {
+    title,
+    description: exam.description,
+    openGraph: { title, description: exam.description, type: "article" },
+    twitter: { card: "summary_large_image", title, description: exam.description },
+  };
 }
 
 export default async function ExamOverviewPage({

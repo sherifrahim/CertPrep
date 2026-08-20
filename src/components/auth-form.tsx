@@ -92,6 +92,14 @@ export function AuthForm({ mode, action, googleAction, providerError }: Props) {
         </button>
       </form>
 
+      {!isSignUp && (
+        <p className="mt-4 text-sm text-muted">
+          <Link href="/forgot-password" className="text-accent-text underline">
+            Forgot your password?
+          </Link>
+        </p>
+      )}
+
       <p className="mt-4 text-sm text-muted">
         {isSignUp ? "Already have an account? " : "No account yet? "}
         <Link href={isSignUp ? "/signin" : "/signup"} className="text-accent-text underline">

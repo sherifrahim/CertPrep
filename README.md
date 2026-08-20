@@ -111,6 +111,16 @@ While the Google consent screen is in **Testing** mode, only accounts listed as 
 
 **Accounts are not linked across providers by email.** Credentials sign-up does not verify the address, so auto-linking would let someone who registered a password against an address they do not own inherit the real owner's Google account. Someone who signed up with a password and then tries Google gets an explanatory message on `/signin` rather than a silent merge. Adding verified email would make safe linking possible.
 
+### Password reset
+
+`/forgot-password` issues a single-use link that expires in an hour. Only the SHA-256 hash of the token is stored, so a database leak yields nothing usable. Completing a reset also deletes the user's sessions.
+
+The response is identical whether or not the address has an account, to avoid revealing which emails are registered, and requests are throttled per IP and address.
+
+Mail goes through Resend when `RESEND_API_KEY` is set. **Without it the message is logged to the server console instead**, so the flow is testable locally — but a production deployment needs the key or nobody receives their link.
+
+Accounts created through Google have no password, so there is nothing to reset; the confirmation screen says so and points at Google sign-in.
+
 ## Deploying to Vercel
 
 1. Push the repository to GitHub and import it in Vercel.

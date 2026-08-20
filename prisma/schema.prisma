@@ -20,6 +20,7 @@ model User {
   sessions  Session[]
   attempts  Attempt[]
   cardStats CardProgress[]
+  resetTokens PasswordResetToken[]
 }
 
 model Account {
@@ -98,4 +99,19 @@ model CardProgress {
 
   @@unique([userId, cardId])
   @@index([userId, examId, dueAt])
+}
+
+/// Single-use password reset token. Only the SHA-256 hash is stored, so a
+/// database leak does not hand an attacker usable reset links.
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }

@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { exams } from "./index";
 import { isCorrect, randomiseAll, seedFrom } from "@/lib/quiz";
-import type { Question } from "./types";
 
 const allQuestions = exams.flatMap((e) => e.questions);
 const allCards = exams.flatMap((e) => e.flashcards);

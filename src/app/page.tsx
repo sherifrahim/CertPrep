@@ -34,7 +34,7 @@ export default function HomePage() {
       <section className="py-16 sm:py-24">
         <p className="chip">Microsoft security certifications</p>
         <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">
-          Everything you need to pass Microsoft's security certifications.
+          Everything you need to pass the Microsoft security certifications.
         </h1>
         <p className="mt-4 max-w-2xl text-lg text-muted">
           Practice questions with real explanations, flashcards that schedule themselves, timed mock

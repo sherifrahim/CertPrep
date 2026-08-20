@@ -3,7 +3,6 @@
 import { useEffect, useMemo } from "react";
 import type { QuestionOption, QuestionType } from "@/content/types";
 import { YES_NO_OPTIONS } from "@/content/types";
-import { seedFrom, shuffle } from "@/lib/quiz";
 
 /** Statements as the browser sees them — the per-statement answer is never sent. */
 export type DisplayStatement = { id: string; text: string };
@@ -36,10 +35,11 @@ function toneFor(state: "correct" | "wrong" | "chosen" | "idle") {
 export function QuestionBody({ question, selected, onChange, revealed }: Props) {
   const locked = Boolean(revealed);
 
-  // Steps arrive in a stable but non-answer order; keep the shuffle stable per question.
+  // Steps arrive already reordered by the server, never in their stored (correct)
+  // sequence, so they are presented exactly as given.
   const initialSteps = useMemo(
-    () => shuffle(question.steps ?? [], seedFrom(question.id)).map((s) => s.id),
-    [question.steps, question.id],
+    () => (question.steps ?? []).map((s) => s.id),
+    [question.steps],
   );
   const order = selected.length ? selected : initialSteps;
 

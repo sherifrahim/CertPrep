@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getExam } from "@/content";
 import { MockRunner, type MockQuestion } from "@/components/quiz/mock-runner";
 import { MockResumeBanner } from "@/components/quiz/mock-resume-banner";
-import { buildMockPaper, seedFrom, shuffle } from "@/lib/quiz";
+import { buildMockPaper, randomiseAll, seedFrom } from "@/lib/quiz";
 
 export const metadata = { title: "Mock exam" };
 
@@ -41,7 +41,7 @@ export default async function MockPage({
 
   if (query.start === "1") {
     const seed = seedFrom(`${examId}-mock-${Date.now()}`);
-    const paper = buildMockPaper(exam, seed);
+    const paper = randomiseAll(buildMockPaper(exam, seed), seed);
     // Strip every trace of the answer key: no `correct`, no per-statement flags,
     // and steps reordered so their array position is not the sequence.
     const stripped: MockQuestion[] = paper.map((q) => ({
@@ -55,7 +55,7 @@ export default async function MockPage({
       ...(q.statements
         ? { statements: q.statements.map(({ id, text }) => ({ id, text })) }
         : {}),
-      ...(q.steps ? { steps: shuffle(q.steps, seed + seedFrom(q.id)) } : {}),
+      ...(q.steps ? { steps: q.steps } : {}),
     }));
 
     return (

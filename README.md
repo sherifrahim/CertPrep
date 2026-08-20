@@ -31,6 +31,14 @@ Beyond single- and multiple-answer items, the bank supports the formats Microsof
 
 For `statements` the per-statement `correct` flags are stripped before the paper reaches the browser, and for `ordering` the steps are reshuffled server-side, since the stored array order *is* the answer.
 
+### Answer randomisation
+
+Options are reordered per session by `randomiseQuestion()` in [`src/lib/quiz.ts`](src/lib/quiz.ts) before questions reach the browser. Grading compares option **ids**, never positions, so `correct` never changes.
+
+This matters because the bank was authored with the key overwhelmingly first — 93% of single-answer questions had it at position A — which let a learner score well by always picking the first option. Randomisation makes position uninformative regardless of how future questions are authored.
+
+Ordering questions store their steps in the correct sequence, so they are always reshuffled and explicitly never presented already solved. Yes/No items keep their fixed order.
+
 ### Case studies
 
 Defined in each exam's `case-studies.ts` and linked from questions by `caseStudyId`. Such questions are **excluded from practice and mock pools** by `standaloneQuestions()` in [`src/lib/quiz.ts`](src/lib/quiz.ts), because they are unanswerable without their scenario. They are also excluded from the wrong-answer drill for the same reason.

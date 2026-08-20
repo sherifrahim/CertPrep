@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getExam } from "@/content";
 import { PracticeRunner } from "@/components/quiz/practice-runner";
+import { randomiseAll, seedFrom } from "@/lib/quiz";
 
 export const metadata = { title: "Case study" };
 
@@ -16,9 +17,12 @@ export default async function CaseStudyRunnerPage({
   const caseStudy = exam.caseStudies.find((c) => c.id === caseId);
   if (!caseStudy) notFound();
 
-  // Case study questions are answered in their authored order, not shuffled —
-  // they build on each other the way the real exam presents them.
-  const questions = exam.questions.filter((q) => q.caseStudyId === caseId);
+  // Questions stay in authored order because they build on each other, but the
+  // answer options within each are randomised.
+  const questions = randomiseAll(
+    exam.questions.filter((q) => q.caseStudyId === caseId),
+    seedFrom(`${examId}-${caseId}-${Date.now()}`),
+  );
   if (questions.length === 0) notFound();
 
   return (

@@ -2,7 +2,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getExam } from "@/content";
 import { PracticeRunner } from "@/components/quiz/practice-runner";
-import { pickPracticeQuestions, seedFrom, shuffle, standaloneQuestions } from "@/lib/quiz";
+import {
+  pickPracticeQuestions,
+  randomiseAll,
+  seedFrom,
+  shuffle,
+  standaloneQuestions,
+} from "@/lib/quiz";
 import { getDrillSet } from "@/lib/drill";
 
 export const metadata = { title: "Practice quiz" };
@@ -32,7 +38,8 @@ export default async function PracticePage({
   // Drill mode re-asks only the questions you last got wrong.
   if (query.mode === "missed") {
     const drill = await getDrillSet(examId);
-    const questions = shuffle(drill.questions, seedFrom(`${examId}-drill-${Date.now()}`));
+    const drillSeed = seedFrom(`${examId}-drill-${Date.now()}`);
+    const questions = randomiseAll(shuffle(drill.questions, drillSeed), drillSeed);
 
     if (!drill.signedIn) {
       return (
@@ -90,11 +97,10 @@ export default async function PracticePage({
 
   if (query.start === "1") {
     const count = Number.isFinite(requestedCount) && requestedCount > 0 ? requestedCount : 10;
-    const questions = pickPracticeQuestions(
-      exam,
-      selectedDomains,
-      count,
-      seedFrom(`${examId}-${Date.now()}`),
+    const seed = seedFrom(`${examId}-${Date.now()}`);
+    const questions = randomiseAll(
+      pickPracticeQuestions(exam, selectedDomains, count, seed),
+      seed,
     );
 
     if (questions.length === 0) {

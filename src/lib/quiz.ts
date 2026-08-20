@@ -1,12 +1,31 @@
 import { YES_NO_OPTIONS, type Exam, type Question } from "@/content/types";
 
+/**
+ * Seeded PRNG (mulberry32).
+ *
+ * The previous implementation was a linear congruential generator read as
+ * `state % (i + 1)`. An LCG with a power-of-two modulus has extremely short
+ * periods in its low bits — `state % 4` cycles 0,3,2,1 forever — so the
+ * "shuffle" was close to deterministic. mulberry32 avalanches the bits before
+ * they are used, so every position is equally likely.
+ */
+function rng(seed: number): () => number {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
 /** Fisher-Yates using a seeded PRNG so a given attempt id always rebuilds the same paper. */
 export function shuffle<T>(items: T[], seed: number): T[] {
   const out = [...items];
-  let state = seed || 1;
+  const next = rng(seed || 1);
   for (let i = out.length - 1; i > 0; i--) {
-    state = (state * 1664525 + 1013904223) % 4294967296;
-    const j = state % (i + 1);
+    const j = Math.floor(next() * (i + 1));
     [out[i], out[j]] = [out[j], out[i]];
   }
   return out;
@@ -50,6 +69,52 @@ export function scoreOf(correctCount: number, total: number): number {
  */
 export function standaloneQuestions(exam: Exam): Question[] {
   return exam.questions.filter((q) => !q.caseStudyId);
+}
+
+/**
+ * Randomises answer positions so the key is never predictable.
+ *
+ * Content was authored with the correct answer overwhelmingly first, which let
+ * a learner score well by always picking the first option. Grading compares
+ * option *ids*, never positions, so reordering here is safe and needs no
+ * change to `correct`.
+ *
+ * Yes/No items keep their fixed order — "Yes" before "No" is part of the
+ * question, not a choice to scramble.
+ */
+export function randomiseQuestion(question: Question, seed: number): Question {
+  const next: Question = { ...question };
+
+  if (
+    (question.type === "single" || question.type === "multi") &&
+    question.options &&
+    question.options.length > 1
+  ) {
+    next.options = shuffle(question.options, seed + seedFrom(question.id));
+  }
+
+  if (question.type === "statements" && question.statements) {
+    next.statements = shuffle(question.statements, seed + seedFrom(question.id + "s"));
+  }
+
+  if (question.type === "ordering" && question.steps && question.steps.length > 1) {
+    // Steps are stored in the correct sequence, so they must never be shown that
+    // way. A shuffle can legitimately land back on it, so reshuffle until it does
+    // not — bounded, since any swap breaks the match.
+    let steps = shuffle(question.steps, seed + seedFrom(question.id + "o"));
+    for (let attempt = 1; attempt < 8; attempt++) {
+      if (steps.map((s) => s.id).join() !== question.correct.join()) break;
+      steps = shuffle(question.steps, seed + seedFrom(question.id + "o" + attempt));
+    }
+    next.steps = steps;
+  }
+
+  return next;
+}
+
+/** Applies `randomiseQuestion` across a set, keeping one seed per session. */
+export function randomiseAll(questions: Question[], seed: number): Question[] {
+  return questions.map((q) => randomiseQuestion(q, seed));
 }
 
 export function pickPracticeQuestions(

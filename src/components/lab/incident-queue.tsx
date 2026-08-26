@@ -14,7 +14,10 @@ const sevTone: Record<Severity, string> = {
 
 function when(iso: string): string {
   if (!iso) return "—";
+  // An explicit timeZone keeps server render and client hydration identical;
+  // without it the server's zone and the browser's disagree and React bails.
   return new Date(iso).toLocaleString("en-GB", {
+    timeZone: "UTC",
     day: "2-digit",
     month: "short",
     hour: "2-digit",

@@ -88,6 +88,7 @@ export default function DevicesPage() {
                 <td className="px-3 py-2 text-xs text-muted">
                   {d.lastSeen
                     ? d.lastSeen.toLocaleString("en-GB", {
+                        timeZone: "UTC",
                         day: "2-digit",
                         month: "short",
                         hour: "2-digit",

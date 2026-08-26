@@ -14,7 +14,10 @@ import { getTriage, setTriage, type TriageState } from "@/lab/triage";
 
 function when(iso: string): string {
   if (!iso) return "—";
+  // UTC explicitly: the lab clock is UTC, and a fixed zone keeps the server
+  // render and the client hydration byte-identical.
   return new Date(iso).toLocaleString("en-GB", {
+    timeZone: "UTC",
     day: "2-digit",
     month: "short",
     hour: "2-digit",

@@ -11,10 +11,15 @@ const DEFAULT_QUERY = `DeviceProcessEvents
 | project Timestamp, DeviceName, AccountName, ProcessCommandLine
 | take 20`;
 
-type Props = { schema: TableSchema[]; rowCounts: Record<string, number> };
+type Props = {
+  schema: TableSchema[];
+  rowCounts: Record<string, number>;
+  /** Prefilled from an incident investigation step. */
+  initialQuery?: string;
+};
 
-export function HuntingConsole({ schema, rowCounts }: Props) {
-  const [query, setQuery] = useState(DEFAULT_QUERY);
+export function HuntingConsole({ schema, rowCounts, initialQuery }: Props) {
+  const [query, setQuery] = useState(initialQuery || DEFAULT_QUERY);
   const [result, setResult] = useState<LabResult | null>(null);
   const [pending, startTransition] = useTransition();
   const [openTable, setOpenTable] = useState<string | null>(null);

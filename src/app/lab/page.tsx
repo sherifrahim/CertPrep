@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { IOC, DEVICES, USERS, tableRowCounts } from "@/lab/data";
+import { PLANNED_BLADES, READY_BLADES } from "@/lab/nav";
 import { TABLES } from "@/lab/schema";
 
 export const metadata = {
@@ -13,7 +14,7 @@ export default function LabPage() {
   const total = Object.values(counts).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10">
+    <div className="max-w-5xl">
       <p className="chip">Hands-on</p>
       <h1 className="mt-4 text-3xl font-semibold tracking-tight">Practice lab</h1>
       <p className="mt-3 max-w-2xl text-muted">
@@ -36,25 +37,32 @@ export default function LabPage() {
       </div>
 
       <section className="mt-8">
-        <h2 className="text-xl font-semibold tracking-tight">Start here</h2>
+        <h2 className="text-xl font-semibold tracking-tight">Blades</h2>
+        <p className="mt-1 text-sm text-muted">
+          {READY_BLADES.length} built, {PLANNED_BLADES.length} planned. Everything is listed so the
+          navigation shows the whole surface rather than hiding the gaps.
+        </p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <Link href="/lab/hunting" className="card p-5 transition-shadow hover:shadow-md">
-            <h3 className="font-medium">Advanced hunting</h3>
-            <p className="mt-1 text-sm text-muted">
-              Write KQL against {TABLES.length} tables with a schema browser and sample queries, the
-              way the Defender portal lays it out.
-            </p>
-            <span className="mt-3 inline-block text-sm text-accent-text">Open the console →</span>
-          </Link>
-          <div className="card p-5 opacity-70">
-            <h3 className="font-medium">Incident queue</h3>
-            <p className="mt-1 text-sm text-muted">
-              Triage the alerts this environment raised, assign and classify them, and walk the
-              attack story end to end.
-            </p>
-            <span className="mt-3 inline-block text-sm text-muted">Coming next</span>
-          </div>
+          {READY_BLADES.map((blade) => (
+            <Link key={blade.href} href={blade.href} className="card p-5 transition-shadow hover:shadow-md">
+              <h3 className="font-medium">{blade.label}</h3>
+              <p className="mt-1 text-sm text-muted">{blade.hint}</p>
+              <span className="mt-3 inline-block text-sm text-accent-text">Open →</span>
+            </Link>
+          ))}
         </div>
+        <details className="mt-4">
+          <summary className="cursor-pointer text-sm text-accent-text">
+            {PLANNED_BLADES.length} blades still to build
+          </summary>
+          <ul className="mt-2 grid gap-1 text-sm text-muted sm:grid-cols-2">
+            {PLANNED_BLADES.map((b) => (
+              <li key={b.href}>
+                <span className="font-medium text-ink">{b.label}</span> — {b.hint}
+              </li>
+            ))}
+          </ul>
+        </details>
       </section>
 
       <section className="mt-10">

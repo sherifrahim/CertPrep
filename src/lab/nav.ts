@@ -87,7 +87,7 @@ export const LAB_NAV: BladeSection[] = [
             href: "/lab/email",
             label: "Explorer",
             hint: "Hunt delivered mail, see clicks, and purge from mailboxes.",
-            status: "planned",
+            status: "ready",
           },
           {
             href: "/lab/quarantine",
@@ -109,7 +109,7 @@ export const LAB_NAV: BladeSection[] = [
             href: "/lab/analytics",
             label: "Analytics rules",
             hint: "Author scheduled rules and see what they would have caught.",
-            status: "planned",
+            status: "ready",
           },
           {
             href: "/lab/connectors",

@@ -25,6 +25,13 @@ export async function SiteHeader() {
           ))}
         </nav>
 
+        <Link
+          href="/lab"
+          className="hidden rounded-md px-2.5 py-1.5 text-sm text-muted hover:bg-surface-2 hover:text-ink sm:block"
+        >
+          Lab
+        </Link>
+
         <div className="ml-auto flex items-center gap-2 text-sm">
           {session?.user ? (
             <>

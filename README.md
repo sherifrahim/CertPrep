@@ -208,36 +208,53 @@ Set in [`next.config.ts`](next.config.ts) for every route: CSP, HSTS, `X-Frame-O
 
 The CSP keeps `'unsafe-inline'` on `script-src` because Next.js injects inline bootstrap scripts; removing it needs nonce-based CSP via middleware. The other directives still carry most of the value — `frame-ancestors 'none'`, `object-src 'none'`, and `base-uri 'self'`.
 
-## Deploying to Vercel
+## Deploying
 
-1. Push the repository to GitHub and import it in Vercel.
-2. Create a Postgres database (Neon, Supabase, or Vercel Postgres) and copy its connection string.
-3. Set these environment variables in the Vercel project:
-   - `DATABASE_URL` — the hosted Postgres connection string
-   - `AUTH_SECRET` — a fresh `openssl rand -base64 32` value
-   - `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` — only if using Google sign-in
-4. Deploy. The build script runs `prisma generate` before `next build`.
-5. Apply migrations against the hosted database once:
+The site is live at **https://certprep-exams.vercel.app**.
+
+Deployment is **Git-connected**: pushing to `main` triggers a Vercel build automatically, and it goes live in about a minute. There is no manual deploy step and no CLI involved.
+
+```bash
+git push origin main
+```
+
+To confirm a push actually deployed rather than assuming it did, read the commit status — Vercel writes one, and no authentication is needed for a public repo:
+
+```bash
+curl -s https://api.github.com/repos/sherifrahim/CertPrep/commits/$(git rev-parse HEAD)/status
+```
+
+Look for `"context": "Vercel"` moving from `pending` to `success`.
+
+### Environment variables
+
+These live in the **Vercel project settings**, not in the repository and not in GitHub Secrets — Vercel does not read GitHub Secrets:
+
+| Variable | Purpose |
+| --- | --- |
+| `DATABASE_URL` | Hosted Postgres connection string |
+| `AUTH_SECRET` | A fresh `openssl rand -base64 32` value |
+| `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | Only if Google sign-in is enabled |
+
+Leave `AUTH_URL` **unset** in production. `trustHost: true` in [`src/auth.ts`](src/auth.ts) makes Auth.js infer the origin from the request, so the same build works on any domain; pinning it breaks the post-sign-in redirect.
+
+The build script runs `prisma generate` before `next build`, because the generated client lives in `src/generated/prisma` and is gitignored — which is also why `postinstall` runs it.
+
+Apply migrations against the hosted database once, after changing the schema:
 
 ```bash
 DATABASE_URL="<your-production-url>" npx prisma migrate deploy
 ```
 
-The generated Prisma client lives in `src/generated/prisma` and is gitignored, which is why `prisma generate` runs in both `build` and `postinstall`.
+### Setting up a new deployment
 
-### Deploying with the Vercel CLI
+Only needed when creating a fresh Vercel project rather than pushing to the existing one:
 
-Git-based deploys are unaffected by this, but `vercel deploy` from the command line **uploads your local `.env`**, and a shipped `.env` overrides the project environment variables. That pins `AUTH_URL` to `http://localhost:3000` and breaks the post-sign-in redirect in production.
+1. Import the repository at [vercel.com/new](https://vercel.com/new), production branch `main`.
+2. Add the environment variables above.
+3. Create the Postgres database and run `prisma migrate deploy` against it.
 
-A `.vercelignore` does not fix it — Vercel puts `.env` in its upload manifest and the build fails if the file is then missing. Move it aside for the duration of the deploy instead:
-
-```bash
-mv .env .env.bak && vercel deploy --prod && mv .env.bak .env
-```
-
-`vercel link` also writes a `.env.local` holding a `VERCEL_OIDC_TOKEN`. That one is harmless because it sets no key the app reads, but if you ever put app settings in `.env.local`, move it aside too — Next.js gives it higher precedence than `.env`.
-
-Leave `AUTH_URL` unset in production. `trustHost: true` in [`src/auth.ts`](src/auth.ts) makes Auth.js infer the origin from the request, so the same build works on any domain.
+> **If a project was ever deployed with `vercel deploy` from the CLI**, connect it to Git before relying on pushes: Settings → Git → Connect Git Repository. Until that is done, pushes to `main` change nothing on the hosted site and the deployment silently serves whatever was last uploaded by hand. Afterwards, trigger the first Git build with a new commit rather than redeploying the existing one — *Redeploy* rebuilds the old CLI-uploaded source, not the repository.
 
 ## Adding content
 

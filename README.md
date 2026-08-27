@@ -51,7 +51,7 @@ Ordering questions store their steps in the correct sequence, so they are always
 npm test
 ```
 
-334 vitest cases over the pure logic, the content bank, and the practice lab: shuffle uniformity, grading across all five question formats, answer randomisation, mock composition, Leitner scheduling, drill selection, reset-token handling, readiness weighting, the KQL engine, and every rule-evaluation model in the lab. Pure logic lives in [`src/lib/scheduling.ts`](src/lib/scheduling.ts), [`src/lib/password-reset.ts`](src/lib/password-reset.ts), and [`src/lib/readiness.ts`](src/lib/readiness.ts) so it is testable without a database, and the lab's logic sits in `src/lab/` for the same reason.
+534 vitest cases over the pure logic, the content bank, and the practice lab: shuffle uniformity, grading across all five question formats, answer randomisation, mock composition, Leitner scheduling, drill selection, reset-token handling, readiness weighting, the KQL engine, and every rule-evaluation model in the lab. Pure logic lives in [`src/lib/scheduling.ts`](src/lib/scheduling.ts), [`src/lib/password-reset.ts`](src/lib/password-reset.ts), and [`src/lib/readiness.ts`](src/lib/readiness.ts) so it is testable without a database, and the lab's logic sits in `src/lab/` for the same reason.
 
 Where a lab blade shows teaching copy next to a worked example — "this is denied by the rule at priority 200" — a test asserts the engine actually agrees with the copy. Explanatory text that drifts from behaviour is worse than none, because learners believe it.
 
@@ -85,21 +85,27 @@ A full intrusion runs through it — phishing, a click, credential replay from a
 
 Grouped by product in a persistent left rail, the way the real portals are. Planned blades stay visible but disabled, so the navigation is an honest roadmap rather than a curated subset — and [`src/lab/nav.test.ts`](src/lab/nav.test.ts) enforces that, failing if a blade claims to be ready without a page or is built while still marked planned.
 
+Each blade reproduces the real product's menu, tabs, field labels, option values and defaults. Azure resources render through a shared resource shell — breadcrumb, command bar, collapsible Essentials, searchable grouped menu — and Defender surfaces through an XDR entity shell, because the two portals do not look alike. Icons and imagery are the only things deliberately left out.
+
 | Blade | Route | What you practise |
 | --- | --- | --- |
 | Incidents & alerts | `/lab/incidents` | Triage a correlated queue, assign, classify, walk the attack story |
 | Advanced hunting | `/lab/hunting` | Write real KQL against all 14 tables, with a schema browser and samples |
 | Action center | `/lab/actions` | Approve or reject pending remediation, with the blast radius stated |
 | Device inventory | `/lab/devices` | Onboarded endpoints with risk, exposure and onboarding state |
-| Explorer | `/lab/email` | Hunt delivered mail, separate received from clicked, remediate |
+| Device entity | `/lab/devices/[id]` | Eight response actions, timeline, software, CVEs, missing updates |
+| Identities | `/lab/identities` | Risk versus investigation priority; containment that actually contains |
+| Vulnerability management | `/lab/vulnerabilities` | Exposure score against secure score, weaknesses ranked by threat |
+| Attack surface reduction | `/lab/asr` | ASR rules by GUID, audit versus block, and what each would have stopped |
+| Explorer | `/lab/email` | Views, the property filter bar, chart breakdowns, take-action wizard |
 | Quarantine | `/lab/quarantine` | Release, report and expire quarantined mail as admin or as end user |
 | Analytics rules | `/lab/analytics` | Author scheduled rules and see what they would have caught |
+| Data connectors | `/lab/connectors` | Which tables a source feeds, and which detections die without it |
 | Network security groups | `/lab/nsg` | Build rules, test a flow, see which rule decided it and why |
-| Azure Firewall | `/lab/firewall` | DNAT, network and application rules, threat intelligence, full trace |
+| Azure Firewall | `/lab/firewall` | Rule collections, DNAT, threat intelligence, IDPS signature rules |
+| Web application firewall | `/lab/waf` | Detection versus prevention, anomaly scoring, custom rules, exclusions |
 | Virtual networks | `/lab/vnet` | Effective routes, longest-prefix match, peering, private endpoints |
-| Defender for Cloud | `/lab/defender-cloud` | Secure score, recommendations and attack paths over an Azure estate |
-
-Still to build: identities, vulnerability management, attack surface reduction, and Sentinel data connectors.
+| Defender for Cloud | `/lab/defender-cloud` | Secure score, exemptions, compliance, attack paths, Defender plans |
 
 ### The KQL engine
 
@@ -118,7 +124,14 @@ The interactive blades exist because these behaviours are the ones that reading 
 - **Virtual networks** ([`vnet.ts`](src/lab/vnet.ts)) — longest prefix match wins first; only on a tie does source break it, user-defined over BGP over system. Peering is never transitive, so two spokes on a shared hub cannot reach each other. A next hop of `None` is a route that matches and drops.
 - **Action center** ([`actions.ts`](src/lab/actions.ts)) — what an automated investigation may do unattended is set by the **device group's automation level**, not by alert severity. The same file in `AppData\Roaming` is auto-remediated under one semi-automatic level and held for approval under the other.
 - **Quarantine** ([`quarantine.ts`](src/lab/quarantine.ts)) — recipient permissions come from the quarantine policy the **verdict** assigns. Malware and high-confidence phishing are admin-only and invisible to the user; a normal-confidence phish they can release themselves.
-- **Defender for Cloud** ([`defender-cloud.ts`](src/lab/defender-cloud.ts)) — secure score is earned points over possible points, weighted per control. A resource counts as healthy only once it passes **every** recommendation in its control, so fixing one of two earns nothing, and a Low-severity finding can be worth more points than a High one. Mark recommendations remediated and watch the score move.
+- **Defender for Cloud** ([`defender-cloud.ts`](src/lab/defender-cloud.ts)) — secure score is earned points over possible points, weighted per control. A resource counts as healthy only once it passes **every** recommendation in its control, so fixing one of two earns nothing, and a Low-severity finding can be worth more points than a High one. Exemptions raise the score by removing resources from the denominator, so a blanket waiver reaches 100% with nothing fixed. Compliance controls, by contrast, give no partial credit at all.
+- **IDPS** ([`idps.ts`](src/lab/idps.ts)) — policy mode is only a default. A per-signature override beats it, and the **bypass list beats both** because it is evaluated first, so a bypass entry silently defeats every override while the blade still reads "Alert and deny". IDPS also only sees traffic the rules already allowed.
+- **WAF** ([`waf.ts`](src/lab/waf.ts)) — **Detection mode never blocks**, whatever the rules say; a new policy defaults to it. Managed rules use CRS anomaly scoring rather than blocking individually, so one Critical match blocks alone while a single Warning never does and two together do. Custom rules run first and terminate, making a custom Allow a hole straight through the managed set.
+- **Device response** ([`device.ts`](src/lab/device.ts)) — full isolation takes everything; selective leaves Outlook, Teams and Skype so you can still reach the person. Restricting app execution is not isolation at all — the device stays on the network. Only the three containment actions can be undone, and an inactive device offers none of them.
+- **Identity containment** ([`identity.ts`](src/lab/identity.ts)) — disabling an account leaves every refresh token valid until it expires, so an attacker holding one keeps working; revoking sessions without disabling lets them sign straight back in. Containment needs both halves, and the blade says plainly when only one has been done.
+- **Attack surface reduction** ([`asr.ts`](src/lab/asr.ts)) — **Audit writes the same events as Block and prevents nothing**, so a coverage report counting configured rules cannot tell them apart. The rule that would have stopped this lab's own LSASS dump is sitting in Audit.
+- **Vulnerability management** ([`tvm.ts`](src/lab/tvm.ts)) — exposure score and secure score for devices measure opposite things in opposite directions, take different inputs, and move independently. Weaknesses rank by **threat**, not CVSS: a 6.5 with a verified exploit outranks a 9.8 nobody has weaponised.
+- **Data connectors** ([`connectors.ts`](src/lab/connectors.ts)) — a connector is what puts rows in a table. Turn one off and nothing errors; the table goes empty and every rule reading it returns nothing while still reporting itself healthy. Detection coverage is a function of ingestion.
 
 ### Nothing is persisted
 

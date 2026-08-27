@@ -2,14 +2,27 @@
 
 import { useMemo, useState } from "react";
 import {
-  EMPTY_FILTERS,
-  describeRemediation,
-  filterMail,
-  summarise,
-  type MailFilters,
-  type MailRow,
-  type RemediationAction,
-} from "@/lab/email";
+  CHART_BREAKDOWNS,
+  EXPLORER_ACTIONS,
+  EXPLORER_HINTS,
+  EXPLORER_VIEWS,
+  FILTER_OPERATORS,
+  FILTER_PROPERTIES,
+  applyFilters,
+  applyView,
+  chartData,
+  describeAction,
+  distinctValues,
+  explorerRows,
+  type ChartBreakdown,
+  type ExplorerAction,
+  type ExplorerFilter,
+  type ExplorerRow,
+  type ExplorerView,
+  type FilterOperator,
+  type FilterProperty,
+} from "@/lab/explorer";
+import { LabNote } from "./azure/resource-shell";
 
 function when(iso: string): string {
   return new Date(iso).toLocaleString("en-GB", {
@@ -21,227 +34,414 @@ function when(iso: string): string {
   });
 }
 
-const ACTIONS: { value: RemediationAction; label: string }[] = [
-  { value: "SoftDelete", label: "Soft delete" },
-  { value: "HardDelete", label: "Hard delete" },
-  { value: "MoveToJunk", label: "Move to junk" },
-  { value: "MoveToInbox", label: "Move to inbox" },
-];
-
-export function EmailExplorer({ mail }: { mail: MailRow[] }) {
-  const [filters, setFilters] = useState<MailFilters>({ ...EMPTY_FILTERS, threatOnly: true });
+export function EmailExplorer() {
+  const all = useMemo(() => explorerRows(), []);
+  const [view, setView] = useState<ExplorerView>("All email");
+  const [filters, setFilters] = useState<ExplorerFilter[]>([]);
+  const [breakdown, setBreakdown] = useState<ChartBreakdown>("Delivery action");
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [done, setDone] = useState<string | null>(null);
+  const [detail, setDetail] = useState<ExplorerRow | null>(null);
+  const [action, setAction] = useState<ExplorerAction>("Soft delete");
+  const [note, setNote] = useState<string | null>(null);
+  const [confirmed, setConfirmed] = useState<string | null>(null);
 
-  const rows = useMemo(() => filterMail(mail, filters), [mail, filters]);
-  const stats = useMemo(() => summarise(rows), [rows]);
-  const chosen = rows.filter((r) => selected.has(r.networkMessageId));
+  // Draft filter row
+  const [property, setProperty] = useState<FilterProperty>("Sender address");
+  const [operator, setOperator] = useState<FilterOperator>("Equal any of");
+  const [value, setValue] = useState("");
 
-  function toggle(id: string) {
-    setSelected((s) => {
-      const next = new Set(s);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-    setDone(null);
+  const inView = useMemo(() => applyView(all, view), [all, view]);
+  const rows = useMemo(() => applyFilters(inView, filters), [inView, filters]);
+  const chart = useMemo(() => chartData(rows, breakdown), [rows, breakdown]);
+  const max = chart.length > 0 ? chart[0].count : 0;
+
+  const selectedRows = rows.filter((r) => selected.has(r.networkMessageId));
+  const outcome = selectedRows.length > 0 ? describeAction(action, selectedRows) : null;
+
+  function addFilter() {
+    const values = value
+      .split(",")
+      .map((v) => v.trim())
+      .filter(Boolean);
+    if (values.length === 0) return;
+    setFilters((f) => [...f, { property, operator, values }]);
+    setValue("");
+    setNote(null);
   }
 
-  function apply(action: RemediationAction) {
-    const r = describeRemediation(action, chosen);
-    setDone(
-      `${ACTIONS.find((a) => a.value === action)!.label} applied to ${r.affected} message${
-        r.affected === 1 ? "" : "s"
-      } across ${r.mailboxes.length} mailbox${r.mailboxes.length === 1 ? "" : "es"}. ${r.explanation}`,
-    );
-  }
-
-  const set = (p: Partial<MailFilters>) => {
-    setFilters((f) => ({ ...f, ...p }));
+  function applyHint(hint: (typeof EXPLORER_HINTS)[number]) {
+    if (hint.view) setView(hint.view);
+    setFilters(hint.filters);
+    setNote(hint.teaches);
     setSelected(new Set());
-    setDone(null);
-  };
+    setConfirmed(null);
+  }
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        {[
-          { label: "Messages", value: stats.total },
-          { label: "Threats", value: stats.threats },
-          { label: "Delivered", value: stats.delivered },
-          { label: "Clicked", value: stats.clicked },
-          { label: "Senders", value: stats.distinctSenders },
-          { label: "Recipients", value: stats.distinctRecipients },
-        ].map((s) => (
-          <div key={s.label} className="card p-3">
-            <p className="text-xl font-semibold">{s.value}</p>
-            <p className="text-xs text-muted">{s.label}</p>
+      {/* view tabs */}
+      <div className="flex flex-wrap gap-1 border-b border-line">
+        {EXPLORER_VIEWS.map((v) => (
+          <button
+            key={v}
+            type="button"
+            onClick={() => {
+              setView(v);
+              setSelected(new Set());
+              setNote(null);
+            }}
+            className={`px-3 py-2 text-sm ${
+              view === v ? "border-b-2 border-accent font-medium text-ink" : "text-muted"
+            }`}
+          >
+            {v}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex flex-wrap gap-1">
+        {EXPLORER_HINTS.map((h) => (
+          <button key={h.label} type="button" onClick={() => applyHint(h)} className="chip hover:text-ink">
+            {h.label}
+          </button>
+        ))}
+      </div>
+
+      {note && <p className="rounded border border-line bg-surface-2 p-3 text-sm">{note}</p>}
+
+      {/* filter bar */}
+      <section className="card p-3">
+        <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,2fr)_auto]">
+          <label className="text-xs">
+            <span className="mb-1 block font-medium">Property</span>
+            <select
+              value={property}
+              onChange={(e) => setProperty(e.target.value as FilterProperty)}
+              className="field py-1 text-xs"
+            >
+              {FILTER_PROPERTIES.map((p) => (
+                <option key={p}>{p}</option>
+              ))}
+            </select>
+          </label>
+          <label className="text-xs">
+            <span className="mb-1 block font-medium">Operator</span>
+            <select
+              value={operator}
+              onChange={(e) => setOperator(e.target.value as FilterOperator)}
+              className="field py-1 text-xs"
+            >
+              {FILTER_OPERATORS.map((o) => (
+                <option key={o}>{o}</option>
+              ))}
+            </select>
+          </label>
+          <label className="text-xs">
+            <span className="mb-1 block font-medium">Value</span>
+            <input
+              list="explorer-values"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && addFilter()}
+              placeholder="comma separated"
+              className="field py-1 font-mono text-xs"
+            />
+            <datalist id="explorer-values">
+              {distinctValues(inView, property).map((v) => (
+                <option key={v} value={v} />
+              ))}
+            </datalist>
+          </label>
+          <div className="flex items-end">
+            <button type="button" onClick={addFilter} className="btn-secondary py-1 text-xs">
+              Add filter
+            </button>
           </div>
-        ))}
-      </div>
+        </div>
 
-      <div className="card p-4">
-        <div className="grid gap-3 sm:grid-cols-3">
-          <label className="text-sm">
-            <span className="mb-1 block font-medium">Sender</span>
-            <input
-              value={filters.sender}
-              onChange={(e) => set({ sender: e.target.value })}
-              placeholder="contoso-benefits.com"
-              className="field py-1.5 text-sm"
-            />
-          </label>
-          <label className="text-sm">
-            <span className="mb-1 block font-medium">Recipient</span>
-            <input
-              value={filters.recipient}
-              onChange={(e) => set({ recipient: e.target.value })}
-              className="field py-1.5 text-sm"
-            />
-          </label>
-          <label className="text-sm">
-            <span className="mb-1 block font-medium">Subject</span>
-            <input
-              value={filters.subject}
-              onChange={(e) => set({ subject: e.target.value })}
-              className="field py-1.5 text-sm"
-            />
+        {filters.length > 0 && (
+          <div className="mt-2 flex flex-wrap items-center gap-1">
+            {filters.map((f, i) => (
+              <span
+                key={`${f.property}-${i}`}
+                className="inline-flex items-center gap-1 rounded-full border border-line bg-surface-2 px-2 py-0.5 text-[11px]"
+              >
+                {f.property} {f.operator.toLowerCase()} {f.values.join(", ")}
+                <button
+                  type="button"
+                  onClick={() => setFilters((all) => all.filter((_, j) => j !== i))}
+                  aria-label={`Remove ${f.property} filter`}
+                  className="text-muted hover:text-bad"
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+            <button
+              type="button"
+              onClick={() => setFilters([])}
+              className="ml-1 text-[11px] text-accent-text"
+            >
+              Clear all
+            </button>
+          </div>
+        )}
+      </section>
+
+      {/* chart — one measure across a few categories, so a single hue and
+          direct labels; colour would be encoding nothing here. */}
+      <section className="card p-3">
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold">
+            {rows.length} message{rows.length === 1 ? "" : "s"}
+          </h2>
+          <label className="text-xs">
+            <span className="mr-1 text-muted">Chart breakdown</span>
+            <select
+              value={breakdown}
+              onChange={(e) => setBreakdown(e.target.value as ChartBreakdown)}
+              className="field inline-block w-auto py-0.5 text-xs"
+            >
+              {CHART_BREAKDOWNS.map((b) => (
+                <option key={b}>{b}</option>
+              ))}
+            </select>
           </label>
         </div>
-        <div className="mt-3 flex flex-wrap gap-4 text-sm">
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={filters.threatOnly}
-              onChange={(e) => set({ threatOnly: e.target.checked })}
-              className="accent-[var(--accent)]"
-            />
-            Threats only
-          </label>
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={filters.clickedOnly}
-              onChange={(e) => set({ clickedOnly: e.target.checked })}
-              className="accent-[var(--accent)]"
-            />
-            Clicked only
-          </label>
-          <button
-            type="button"
-            onClick={() => set(EMPTY_FILTERS)}
-            className="ml-auto text-sm text-accent-text underline"
-          >
-            Clear filters
-          </button>
-        </div>
-      </div>
 
-      {/* remediation bar */}
-      <div className="card flex flex-wrap items-center gap-2 p-3">
-        <span className="text-sm">
-          <strong>{chosen.length}</strong> selected
-        </span>
-        {ACTIONS.map((a) => (
-          <button
-            key={a.value}
-            type="button"
-            disabled={chosen.length === 0}
-            onClick={() => apply(a.value)}
-            className={`${a.value === "HardDelete" ? "btn-secondary" : "btn-secondary"} text-xs`}
-          >
-            {a.label}
-          </button>
-        ))}
-        <button
-          type="button"
-          onClick={() => setSelected(new Set(rows.map((r) => r.networkMessageId)))}
-          className="btn-ghost ml-auto text-xs"
-        >
-          Select all shown
-        </button>
-      </div>
+        <ul className="space-y-1.5">
+          {chart.map((slice) => (
+            <li key={slice.label} className="flex items-center gap-2 text-xs">
+              <span className="w-40 shrink-0 truncate text-muted" title={slice.label}>
+                {slice.label || "(none)"}
+              </span>
+              <span className="flex min-w-0 flex-1 items-center gap-2">
+                <span
+                  className="h-3 rounded-sm"
+                  style={{
+                    width: `${max === 0 ? 0 : Math.max((slice.count / max) * 100, 1)}%`,
+                    background: "var(--accent)",
+                  }}
+                  title={`${slice.label}: ${slice.count}`}
+                />
+                <span className="shrink-0 tabular-nums">{slice.count}</span>
+              </span>
+            </li>
+          ))}
+          {chart.length === 0 && <li className="text-xs text-muted">Nothing matches.</li>}
+        </ul>
+      </section>
 
-      {done && <p className="card border-ok bg-ok-soft p-3 text-sm">{done}</p>}
+      {/* take action */}
+      {selectedRows.length > 0 && (
+        <section className="card p-3">
+          <div className="flex flex-wrap items-end gap-2">
+            <label className="text-xs">
+              <span className="mb-1 block font-medium">
+                Take action on {selectedRows.length} message
+                {selectedRows.length === 1 ? "" : "s"}
+              </span>
+              <select
+                value={action}
+                onChange={(e) => setAction(e.target.value as ExplorerAction)}
+                className="field py-1 text-xs"
+              >
+                {EXPLORER_ACTIONS.map((a) => (
+                  <option key={a}>{a}</option>
+                ))}
+              </select>
+            </label>
+            <button
+              type="button"
+              onClick={() => setConfirmed(action)}
+              className="btn-primary py-1 text-xs"
+            >
+              Next
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setSelected(new Set());
+                setConfirmed(null);
+              }}
+              className="btn-secondary py-1 text-xs"
+            >
+              Clear selection
+            </button>
+          </div>
 
-      <div className="card overflow-x-auto">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b border-line text-xs uppercase tracking-wide text-muted">
+          {outcome && (
+            <div className="mt-2 rounded border border-line bg-surface-2 p-3 text-xs">
+              <p>{outcome.explanation}</p>
+              <p className="mt-1 text-muted">
+                {outcome.affected} message{outcome.affected === 1 ? "" : "s"} across{" "}
+                {outcome.mailboxes.length} mailbox{outcome.mailboxes.length === 1 ? "" : "es"} ·{" "}
+                {outcome.reversible ? "Reversible" : "Not reversible"} ·{" "}
+                {outcome.requiresApproval
+                  ? "Goes to the Action center for approval"
+                  : "Runs without approval"}
+              </p>
+              {confirmed === action && (
+                <p className="mt-2 rounded bg-ok-soft p-2 text-ok">
+                  Submitted.{" "}
+                  {outcome.requiresApproval
+                    ? "It is now pending in the Action center — the mail has not moved yet."
+                    : "No approval was needed."}
+                </p>
+              )}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* results grid */}
+      <section className="card overflow-x-auto">
+        <table className="w-full text-left text-xs">
+          <thead className="border-b border-line bg-surface-2/50 uppercase tracking-wide text-muted">
             <tr>
-              <th className="w-8 px-3 py-2" />
-              <th className="px-3 py-2 font-medium">Time</th>
-              <th className="px-3 py-2 font-medium">Sender</th>
-              <th className="px-3 py-2 font-medium">Recipient</th>
+              <th className="px-2 py-2">
+                <input
+                  type="checkbox"
+                  aria-label="Select all"
+                  checked={rows.length > 0 && selected.size === rows.length}
+                  onChange={(e) =>
+                    setSelected(
+                      e.target.checked ? new Set(rows.map((r) => r.networkMessageId)) : new Set(),
+                    )
+                  }
+                />
+              </th>
+              <th className="px-3 py-2 font-medium">Date</th>
               <th className="px-3 py-2 font-medium">Subject</th>
-              <th className="px-3 py-2 font-medium">Verdict</th>
-              <th className="px-3 py-2 font-medium">Delivered to</th>
-              <th className="px-3 py-2 font-medium">Clicked</th>
+              <th className="px-3 py-2 font-medium">Recipient</th>
+              <th className="px-3 py-2 font-medium">Sender</th>
+              <th className="px-3 py-2 font-medium">Delivery action</th>
+              <th className="px-3 py-2 font-medium">Original location</th>
+              <th className="px-3 py-2 font-medium">Latest location</th>
+              <th className="px-3 py-2 font-medium">Detection tech</th>
             </tr>
           </thead>
           <tbody>
-            {rows.slice(0, 200).map((m) => (
-              <tr
-                key={m.networkMessageId}
-                className={`border-b border-line last:border-0 hover:bg-surface-2 ${
-                  m.clicked ? "bg-bad-soft" : ""
-                }`}
-              >
-                <td className="px-3 py-2">
-                  <input
-                    type="checkbox"
-                    checked={selected.has(m.networkMessageId)}
-                    onChange={() => toggle(m.networkMessageId)}
-                    aria-label={`Select message to ${m.recipient}`}
-                    className="accent-[var(--accent)]"
-                  />
-                </td>
-                <td className="whitespace-nowrap px-3 py-2 text-xs text-muted">{when(m.timestamp)}</td>
-                <td className="px-3 py-2 text-xs">
-                  <span className="font-mono">{m.sender}</span>
-                  {m.authentication.includes("SPF: fail") && (
-                    <span className="ml-2 rounded bg-warn-soft px-1.5 py-0.5 text-[10px] uppercase text-warn">
-                      auth fail
-                    </span>
-                  )}
-                </td>
-                <td className="px-3 py-2 font-mono text-xs">{m.recipient}</td>
-                <td className="max-w-[280px] px-3 py-2">
-                  <span className="block truncate" title={m.subject}>
-                    {m.subject}
-                  </span>
-                  {m.urls.length > 0 && (
-                    <span className="block truncate font-mono text-[11px] text-muted" title={m.urls.join(", ")}>
-                      {m.urls[0]}
-                    </span>
-                  )}
-                </td>
-                <td className="px-3 py-2">
-                  {m.threatTypes ? (
-                    <span className="rounded bg-bad-soft px-2 py-0.5 text-xs text-bad">
-                      {m.threatTypes}
-                    </span>
-                  ) : (
-                    <span className="text-xs text-muted">—</span>
-                  )}
-                </td>
-                <td className="px-3 py-2 text-xs">{m.deliveryLocation}</td>
-                <td className="px-3 py-2 text-xs">
-                  {m.clicked ? (
-                    <span className="font-medium text-bad">{m.clickAction}</span>
-                  ) : (
-                    <span className="text-muted">no</span>
-                  )}
+            {rows.slice(0, 80).map((r) => {
+              const moved = r.originalDeliveryLocation !== r.latestDeliveryLocation;
+              return (
+                <tr
+                  key={r.networkMessageId}
+                  className="border-b border-line last:border-0 hover:bg-surface-2"
+                >
+                  <td className="px-2 py-2">
+                    <input
+                      type="checkbox"
+                      aria-label={`Select ${r.subject}`}
+                      checked={selected.has(r.networkMessageId)}
+                      onChange={(e) =>
+                        setSelected((s) => {
+                          const next = new Set(s);
+                          if (e.target.checked) next.add(r.networkMessageId);
+                          else next.delete(r.networkMessageId);
+                          return next;
+                        })
+                      }
+                    />
+                  </td>
+                  <td className="px-3 py-2 whitespace-nowrap text-muted">{when(r.timestamp)}</td>
+                  <td className="px-3 py-2">
+                    <button
+                      type="button"
+                      onClick={() => setDetail(r)}
+                      className="text-left text-accent-text"
+                    >
+                      {r.subject}
+                    </button>
+                    {r.threatTypes && (
+                      <span className="ml-2 rounded bg-bad-soft px-1.5 py-0.5 text-[10px] text-bad">
+                        {r.threatTypes}
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-3 py-2 font-mono text-[11px]">{r.recipient}</td>
+                  <td className="px-3 py-2 font-mono text-[11px]">{r.sender}</td>
+                  <td className="px-3 py-2">{r.deliveryAction}</td>
+                  <td className="px-3 py-2 text-muted">{r.originalDeliveryLocation}</td>
+                  <td className={`px-3 py-2 ${moved ? "font-medium text-warn" : ""}`}>
+                    {r.latestDeliveryLocation}
+                    {moved && <span className="ml-1 text-[10px]">(moved)</span>}
+                  </td>
+                  <td className="px-3 py-2 text-muted">{r.detectionTechnology}</td>
+                </tr>
+              );
+            })}
+            {rows.length === 0 && (
+              <tr>
+                <td colSpan={9} className="px-3 py-6 text-center text-muted">
+                  No messages match this view and filter set.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
-      </div>
+        {rows.length > 80 && (
+          <p className="border-t border-line px-3 py-2 text-[11px] text-muted">
+            Showing the first 80 of {rows.length}.
+          </p>
+        )}
+      </section>
 
-      {rows.length > 200 && (
-        <p className="text-xs text-muted">Showing the first 200 of {rows.length} messages.</p>
+      {detail && (
+        <section className="card p-4">
+          <div className="flex items-start justify-between gap-3">
+            <h2 className="text-sm font-semibold">{detail.subject}</h2>
+            <button type="button" onClick={() => setDetail(null)} className="text-xs text-muted">
+              Close
+            </button>
+          </div>
+          <dl className="mt-2 grid gap-x-6 gap-y-1 text-xs sm:grid-cols-2">
+            {[
+              ["Network message ID", detail.networkMessageId],
+              ["Sender", detail.sender],
+              ["Sender IP", detail.senderIp],
+              ["Sender domain", detail.senderDomain],
+              ["Recipient", detail.recipient],
+              ["Directionality", detail.directionality],
+              ["Delivery action", detail.deliveryAction],
+              ["Original delivery location", detail.originalDeliveryLocation],
+              ["Latest delivery location", detail.latestDeliveryLocation],
+              ["Detection technology", detail.detectionTechnology],
+              ["Authentication", detail.authentication],
+              ["Click verdict", detail.clickVerdict],
+              ["Campaign", detail.campaignId ?? "—"],
+            ].map(([k, v]) => (
+              <div key={k as string} className="flex gap-2">
+                <dt className="shrink-0 text-muted">{k}</dt>
+                <dd className="min-w-0 break-words font-mono text-[11px]">{v}</dd>
+              </div>
+            ))}
+          </dl>
+          {detail.urls.length > 0 && (
+            <div className="mt-2">
+              <p className="text-[11px] uppercase tracking-wide text-muted">URLs</p>
+              <ul className="mt-0.5 space-y-0.5">
+                {detail.urls.map((u) => (
+                  <li key={u} className="break-all font-mono text-[11px]">
+                    {u}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </section>
       )}
-      {rows.length === 0 && <p className="card p-4 text-sm text-muted">No messages match.</p>}
+
+      <LabNote>
+        <p>
+          <strong>Original</strong> and <strong>Latest delivery location</strong> are separate
+          columns for a reason. The phishing wave was delivered to six inboxes and then pulled to
+          quarantine by zero-hour auto purge — except the one the recipient had already clicked.
+          Filter on the original location and you get the whole campaign; filter on the latest and
+          you get what is still sitting where a user can reach it. Hunting the wrong column is how
+          a remediation misses the only message that mattered.
+        </p>
+      </LabNote>
     </div>
   );
 }

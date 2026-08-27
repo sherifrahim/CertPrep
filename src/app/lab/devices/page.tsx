@@ -69,7 +69,9 @@ export default function DevicesPage() {
             {rows.map((d) => (
               <tr key={d.id} className="border-b border-line last:border-0 hover:bg-surface-2">
                 <td className="px-3 py-2">
-                  <span className="font-mono text-xs">{d.name}</span>
+                  <Link href={`/lab/devices/${d.id}`} className="font-mono text-xs text-accent-text">
+                    {d.name}
+                  </Link>
                   {d.name === IOC.victimDevice && (
                     <span className="ml-2 rounded bg-bad-soft px-1.5 py-0.5 text-[10px] uppercase text-bad">
                       patient zero

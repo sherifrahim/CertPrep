@@ -69,8 +69,8 @@ export const LAB_NAV: BladeSection[] = [
           {
             href: "/lab/vulnerabilities",
             label: "Vulnerability management",
-            hint: "Exposure score, weaknesses and security recommendations.",
-            status: "planned",
+            hint: "Exposure score, secure score for devices, weaknesses ranked by threat.",
+            status: "ready",
           },
           {
             href: "/lab/asr",
@@ -114,8 +114,8 @@ export const LAB_NAV: BladeSection[] = [
           {
             href: "/lab/connectors",
             label: "Data connectors",
-            hint: "Connect sources and see which tables they populate.",
-            status: "planned",
+            hint: "Connect sources, and see which detections stop working when one is off.",
+            status: "ready",
           },
         ],
       },

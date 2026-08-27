@@ -58,8 +58,8 @@ export const LAB_NAV: BladeSection[] = [
           {
             href: "/lab/identities",
             label: "Identities",
-            hint: "Directory accounts with risk and privilege.",
-            status: "planned",
+            hint: "Directory accounts with risk, investigation priority and containment actions.",
+            status: "ready",
           },
         ],
       },
@@ -75,8 +75,8 @@ export const LAB_NAV: BladeSection[] = [
           {
             href: "/lab/asr",
             label: "Attack surface reduction",
-            hint: "ASR rules in audit, block and warn, with per-rule impact.",
-            status: "planned",
+            hint: "ASR rules in audit, block and warn, and what each would have stopped.",
+            status: "ready",
           },
         ],
       },

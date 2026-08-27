@@ -549,3 +549,354 @@ export function livePaths(remediated: ReadonlySet<string>): AttackPath[] {
 }
 
 export const SEVERITY_ORDER: Severity[] = ["High", "Medium", "Low"];
+
+/* ------------------------------------------------------------ exemptions */
+
+export type ExemptionCategory = "Waiver" | "Mitigated";
+
+export type Exemption = {
+  recommendationId: string;
+  /** Empty means the whole recommendation is exempt, not just some resources. */
+  resourceIds: string[];
+  category: ExemptionCategory;
+  justification: string;
+};
+
+/**
+ * Exempt resources leave the score calculation entirely — they are not counted
+ * as healthy, they are removed from the denominator. That is why exempting
+ * everything unhealthy raises the score to 100% without fixing anything, and
+ * why exemptions need a justification and a review date in practice.
+ */
+export function applyExemptions(
+  recommendations: Recommendation[],
+  exemptions: Exemption[],
+): Recommendation[] {
+  if (exemptions.length === 0) return recommendations;
+
+  return recommendations.map((rec) => {
+    const relevant = exemptions.filter((e) => e.recommendationId === rec.id);
+    if (relevant.length === 0) return rec;
+
+    const wholeRecommendation = relevant.some((e) => e.resourceIds.length === 0);
+    if (wholeRecommendation) return { ...rec, healthy: [], unhealthy: [] };
+
+    const exempt = new Set(relevant.flatMap((e) => e.resourceIds));
+    return {
+      ...rec,
+      healthy: rec.healthy.filter((id) => !exempt.has(id)),
+      unhealthy: rec.unhealthy.filter((id) => !exempt.has(id)),
+    };
+  });
+}
+
+/* --------------------------------------------------------- security alerts */
+
+export type AlertStatus = "Active" | "In progress" | "Resolved" | "Dismissed";
+
+export type SecurityAlert = {
+  id: string;
+  title: string;
+  severity: "High" | "Medium" | "Low" | "Informational";
+  status: AlertStatus;
+  /** MITRE ATT&CK tactic, as the alerts blade labels it. */
+  tactic: string;
+  affectedResource: string;
+  detectedBy: string;
+  startTime: string;
+  description: string;
+  remediationSteps: string[];
+};
+
+export const SECURITY_ALERTS: SecurityAlert[] = [
+  {
+    id: "alert-2211",
+    title: "Suspicious authentication activity",
+    severity: "High",
+    status: "Active",
+    tactic: "Credential Access",
+    affectedResource: "vm-jump-01",
+    detectedBy: "Microsoft Defender for Servers",
+    startTime: "2026-03-09T21:14:00.000Z",
+    description:
+      "Multiple failed sign-ins followed by a success on the jump host, from an address with no prior history against this subscription.",
+    remediationSteps: [
+      "Confirm whether the sign-in was expected by contacting the account owner.",
+      "Enforce just-in-time access so the management port is not open continuously.",
+      "Reset the account credentials and revoke active sessions.",
+    ],
+  },
+  {
+    id: "alert-2209",
+    title: "Anonymous access to a storage account containing sensitive data",
+    severity: "High",
+    status: "Active",
+    tactic: "Collection",
+    affectedResource: "stfinancedata",
+    detectedBy: "Microsoft Defender for Storage",
+    startTime: "2026-03-09T11:02:00.000Z",
+    description:
+      "A blob container holding finance exports was read without authentication from an external address.",
+    remediationSteps: [
+      "Set the storage account's default network rule to deny.",
+      "Disable anonymous blob access on the account and the container.",
+      "Rotate any keys that may have been exposed, then move to a private endpoint.",
+    ],
+  },
+  {
+    id: "alert-2204",
+    title: "Digital currency mining activity detected",
+    severity: "Medium",
+    status: "In progress",
+    tactic: "Impact",
+    affectedResource: "vm-web-02",
+    detectedBy: "Microsoft Defender for Servers",
+    startTime: "2026-03-08T02:41:00.000Z",
+    description:
+      "A process on the web server contacted a known mining pool and sustained high CPU for several hours.",
+    remediationSteps: [
+      "Isolate the machine and capture the running process list.",
+      "Patch the vulnerability that allowed the initial execution.",
+    ],
+  },
+  {
+    id: "alert-2198",
+    title: "Unusual role assignment granted at subscription scope",
+    severity: "Medium",
+    status: "Active",
+    tactic: "Privilege Escalation",
+    affectedResource: "Contoso Production",
+    detectedBy: "Microsoft Defender for Resource Manager",
+    startTime: "2026-03-07T16:20:00.000Z",
+    description:
+      "An Owner role assignment was created outside the usual change window by an account that had not made one before.",
+    remediationSteps: [
+      "Review the assignment and remove it if it was not requested.",
+      "Move standing owner rights into Privileged Identity Management.",
+    ],
+  },
+  {
+    id: "alert-2190",
+    title: "Access from a Tor exit node",
+    severity: "Low",
+    status: "Dismissed",
+    tactic: "Initial Access",
+    affectedResource: "app-customer-portal",
+    detectedBy: "Microsoft Defender for App Service",
+    startTime: "2026-03-06T09:55:00.000Z",
+    description: "A request reached the portal from an address published as a Tor exit node.",
+    remediationSteps: ["Confirm whether anonymised access is expected for this application."],
+  },
+];
+
+/* ---------------------------------------------------------- Defender plans */
+
+export type PlanState = "On" | "Off";
+
+export type DefenderPlan = {
+  name: string;
+  state: PlanState;
+  /** What the plan actually buys, since the names do not say. */
+  provides: string;
+  /** Recommendations and alerts that stop working when the plan is off. */
+  enables: string[];
+  pricing: string;
+};
+
+export const DEFENDER_PLANS: DefenderPlan[] = [
+  {
+    name: "Foundational CSPM",
+    state: "On",
+    provides:
+      "Free. Secure score, security recommendations, and asset inventory across every connected subscription.",
+    enables: ["Secure score", "Recommendations"],
+    pricing: "Free",
+    },
+  {
+    name: "Defender CSPM",
+    state: "Off",
+    provides:
+      "Attack path analysis, the cloud security explorer, agentless scanning and sensitive data discovery.",
+    enables: ["Attack path analysis", "Cloud security explorer"],
+    pricing: "Per billable resource / month",
+  },
+  {
+    name: "Defender for Servers Plan 2",
+    state: "On",
+    provides:
+      "Defender for Endpoint integration, vulnerability assessment, just-in-time VM access and file integrity monitoring.",
+    enables: ["rec-vuln-vm", "rec-jit", "alert-2211", "alert-2204"],
+    pricing: "Per server / month",
+  },
+  {
+    name: "Defender for Storage",
+    state: "On",
+    provides: "Malware scanning on upload and sensitive data threat detection for storage accounts.",
+    enables: ["alert-2209"],
+    pricing: "Per storage account / month",
+  },
+  {
+    name: "Defender for SQL",
+    state: "On",
+    provides: "Vulnerability assessment and behavioural threat detection for SQL databases.",
+    enables: ["rec-vuln-sql"],
+    pricing: "Per instance / month",
+  },
+  {
+    name: "Defender for Containers",
+    state: "Off",
+    provides: "Registry scanning, runtime threat detection and Kubernetes posture management.",
+    enables: ["rec-aks-network"],
+    pricing: "Per vCore / month",
+  },
+  {
+    name: "Defender for App Service",
+    state: "On",
+    provides: "Detection of attacks targeting web applications hosted on App Service.",
+    enables: ["alert-2190"],
+    pricing: "Per instance / month",
+  },
+  {
+    name: "Defender for Key Vault",
+    state: "Off",
+    provides: "Detection of unusual access patterns against vaults.",
+    enables: [],
+    pricing: "Per vault / month",
+  },
+  {
+    name: "Defender for Resource Manager",
+    state: "On",
+    provides: "Detection of suspicious control-plane operations across the subscription.",
+    enables: ["alert-2198"],
+    pricing: "Per subscription / month",
+  },
+];
+
+/* ---------------------------------------------------- regulatory compliance */
+
+export type ComplianceControl = {
+  id: string;
+  title: string;
+  /** Recommendations that evidence this control. */
+  recommendationIds: string[];
+};
+
+export type ComplianceStandard = {
+  name: string;
+  enabled: boolean;
+  controls: ComplianceControl[];
+};
+
+export const COMPLIANCE_STANDARDS: ComplianceStandard[] = [
+  {
+    name: "Microsoft cloud security benchmark",
+    enabled: true,
+    controls: [
+      {
+        id: "NS-1",
+        title: "Establish network segmentation boundaries",
+        recommendationIds: ["rec-storage-public", "rec-aks-network"],
+      },
+      {
+        id: "IM-1",
+        title: "Use centralised identity and authentication",
+        recommendationIds: ["rec-mfa-owners", "rec-mfa-write"],
+      },
+      {
+        id: "PA-1",
+        title: "Separate and limit highly privileged users",
+        recommendationIds: ["rec-overprivileged", "rec-managed-identity"],
+      },
+      {
+        id: "PV-6",
+        title: "Rapidly and automatically remediate vulnerabilities",
+        recommendationIds: ["rec-vuln-vm", "rec-vuln-sql", "rec-updates"],
+      },
+      {
+        id: "DP-3",
+        title: "Encrypt sensitive data in transit",
+        recommendationIds: ["rec-https", "rec-tls"],
+      },
+      {
+        id: "LT-3",
+        title: "Enable logging for security investigation",
+        recommendationIds: ["rec-kv-logging", "rec-sql-audit"],
+      },
+    ],
+  },
+  {
+    name: "PCI DSS 4.0",
+    enabled: true,
+    controls: [
+      {
+        id: "1.3",
+        title: "Restrict inbound and outbound traffic to that which is necessary",
+        recommendationIds: ["rec-storage-public", "rec-jit", "rec-mgmt-ports-closed"],
+      },
+      {
+        id: "4.2",
+        title: "Protect cardholder data with strong cryptography during transmission",
+        recommendationIds: ["rec-https", "rec-tls"],
+      },
+      {
+        id: "8.4",
+        title: "Multi-factor authentication is implemented",
+        recommendationIds: ["rec-mfa-owners", "rec-mfa-write"],
+      },
+    ],
+  },
+  {
+    name: "ISO/IEC 27001:2022",
+    enabled: false,
+    controls: [
+      {
+        id: "A.8.2",
+        title: "Privileged access rights",
+        recommendationIds: ["rec-overprivileged", "rec-mfa-owners"],
+      },
+      {
+        id: "A.8.8",
+        title: "Management of technical vulnerabilities",
+        recommendationIds: ["rec-vuln-vm", "rec-updates"],
+      },
+    ],
+  },
+];
+
+export type ControlCompliance = {
+  control: ComplianceControl;
+  passed: number;
+  failed: number;
+  compliant: boolean;
+};
+
+/**
+ * A compliance control passes only when every recommendation behind it passes.
+ * Partial credit does not exist here, unlike the secure score — which is why a
+ * subscription can sit at a respectable score and still fail most controls.
+ */
+export function assessStandard(
+  standard: ComplianceStandard,
+  recommendations: Recommendation[] = RECOMMENDATIONS,
+  remediated: ReadonlySet<string> = new Set(),
+): { controls: ControlCompliance[]; passed: number; total: number } {
+  const byId = new Map(recommendations.map((r) => [r.id, r]));
+
+  const controls = standard.controls.map((control) => {
+    let passed = 0;
+    let failed = 0;
+    for (const id of control.recommendationIds) {
+      const rec = byId.get(id);
+      const ok = remediated.has(id) || (rec ? rec.unhealthy.length === 0 : true);
+      if (ok) passed++;
+      else failed++;
+    }
+    return { control, passed, failed, compliant: failed === 0 };
+  });
+
+  return {
+    controls,
+    passed: controls.filter((c) => c.compliant).length,
+    total: controls.length,
+  };
+}

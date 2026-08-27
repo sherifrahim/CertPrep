@@ -154,7 +154,8 @@ export function isPrivate(ip: string): boolean {
   );
 }
 
-function inCidr(ip: string, cidr: string): boolean {
+/** Exported because the virtual network blade needs the same prefix maths. */
+export function inCidr(ip: string, cidr: string): boolean {
   const [base, bitsRaw] = cidr.split("/");
   const bits = bitsRaw === undefined ? 32 : Number(bitsRaw);
   const ipN = ipToLong(ip);

@@ -19,6 +19,7 @@ Built with Next.js 15 (App Router), Tailwind CSS v4, Prisma 7 + Postgres, and Au
 | Resources | `/exams/[examId]/resources` | External links only — nothing is re-hosted |
 | Dashboard | `/dashboard` | Readiness score, review queue, drill, score history, weakest areas |
 | Password reset | `/forgot-password` | Single-use token, one-hour expiry, no account enumeration |
+| **Practice lab** | `/lab` | A simulated Defender XDR, Sentinel and Azure portal — see [Practice lab](#practice-lab) |
 
 Answers are graded **server-side**. Mock exam papers are sent to the browser with the answer keys and explanations stripped out; the review content only comes back after submission.
 
@@ -50,7 +51,9 @@ Ordering questions store their steps in the correct sequence, so they are always
 npm test
 ```
 
-62 vitest cases over the pure logic and the content bank: shuffle uniformity, grading across all five question formats, answer randomisation, mock composition, Leitner scheduling, drill selection, reset-token handling, and readiness weighting. Pure logic lives in [`src/lib/scheduling.ts`](src/lib/scheduling.ts), [`src/lib/password-reset.ts`](src/lib/password-reset.ts), and [`src/lib/readiness.ts`](src/lib/readiness.ts) so it is testable without a database.
+334 vitest cases over the pure logic, the content bank, and the practice lab: shuffle uniformity, grading across all five question formats, answer randomisation, mock composition, Leitner scheduling, drill selection, reset-token handling, readiness weighting, the KQL engine, and every rule-evaluation model in the lab. Pure logic lives in [`src/lib/scheduling.ts`](src/lib/scheduling.ts), [`src/lib/password-reset.ts`](src/lib/password-reset.ts), and [`src/lib/readiness.ts`](src/lib/readiness.ts) so it is testable without a database, and the lab's logic sits in `src/lab/` for the same reason.
+
+Where a lab blade shows teaching copy next to a worked example — "this is denied by the rule at priority 200" — a test asserts the engine actually agrees with the copy. Explanatory text that drifts from behaviour is worse than none, because learners believe it.
 
 `npm run validate:content` additionally checks the content bank's referential integrity.
 
@@ -65,6 +68,61 @@ Defined in each exam's `case-studies.ts` and linked from questions by `caseStudy
 ### In-progress mock exams
 
 A running mock is saved to `localStorage` by [`src/lib/mock-session.ts`](src/lib/mock-session.ts), so closing the tab does not destroy the paper. The countdown is stored as remaining seconds rather than a start timestamp, which means **the clock pauses while the exam is not open** — chosen so an interruption does not cost the attempt. It also means the timer can be paused by closing the tab; acceptable for self-study, but worth knowing. Sessions expire after 7 days and are cleared on submit.
+
+## Practice lab
+
+Reading about advanced hunting is not the same as having used it, and the exams assume portal time that most candidates have not had. `/lab` is a simulated tenant — Contoso, a mid-size finance business — with a real KQL engine, realistically shaped telemetry, and a complete intrusion buried in the noise.
+
+Nothing here talks to Microsoft. It is a simulation whose table names, columns, and rule-evaluation behaviour follow the real products closely enough that what you learn transfers.
+
+### The environment
+
+Seven days of telemetry across **14 tables** ([`src/lab/schema.ts`](src/lab/schema.ts)) from Defender XDR, Microsoft Sentinel, and Entra ID, generated deterministically from a fixed seed in [`src/lab/data.ts`](src/lab/data.ts) so every learner sees the same environment and exercises have stable answers.
+
+A full intrusion runs through it — phishing, a click, credential replay from an external address with no MFA, encoded PowerShell, an LSASS dump via `comsvcs.dll` MiniDump, lateral movement on a service account, and exfiltration. Every stage is visible if you query for it. The lab home page gives the answer behind a disclosure, so you can try first.
+
+### Blades
+
+Grouped by product in a persistent left rail, the way the real portals are. Planned blades stay visible but disabled, so the navigation is an honest roadmap rather than a curated subset — and [`src/lab/nav.test.ts`](src/lab/nav.test.ts) enforces that, failing if a blade claims to be ready without a page or is built while still marked planned.
+
+| Blade | Route | What you practise |
+| --- | --- | --- |
+| Incidents & alerts | `/lab/incidents` | Triage a correlated queue, assign, classify, walk the attack story |
+| Advanced hunting | `/lab/hunting` | Write real KQL against all 14 tables, with a schema browser and samples |
+| Action center | `/lab/actions` | Approve or reject pending remediation, with the blast radius stated |
+| Device inventory | `/lab/devices` | Onboarded endpoints with risk, exposure and onboarding state |
+| Explorer | `/lab/email` | Hunt delivered mail, separate received from clicked, remediate |
+| Quarantine | `/lab/quarantine` | Release, report and expire quarantined mail as admin or as end user |
+| Analytics rules | `/lab/analytics` | Author scheduled rules and see what they would have caught |
+| Network security groups | `/lab/nsg` | Build rules, test a flow, see which rule decided it and why |
+| Azure Firewall | `/lab/firewall` | DNAT, network and application rules, threat intelligence, full trace |
+| Virtual networks | `/lab/vnet` | Effective routes, longest-prefix match, peering, private endpoints |
+| Defender for Cloud | `/lab/defender-cloud` | Secure score, recommendations and attack paths over an Azure estate |
+
+Still to build: identities, vulnerability management, attack surface reduction, and Sentinel data connectors.
+
+### The KQL engine
+
+[`src/lab/kql/engine.ts`](src/lab/kql/engine.ts) is a real interpreter, not a lookup table of canned answers: lexer, parser, and evaluator for the subset of Kusto that actually appears in SC-200 and SC-500 hunting — `where`, `project`, `extend`, `summarize` with aggregations, `join`, `union`, `top`, `sort`, `distinct`, `render`, the string operators (`has`, `contains`, `startswith`, `matches regex`), timespan literals, and around forty scalar functions.
+
+Anything outside that subset **fails with a clear message rather than returning a plausible-looking wrong answer**, because a query engine that quietly lies is worse than no engine at all for someone trying to learn.
+
+Queries run server-side through [`src/lib/actions/lab-actions.ts`](src/lib/actions/lab-actions.ts). Blades that pose an investigation question link straight into the console with the query prefilled, via `/lab/hunting?q=…`.
+
+### What each rule engine is really teaching
+
+The interactive blades exist because these behaviours are the ones that reading reliably fails to convey. Each is a pure function with a trace, so the answer always comes with its reasoning:
+
+- **NSG** ([`nsg.ts`](src/lab/nsg.ts)) — priority order decides nothing unless the rule also *matches*. The `Internet` service tag excludes private space, which is why the deny people expect to catch internal RDP does not.
+- **Azure Firewall** ([`firewall.ts`](src/lab/firewall.ts)) — rule **types** are processed DNAT, then network, then application, and that order outranks every priority number. A broad network allow therefore silently disables the FQDN allow-list you thought you had, because network rules terminate before application rules are ever consulted.
+- **Virtual networks** ([`vnet.ts`](src/lab/vnet.ts)) — longest prefix match wins first; only on a tie does source break it, user-defined over BGP over system. Peering is never transitive, so two spokes on a shared hub cannot reach each other. A next hop of `None` is a route that matches and drops.
+- **Action center** ([`actions.ts`](src/lab/actions.ts)) — what an automated investigation may do unattended is set by the **device group's automation level**, not by alert severity. The same file in `AppData\Roaming` is auto-remediated under one semi-automatic level and held for approval under the other.
+- **Quarantine** ([`quarantine.ts`](src/lab/quarantine.ts)) — recipient permissions come from the quarantine policy the **verdict** assigns. Malware and high-confidence phishing are admin-only and invisible to the user; a normal-confidence phish they can release themselves.
+- **Defender for Cloud** ([`defender-cloud.ts`](src/lab/defender-cloud.ts)) — secure score is earned points over possible points, weighted per control. A resource counts as healthy only once it passes **every** recommendation in its control, so fixing one of two earns nothing, and a Low-severity finding can be worth more points than a High one. Mark recommendations remediated and watch the score move.
+
+### Nothing is persisted
+
+Lab state — triage decisions, approvals, remediation toggles — lives in component state or `localStorage`, never the database. The lab is a sandbox to be re-run, so there is no schema for it and signing in is not required to use it.
 
 ## Local setup
 

@@ -142,7 +142,13 @@ export const LAB_NAV: BladeSection[] = [
           {
             href: "/lab/firewall",
             label: "Azure Firewall",
-            hint: "Rule collections, priorities and DNAT.",
+            hint: "Rule collections, DNAT, threat intelligence and IDPS signature rules.",
+            status: "ready",
+          },
+          {
+            href: "/lab/waf",
+            label: "Web application firewall",
+            hint: "Policy settings, managed rules with anomaly scoring, custom rules and exclusions.",
             status: "ready",
           },
         ],

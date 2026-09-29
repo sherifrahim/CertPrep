@@ -34,10 +34,10 @@ export const sc500CaseStudyQuestions: Question[] = [
     prompt:
       "You need to meet the identity and governance requirements. Which two actions should you perform? (Choose two.)",
     options: [
-      { id: "a", text: "Convert the fourteen Owner assignments to eligible PIM assignments requiring approval and MFA on activation" },
-      { id: "b", text: "Switch the key vault to the Azure RBAC permission model" },
-      { id: "c", text: "Replace Owner with Contributor for the fourteen engineers" },
-      { id: "d", text: "Add a resource lock to the production subscription" },
+      { id: "a", text: "Convert the fourteen Owner assignments to eligible PIM assignments with approval and MFA" },
+      { id: "b", text: "Switch the key vault from access policies to the Azure RBAC permission model" },
+      { id: "c", text: "Replace Owner with Contributor for the fourteen engineers on the subscription" },
+      { id: "d", text: "Add a resource lock to the production subscription and its resource groups" },
     ],
     correct: ["a", "b"],
     explanation:
@@ -54,7 +54,7 @@ export const sc500CaseStudyQuestions: Question[] = [
       "You need stgship to reject requests authorised with account keys. What should you do?",
     options: [
       { id: "a", text: "Set allowSharedKeyAccess to false on the storage account" },
-      { id: "b", text: "Rotate both account keys and store them in Key Vault" },
+      { id: "b", text: "Rotate both account keys regularly and store them in Key Vault" },
       { id: "c", text: "Enable the storage firewall for the application subnet" },
       { id: "d", text: "Issue user delegation SAS tokens to all callers" },
     ],
@@ -73,9 +73,9 @@ export const sc500CaseStudyQuestions: Question[] = [
       "You need to meet the sqlship and outbound inspection requirements. Which two should you implement? (Choose two.)",
     options: [
       { id: "a", text: "A private endpoint for sqlship with public network access disabled" },
-      { id: "b", text: "Azure Firewall in the hub, with a 0.0.0.0/0 user-defined route on the spoke subnets" },
-      { id: "c", text: "Additional SQL firewall rules listing the application subnet" },
-      { id: "d", text: "NSG rules denying all outbound internet traffic from the spokes" },
+      { id: "b", text: "Azure Firewall in the hub, with a 0.0.0.0/0 route on the spoke subnets" },
+      { id: "c", text: "Additional SQL firewall rules listing the application subnet ranges" },
+      { id: "d", text: "NSG rules denying all outbound internet traffic from the spoke subnets" },
     ],
     correct: ["a", "b"],
     explanation:
@@ -92,9 +92,9 @@ export const sc500CaseStudyQuestions: Question[] = [
       "You need to extend Defender for Servers protections to the 120 EC2 instances without migrating them. What should you do first?",
     options: [
       { id: "a", text: "Connect the AWS account to Defender for Cloud and onboard the instances through Azure Arc" },
-      { id: "b", text: "Rebuild the instances as Azure virtual machines" },
-      { id: "c", text: "Create a site-to-site VPN to the AWS VPC" },
-      { id: "d", text: "Install the Log Analytics agent and take no further action" },
+      { id: "b", text: "Rebuild all 120 instances as Azure virtual machines in a new spoke virtual network in the hub" },
+      { id: "c", text: "Create a site-to-site VPN to the AWS VPC and enable the plan afterwards" },
+      { id: "d", text: "Install the Log Analytics agent on each instance and take no further action" },
     ],
     correct: ["a"],
     explanation:
@@ -110,10 +110,10 @@ export const sc500CaseStudyQuestions: Question[] = [
     prompt:
       "You need to stop the three applications holding model endpoint keys while centralising authentication, rate limiting and logging for model traffic. What should you implement?",
     options: [
-      { id: "a", text: "Azure API Management as an AI gateway in front of the model endpoints, with applications authenticating by managed identity" },
-      { id: "b", text: "A shared key stored in Key Vault and read by each application" },
-      { id: "c", text: "Azure Front Door with response caching" },
-      { id: "d", text: "A network security group restricting the model endpoint subnet" },
+      { id: "a", text: "Azure API Management as an AI gateway in front of the endpoints, with managed identity authentication" },
+      { id: "b", text: "A single shared key stored in Key Vault, which each application reads at startup and reuses" },
+      { id: "c", text: "Azure Front Door with response caching enabled in front of the model endpoints" },
+      { id: "d", text: "A network security group restricting access to the model endpoint subnet by application" },
     ],
     correct: ["a"],
     explanation:
@@ -129,10 +129,10 @@ export const sc500CaseStudyQuestions: Question[] = [
     prompt:
       "You need to meet the Copilot requirements before the pilot. What should you do?",
     options: [
-      { id: "a", text: "Run a Purview DSPM for AI data risk assessment, auto-label sensitive SharePoint content, and create a DLP policy for the Copilot location restricting the Highly Confidential label" },
-      { id: "b", text: "Delete SharePoint sites that share content with anyone" },
-      { id: "c", text: "Disable Purview Audit for the pilot users" },
-      { id: "d", text: "Publish a retention label to all users" },
+      { id: "a", text: "Run a DSPM for AI risk assessment, auto-label sensitive content, and add a DLP policy for Copilot" },
+      { id: "b", text: "Delete SharePoint sites that share content with anyone, and disable external sharing tenant-wide" },
+      { id: "c", text: "Disable Purview Audit for the pilot users and remove their access to Copilot until launch" },
+      { id: "d", text: "Publish a retention label to all users and enable Customer Lockbox for the pilot tenant" },
     ],
     correct: ["a"],
     explanation:

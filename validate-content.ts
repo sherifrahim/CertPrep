@@ -9,6 +9,13 @@
  * that no longer hold enough questions for their weighted mock-exam quota.
  */
 import { exams } from "./src/content";
+import {
+  analyseAnswerLength,
+  MAX_LENGTH_RATIO,
+  MAX_LONGEST_SHARE,
+  MIN_LONGEST_SHARE,
+  MAX_MEAN_RATIO,
+} from "./src/content/answerLength";
 
 let errors = 0;
 const fail = (message: string) => {
@@ -135,6 +142,25 @@ for (const exam of exams) {
     for (const r of step.resourceIds) {
       if (!resourceIds.has(r)) fail(`${step.id}: unknown resourceId "${r}"`);
     }
+  }
+
+  // The key must not be identifiable by being the longest, most detailed option.
+  const lengths = analyseAnswerLength(exam.questions);
+  for (const o of lengths.outliers) {
+    fail(`${o.id}: correct option is ${o.ratio.toFixed(2)}x the longest distractor (max ${MAX_LENGTH_RATIO}x)`);
+  }
+  if (lengths.longestShare > MAX_LONGEST_SHARE) {
+    fail(
+      `correct option is the longest in ${(lengths.longestShare * 100).toFixed(0)}% of single-answer questions (max ${MAX_LONGEST_SHARE * 100}%)`,
+    );
+  }
+  if (lengths.longestShare < MIN_LONGEST_SHARE) {
+    fail(
+      `correct option is the longest in only ${(lengths.longestShare * 100).toFixed(0)}% of single-answer questions (min ${MIN_LONGEST_SHARE * 100}%)`,
+    );
+  }
+  if (lengths.meanRatio > MAX_MEAN_RATIO) {
+    fail(`mean key/distractor length ratio is ${lengths.meanRatio.toFixed(2)} (max ${MAX_MEAN_RATIO})`);
   }
 
   // A mock paper draws from each domain in proportion to its official weight.

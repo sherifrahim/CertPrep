@@ -13,9 +13,9 @@ export const az500ExtraQuestions: Question[] = [
       "A GitHub Actions workflow must deploy to Azure without any client secret stored in GitHub. What should you configure on the app registration?",
     options: [
       { id: "a", text: "A federated identity credential naming the GitHub repository, branch, and issuer" },
-      { id: "b", text: "A client secret with a 7-day expiry, rotated by the workflow" },
-      { id: "c", text: "A certificate uploaded to both GitHub and the app registration" },
-      { id: "d", text: "A system-assigned managed identity on the app registration" },
+      { id: "b", text: "A client secret with a 7-day expiry, rotated by the workflow itself each week" },
+      { id: "c", text: "A certificate uploaded to both GitHub and the app registration for signing" },
+      { id: "d", text: "A system-assigned managed identity on the app registration used by the workflow" },
     ],
     correct: ["a"],
     explanation:
@@ -31,9 +31,9 @@ export const az500ExtraQuestions: Question[] = [
       "You must stop users from consenting to third-party applications that request permission to read all mailboxes, while still allowing consent to low-impact permissions. What should you configure?",
     options: [
       { id: "a", text: "An app consent policy permitting user consent only for permissions you classify as low impact" },
-      { id: "b", text: "Disable user consent for all applications" },
-      { id: "c", text: "A Conditional Access policy requiring MFA for consent" },
-      { id: "d", text: "Remove the Application Developer role from all users" },
+      { id: "b", text: "Disable user consent for all applications, so that every single consent request is blocked outright" },
+      { id: "c", text: "A Conditional Access policy requiring MFA whenever a user grants consent to an app" },
+      { id: "d", text: "Remove the Application Developer role from all users in the tenant directory" },
     ],
     correct: ["a"],
     explanation:
@@ -49,9 +49,9 @@ export const az500ExtraQuestions: Question[] = [
       "Contoso wants to prevent users from downloading files from SharePoint Online when signing in from an unmanaged device, without blocking access outright. Which Conditional Access capability should you use?",
     options: [
       { id: "a", text: "A session control applying app-enforced restrictions or Conditional Access App Control" },
-      { id: "b", text: "A grant control requiring a compliant device" },
-      { id: "c", text: "A grant control requiring MFA" },
-      { id: "d", text: "A sign-in frequency session control" },
+      { id: "b", text: "A grant control requiring a compliant device before access is allowed" },
+      { id: "c", text: "A grant control requiring MFA for every sign-in from unmanaged devices" },
+      { id: "d", text: "A sign-in frequency session control that forces users to re-authenticate every hour of use" },
     ],
     correct: ["a"],
     explanation:
@@ -101,9 +101,9 @@ export const az500ExtraQuestions: Question[] = [
       "You created a private endpoint for a storage account. Virtual machines in the virtual network still resolve the storage account's public IP address. What is missing?",
     options: [
       { id: "a", text: "A private DNS zone for privatelink.blob.core.windows.net linked to the virtual network" },
-      { id: "b", text: "A service endpoint for Microsoft.Storage on the subnet" },
-      { id: "c", text: "An NSG rule allowing the Storage service tag" },
-      { id: "d", text: "A user-defined route for the storage account's IP range" },
+      { id: "b", text: "A service endpoint for Microsoft.Storage enabled on the virtual machine subnet of the network" },
+      { id: "c", text: "An NSG rule allowing the Storage service tag on outbound traffic from the subnet" },
+      { id: "d", text: "A user-defined route for the storage account's IP range through the firewall" },
     ],
     correct: ["a"],
     explanation:
@@ -192,10 +192,10 @@ export const az500ExtraQuestions: Question[] = [
     prompt:
       "You must ensure a virtual machine boots only trusted, signed components and can attest to its boot integrity. Which VM feature set provides this?",
     options: [
-      { id: "a", text: "Trusted launch with secure boot, vTPM, and boot integrity monitoring" },
-      { id: "b", text: "Azure Disk Encryption with a customer-managed key" },
-      { id: "c", text: "Encryption at host" },
-      { id: "d", text: "Just-in-time VM access" },
+      { id: "a", text: "Trusted launch with secure boot, vTPM and boot integrity monitoring" },
+      { id: "b", text: "Azure Disk Encryption with a customer-managed key stored in Key Vault" },
+      { id: "c", text: "Encryption at host for the temporary disks and caches of the virtual machine" },
+      { id: "d", text: "Just-in-time VM access that opens the management ports only when requested" },
     ],
     correct: ["a"],
     explanation:
@@ -210,10 +210,10 @@ export const az500ExtraQuestions: Question[] = [
     prompt:
       "A pod in an AKS cluster must authenticate to Azure Key Vault as a specific Microsoft Entra identity, scoped to that pod's service account rather than the whole node pool. What should you configure?",
     options: [
-      { id: "a", text: "Microsoft Entra Workload ID with a federated credential bound to the Kubernetes service account" },
-      { id: "b", text: "The kubelet managed identity of the node pool" },
-      { id: "c", text: "A Kubernetes secret containing a service principal password" },
-      { id: "d", text: "An AcrPull role assignment on the cluster identity" },
+      { id: "a", text: "Microsoft Entra Workload ID with a federated credential for the Kubernetes service account" },
+      { id: "b", text: "The kubelet managed identity of the node pool, granted the Key Vault Secrets User role on the vault" },
+      { id: "c", text: "A Kubernetes secret that holds a service principal password for the pod to use" },
+      { id: "d", text: "An AcrPull role assignment on the cluster identity for the container registry" },
     ],
     correct: ["a"],
     explanation:
@@ -228,10 +228,10 @@ export const az500ExtraQuestions: Question[] = [
     prompt:
       "Newly pushed container images must be blocked from deployment until they have been scanned and found free of high-severity vulnerabilities. Which Azure Container Registry capability supports this workflow?",
     options: [
-      { id: "a", text: "Quarantine mode, which keeps images unavailable until a scanner marks them as passed" },
-      { id: "b", text: "Geo-replication of the registry" },
-      { id: "c", text: "Anonymous pull access" },
-      { id: "d", text: "Registry retention policies for untagged manifests" },
+      { id: "a", text: "Quarantine mode, which keeps images unavailable until a scanner marks them passed" },
+      { id: "b", text: "Geo-replication of the registry to the regions where the cluster runs" },
+      { id: "c", text: "Anonymous pull access for the images that pass the vulnerability scan" },
+      { id: "d", text: "Registry retention policies that delete untagged manifests after a configurable number of days" },
     ],
     correct: ["a"],
     explanation:
@@ -281,9 +281,9 @@ export const az500ExtraQuestions: Question[] = [
       "You want to find every internet-exposed virtual machine that has a high-severity vulnerability and holds a managed identity with write access to a storage account, expressed as a single query across your cloud estate. Which Defender for Cloud capability should you use?",
     options: [
       { id: "a", text: "Cloud security explorer, which queries the cloud security graph" },
-      { id: "b", text: "Secure score recommendations" },
-      { id: "c", text: "The regulatory compliance dashboard" },
-      { id: "d", text: "Workflow automation" },
+      { id: "b", text: "Secure score recommendations filtered by severity and resource type" },
+      { id: "c", text: "The regulatory compliance dashboard for the selected industry standard" },
+      { id: "d", text: "Workflow automation rules triggered by recommendations or alerts" },
     ],
     correct: ["a"],
     explanation:
@@ -298,10 +298,10 @@ export const az500ExtraQuestions: Question[] = [
     prompt:
       "Defender for Cloud shows an attack path indicating an internet-facing VM can reach a database holding sensitive data. What makes attack path analysis more actionable than a plain list of recommendations?",
     options: [
-      { id: "a", text: "It chains related weaknesses into an exploitable route, so you can break the path at its most effective point" },
-      { id: "b", text: "It automatically remediates every finding in the path" },
-      { id: "c", text: "It replaces the need for vulnerability assessment" },
-      { id: "d", text: "It only reports findings that have already been exploited" },
+      { id: "a", text: "It chains related weaknesses into an exploitable route, so you can break it at the best point" },
+      { id: "b", text: "It automatically remediates every finding in the path without any administrator involvement at all" },
+      { id: "c", text: "It replaces the need for vulnerability assessment on the machines in the path" },
+      { id: "d", text: "It only reports findings that attackers have already exploited in your environment" },
     ],
     correct: ["a"],
     explanation:
@@ -335,9 +335,9 @@ export const az500ExtraQuestions: Question[] = [
       "Which Microsoft Sentinel capability builds behavioural baselines for users and hosts so that deviations such as a first-time sign-in from an unusual country are surfaced with context?",
     options: [
       { id: "a", text: "Entity behavior analytics (UEBA)" },
-      { id: "b", text: "Watchlists" },
-      { id: "c", text: "Summary rules" },
-      { id: "d", text: "The Content hub" },
+      { id: "b", text: "Watchlists of known-bad addresses" },
+      { id: "c", text: "Summary rules for aggregated data" },
+      { id: "d", text: "The Content hub solutions gallery" },
     ],
     correct: ["a"],
     explanation:
@@ -352,10 +352,10 @@ export const az500ExtraQuestions: Question[] = [
     prompt:
       "Audit requires that Log Analytics data cannot be modified or deleted by an administrator for the duration of its retention. Which workspace feature addresses this?",
     options: [
-      { id: "a", text: "Immutability via data export to immutable storage, combined with workspace retention locks on tables" },
-      { id: "b", text: "Raising the daily ingestion cap" },
-      { id: "c", text: "Enabling the Basic logs plan on all tables" },
-      { id: "d", text: "Deleting the workspace access keys" },
+      { id: "a", text: "Data export to immutable storage, combined with retention locks on workspace tables" },
+      { id: "b", text: "Raising the daily ingestion cap so that far more data is kept in the workspace for auditing" },
+      { id: "c", text: "Enabling the Basic logs plan on all tables to reduce storage costs for the data" },
+      { id: "d", text: "Deleting the workspace access keys so that nobody can call the ingestion API" },
     ],
     correct: ["a"],
     explanation:
@@ -390,8 +390,8 @@ export const az500ExtraQuestions: Question[] = [
     options: [
       { id: "a", text: "It alerts on anomalous access patterns such as unusual users or locations retrieving secrets" },
       { id: "b", text: "It can alert when a suspicious application enumerates many secrets in a short period" },
-      { id: "c", text: "It encrypts key vault contents with a second layer of encryption" },
-      { id: "d", text: "It automatically rotates keys that are near expiry" },
+      { id: "c", text: "It encrypts key vault contents with a second layer of encryption using its own keys" },
+      { id: "d", text: "It automatically rotates keys that are near expiry, with no rotation policy needed" },
     ],
     correct: ["a", "b"],
     explanation:

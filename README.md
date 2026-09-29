@@ -41,6 +41,16 @@ This matters because the bank was authored with the key overwhelmingly first —
 
 Ordering questions store their steps in the correct sequence, so they are always reshuffled and explicitly never presented already solved. Yes/No items keep their fixed order.
 
+### Answer length
+
+Position is randomised, but *length* leaks the answer too: the bank originally had the key as the longest option in 65–84% of single-answer questions (chance is 25%), and a learner could score well by always picking the most detailed choice. Distractors are now written at the same level of detail as the key, and `analyseAnswerLength()` in [`src/content/answerLength.ts`](src/content/answerLength.ts) enforces it in both `npm run validate:content` and the test suite:
+
+- no single-answer key may be more than 1.3× (and 12 characters) longer than the longest distractor;
+- per exam, the key may be the longest option in at most 40% and at least 15% of single-answer questions, since a key that is *never* the longest is a tell as well;
+- across single- and multi-answer questions, the mean key length may not exceed 1.15× the mean distractor length.
+
+When you add a question, write the wrong options with the same specificity as the right one, for example with a plausible rationale or qualifier.
+
 ### Exam readiness
 
 [`src/lib/readiness.ts`](src/lib/readiness.ts) weights your per-domain accuracy by each domain's official share of the exam, so a mock dominated by one area does not skew the estimate. Domains with no evidence are **excluded rather than counted as zero**, and reported separately — "80% across two of four areas" is not the same as being ready. "Ready" requires a margin above the pass mark, because the real exam is harder than practice.
@@ -279,7 +289,7 @@ Each exam is a directory under `src/content/exams/` with three files:
 | `questions.ts` | The question bank |
 | `flashcards.ts` | The flashcard deck |
 
-Current bank: **101 / 102 / 138 / 67 questions** and 78 / 71 / 70 / 55 flashcards for AZ-500 / SC-401 / SC-200 / SC-500. Every domain holds enough questions to satisfy its weighted mock-exam quota, so mock papers run at their full 40-question length.
+Current bank: **101 / 102 / 183 / 67 questions** and 78 / 71 / 70 / 55 flashcards for AZ-500 / SC-401 / SC-200 / SC-500. Every domain holds enough questions to satisfy its weighted mock-exam quota, so mock papers run at their full 40-question length.
 
 To add a question, append to the array in the exam's `questions.ts`:
 

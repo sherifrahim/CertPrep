@@ -11,10 +11,10 @@ export const sc200ExtraQuestions: Question[] = [
     prompt:
       "You must reduce Microsoft Sentinel ingestion cost for a verbose table that analysts rarely query interactively but which must remain searchable for investigations. Which table plan should you consider?",
     options: [
-      { id: "a", text: "The Basic or Auxiliary logs plan, which lowers ingestion cost with reduced query capability" },
-      { id: "b", text: "The Analytics plan with a longer retention period" },
-      { id: "c", text: "Deleting the table and re-ingesting on demand" },
-      { id: "d", text: "Enabling a daily cap on the whole workspace" },
+      { id: "a", text: "The Basic or Auxiliary logs plan, trading query features for lower cost" },
+      { id: "b", text: "The Analytics plan, with a longer interactive retention period for the table" },
+      { id: "c", text: "Deleting the table and re-ingesting the data on demand" },
+      { id: "d", text: "A daily cap on the whole workspace to limit ingestion volume" },
     ],
     correct: ["a"],
     explanation:
@@ -47,10 +47,10 @@ export const sc200ExtraQuestions: Question[] = [
     prompt:
       "Your team maintains Sentinel analytics rules as code and needs changes reviewed and deployed automatically from a Git branch. Which Sentinel feature supports this?",
     options: [
-      { id: "a", text: "Repositories, which connects a GitHub or Azure DevOps repo for CI/CD deployment" },
-      { id: "b", text: "Automation rules" },
-      { id: "c", text: "The Content hub" },
-      { id: "d", text: "Data collection rules" },
+      { id: "a", text: "Repositories, connecting a GitHub or Azure DevOps repo for CI/CD" },
+      { id: "b", text: "Automation rules that run playbooks automatically when new incidents are created" },
+      { id: "c", text: "The Content hub, which installs packaged solutions" },
+      { id: "d", text: "Data collection rules that route logs into tables" },
     ],
     correct: ["a"],
     explanation:
@@ -65,10 +65,10 @@ export const sc200ExtraQuestions: Question[] = [
     prompt:
       "An analytics rule fires many alerts for the same brute-force campaign against one account. You want a single incident per account per day instead of one incident per alert. What should you configure on the rule?",
     options: [
-      { id: "a", text: "Alert grouping in the incident settings, grouping alerts into one incident by selected entities within a time window" },
-      { id: "b", text: "Event grouping set to trigger an alert for each event" },
-      { id: "c", text: "A suppression automation rule for 24 hours" },
-      { id: "d", text: "A lower query frequency" },
+      { id: "a", text: "Alert grouping in incident settings, by matching entities in a time window" },
+      { id: "b", text: "Event grouping set to raise a separate alert for every single event in the query" },
+      { id: "c", text: "A suppression automation rule that closes duplicates for 24 hours" },
+      { id: "d", text: "A lower query frequency so fewer alerts are created each day" },
     ],
     correct: ["a"],
     explanation:
@@ -121,9 +121,9 @@ export const sc200ExtraQuestions: Question[] = [
     prompt:
       "Microsoft Defender for Office 365 quarantined a message a user insists is legitimate. What is the correct analyst action to release it and improve future accuracy?",
     options: [
-      { id: "a", text: "Release the message from quarantine and submit it to Microsoft as a false positive" },
-      { id: "b", text: "Disable the anti-phishing policy for that recipient" },
-      { id: "c", text: "Add the sender's domain to the tenant allow list permanently without review" },
+      { id: "a", text: "Release it from quarantine and submit it to Microsoft as a false positive" },
+      { id: "b", text: "Disable the anti-phishing policy for that recipient and every other user" },
+      { id: "c", text: "Add the sender's domain to the tenant allow list permanently without any review" },
       { id: "d", text: "Delete the quarantine policy" },
     ],
     correct: ["a"],
@@ -139,10 +139,10 @@ export const sc200ExtraQuestions: Question[] = [
     prompt:
       "Which Microsoft Defender for Office 365 feature detonates attachments and links in a sandbox before delivery, so unknown malware is caught?",
     options: [
-      { id: "a", text: "Safe Attachments and Safe Links" },
-      { id: "b", text: "Anti-spam policies" },
-      { id: "c", text: "DKIM signing" },
-      { id: "d", text: "Mail flow rules" },
+      { id: "a", text: "Safe Attachments and Safe Links, using detonation" },
+      { id: "b", text: "Anti-spam policies with a strict bulk email threshold" },
+      { id: "c", text: "DKIM signing for outbound messages from the domain" },
+      { id: "d", text: "Mail flow rules that quarantine risky file extensions" },
     ],
     correct: ["a"],
     explanation:
@@ -157,10 +157,10 @@ export const sc200ExtraQuestions: Question[] = [
     prompt:
       "A Defender for Cloud Apps alert reports impossible travel for a user. Which action best confirms whether the sign-in was genuinely malicious before you disable the account?",
     options: [
-      { id: "a", text: "Review the Entra sign-in logs for the sessions, checking IP reputation, device, and whether MFA was satisfied" },
-      { id: "b", text: "Immediately delete the user account" },
-      { id: "c", text: "Suppress the alert as a false positive" },
-      { id: "d", text: "Run a full antivirus scan on the user's device" },
+      { id: "a", text: "Review the Entra sign-in logs: IP reputation, device, and MFA result" },
+      { id: "b", text: "Immediately delete the user account and its mailbox to stop the attacker" },
+      { id: "c", text: "Suppress the alert as a false positive and close the case" },
+      { id: "d", text: "Run a full antivirus scan on the user's device before anything else" },
     ],
     correct: ["a"],
     explanation:
@@ -175,10 +175,10 @@ export const sc200ExtraQuestions: Question[] = [
     prompt:
       "You need to prevent a compromised user's existing access tokens from continuing to work after you reset their password. What should you do?",
     options: [
-      { id: "a", text: "Revoke the user's refresh tokens (revoke sessions) in Microsoft Entra ID" },
-      { id: "b", text: "Reset the password again" },
-      { id: "c", text: "Remove the user's group memberships" },
-      { id: "d", text: "Delete the user's registered devices" },
+      { id: "a", text: "Revoke the user's refresh tokens (revoke sessions) in Entra ID" },
+      { id: "b", text: "Reset the password a second time using a longer, more complex value" },
+      { id: "c", text: "Remove the user from all of their group memberships" },
+      { id: "d", text: "Delete the user's registered devices from Entra ID" },
     ],
     correct: ["a"],
     explanation:
@@ -211,10 +211,10 @@ export const sc200ExtraQuestions: Question[] = [
     prompt:
       "A Microsoft Purview DLP alert indicates a user emailed a spreadsheet of customer records externally. Where should a security operations analyst triage and act on this alert?",
     options: [
-      { id: "a", text: "The DLP alerts page in the Microsoft Purview portal, or the corresponding alert surfaced in Microsoft Defender XDR" },
-      { id: "b", text: "The Azure Activity log" },
-      { id: "c", text: "The Defender for Endpoint device timeline" },
-      { id: "d", text: "Microsoft Entra sign-in logs" },
+      { id: "a", text: "The DLP alerts page in Microsoft Purview or the linked Defender XDR alert" },
+      { id: "b", text: "The Azure Activity log for the mailbox's resource group" },
+      { id: "c", text: "The Defender for Endpoint device timeline for the sender's laptop and mailbox" },
+      { id: "d", text: "Microsoft Entra sign-in logs filtered to the user's account" },
     ],
     correct: ["a"],
     explanation:
@@ -294,9 +294,9 @@ export const sc200ExtraQuestions: Question[] = [
       "Which persistence mechanism should you always check for after a business email compromise, because it silently forwards a victim's mail to an attacker?",
     options: [
       { id: "a", text: "Malicious inbox rules and mailbox forwarding settings" },
-      { id: "b", text: "Scheduled tasks on the mail server" },
-      { id: "c", text: "Registry run keys on the mailbox" },
-      { id: "d", text: "Group Policy preferences" },
+      { id: "b", text: "Scheduled tasks on the mail server that read new messages" },
+      { id: "c", text: "Registry run keys created in the victim's mailbox profile" },
+      { id: "d", text: "Group Policy preferences that redirect the user's mail client" },
     ],
     correct: ["a"],
     explanation:
@@ -331,10 +331,10 @@ export const sc200ExtraQuestions: Question[] = [
     prompt:
       "You want to detect accounts whose sign-in count today is far above their own 14-day average. Which KQL approach fits best?",
     options: [
-      { id: "a", text: "Aggregate per account per day, then use series_decompose_anomalies or compare against avg and stdev of the baseline window" },
-      { id: "b", text: "Use distinct on the account column" },
-      { id: "c", text: "Use take 100 to sample the data" },
-      { id: "d", text: "Use project-away to remove unneeded columns" },
+      { id: "a", text: "Aggregate per account per day, then compare to baseline avg and stdev" },
+      { id: "b", text: "Use distinct on the account column and count the rows" },
+      { id: "c", text: "Use take 100 to sample the data, then eyeball the trend" },
+      { id: "d", text: "Use project-away to remove columns, then sort the rows by TimeGenerated" },
     ],
     correct: ["a"],
     explanation:
@@ -367,10 +367,10 @@ export const sc200ExtraQuestions: Question[] = [
     prompt:
       "In Microsoft Sentinel, what does the 'Go hunt' action on an entity do during an investigation?",
     options: [
-      { id: "a", text: "Runs a set of predefined queries scoped to that entity to reveal its recent related activity" },
-      { id: "b", text: "Permanently blocks the entity across the tenant" },
-      { id: "c", text: "Creates a new analytics rule for that entity" },
-      { id: "d", text: "Exports the entity to a watchlist" },
+      { id: "a", text: "Runs predefined queries scoped to that entity to show its recent activity" },
+      { id: "b", text: "Permanently blocks the entity across the whole tenant until reviewed" },
+      { id: "c", text: "Creates a new scheduled analytics rule that watches only that entity" },
+      { id: "d", text: "Exports the entity's details into a watchlist for later joins" },
     ],
     correct: ["a"],
     explanation:

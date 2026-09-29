@@ -30,7 +30,7 @@ export const sc401ExtraQuestions: Question[] = [
       "You need to detect a broad category of content such as customer complaints, where no fixed pattern or keyword list works reliably. What should you use?",
     options: [
       { id: "a", text: "A trainable classifier trained on positive and negative samples" },
-      { id: "b", text: "A regular-expression based custom sensitive information type" },
+      { id: "b", text: "A regular-expression based custom sensitive information type with a confidence level" },
       { id: "c", text: "An exact data match sensitive information type" },
       { id: "d", text: "Optical character recognition" },
     ],
@@ -47,10 +47,10 @@ export const sc401ExtraQuestions: Question[] = [
     prompt:
       "A sensitivity label must let recipients read and reply to an email but prevent them forwarding it or copying its contents. Which label configuration achieves this?",
     options: [
-      { id: "a", text: "Encryption with the Do Not Forward option, which assigns view, reply, and reply-all without extract or forward rights" },
-      { id: "b", text: "Content marking with a confidential footer" },
-      { id: "c", text: "A container label applied to the mailbox" },
-      { id: "d", text: "A retention label with a 1-year retain action" },
+      { id: "a", text: "Encryption with Do Not Forward, granting view, reply and reply-all only" },
+      { id: "b", text: "Content marking with a confidential footer that is added to the body of the message" },
+      { id: "c", text: "A container label applied to the mailbox that holds the message" },
+      { id: "d", text: "A retention label with a one-year retain action on the item" },
     ],
     correct: ["a"],
     explanation:
@@ -66,8 +66,8 @@ export const sc401ExtraQuestions: Question[] = [
       "External partners without Microsoft accounts must be able to read encrypted email your organisation sends, and you must be able to revoke access after sending. What should you implement?",
     options: [
       { id: "a", text: "Microsoft Purview Advanced Message Encryption with a custom branded portal" },
-      { id: "b", text: "A sensitivity label restricted to internal users only" },
-      { id: "c", text: "Transport Layer Security enforcement on the connector" },
+      { id: "b", text: "A sensitivity label restricted to internal users only, without any external access" },
+      { id: "c", text: "Transport Layer Security enforcement on the connector to each partner domain" },
       { id: "d", text: "S/MIME signing for all outbound mail" },
     ],
     correct: ["a"],
@@ -101,10 +101,10 @@ export const sc401ExtraQuestions: Question[] = [
     prompt:
       "You must scan and label existing files on a Windows file server that will not be migrated to SharePoint. What should you deploy?",
     options: [
-      { id: "a", text: "The Microsoft Purview Information Protection scanner, in discovery mode first and then enforcement" },
-      { id: "b", text: "A service-side auto-labeling policy for SharePoint" },
-      { id: "c", text: "Endpoint DLP with a Devices location policy" },
-      { id: "d", text: "The Purview browser extension" },
+      { id: "a", text: "The Purview Information Protection scanner, first in discovery mode then enforcement" },
+      { id: "b", text: "A service-side auto-labeling policy for SharePoint, scoped to the on-premises file server share" },
+      { id: "c", text: "Endpoint DLP with a Devices location policy on the file server itself" },
+      { id: "d", text: "The Purview browser extension installed on the file server's browsers" },
     ],
     correct: ["a"],
     explanation:
@@ -139,10 +139,10 @@ export const sc401ExtraQuestions: Question[] = [
     prompt:
       "A DLP policy must warn users when they share sensitive content externally but still allow them to proceed with a business justification. Which action should the rule use?",
     options: [
-      { id: "a", text: "Block with override, combined with a policy tip and a user justification prompt" },
-      { id: "b", text: "Block without exceptions" },
-      { id: "c", text: "Audit only, with no notification" },
-      { id: "d", text: "Restrict access to the site collection" },
+      { id: "a", text: "Block with override, plus a policy tip and a user justification prompt" },
+      { id: "b", text: "Block without exceptions, so users can never proceed with sharing" },
+      { id: "c", text: "Audit only, with no notification or policy tip shown to the users" },
+      { id: "d", text: "Restrict access to the site collection until an administrator approves" },
     ],
     correct: ["a"],
     explanation:
@@ -157,10 +157,10 @@ export const sc401ExtraQuestions: Question[] = [
     prompt:
       "You must prevent users pasting sensitive data into a generative AI website in the browser on managed devices. Which combination is required?",
     options: [
-      { id: "a", text: "Onboarded devices, the Purview browser extension or a supported browser, and an Endpoint DLP rule restricting the sensitive service domain" },
-      { id: "b", text: "A sensitivity label with encryption only" },
-      { id: "c", text: "A retention policy for Teams chats" },
-      { id: "d", text: "A container label on the SharePoint site" },
+      { id: "a", text: "Onboarded devices, the Purview browser extension or supported browser, and an Endpoint DLP rule for the service domain" },
+      { id: "b", text: "A sensitivity label with encryption on the files, with no Endpoint DLP rule or device onboarding" },
+      { id: "c", text: "A retention policy for Teams chats plus a communication compliance policy for the AI site" },
+      { id: "d", text: "A container label on the SharePoint site together with a sharing restriction for guests" },
     ],
     correct: ["a"],
     explanation:
@@ -175,10 +175,10 @@ export const sc401ExtraQuestions: Question[] = [
     prompt:
       "Which Microsoft Purview capability prevents Microsoft 365 Copilot from summarising or referencing documents that carry particular sensitivity labels?",
     options: [
-      { id: "a", text: "A DLP policy for the Microsoft 365 Copilot location that restricts content with the selected labels" },
-      { id: "b", text: "A retention label with a disposition review" },
-      { id: "c", text: "An insider risk policy for risky AI usage" },
-      { id: "d", text: "A communication compliance policy" },
+      { id: "a", text: "A DLP policy for the Copilot location that restricts content with the chosen labels" },
+      { id: "b", text: "A retention label with a disposition review, applied to the labelled content" },
+      { id: "c", text: "An insider risk policy for risky AI usage, which flags Copilot prompts written by users" },
+      { id: "d", text: "A communication compliance policy that monitors what users type into Copilot" },
     ],
     correct: ["a"],
     explanation:
@@ -194,9 +194,9 @@ export const sc401ExtraQuestions: Question[] = [
       "A compliance officer must determine which retention policies and labels apply to a specific mailbox and why. Which tool gives that answer directly?",
     options: [
       { id: "a", text: "Policy lookup in data lifecycle management" },
-      { id: "b", text: "Content explorer" },
-      { id: "c", text: "Activity explorer" },
-      { id: "d", text: "The DLP alerts dashboard" },
+      { id: "b", text: "Content explorer, filtered to the mailbox" },
+      { id: "c", text: "Activity explorer for the mailbox owner" },
+      { id: "d", text: "The DLP alerts dashboard for the mailbox" },
     ],
     correct: ["a"],
     explanation:
@@ -211,10 +211,10 @@ export const sc401ExtraQuestions: Question[] = [
     prompt:
       "Records that must not be edited or deleted once declared, with any disposal requiring documented approval, are best implemented using which capability?",
     options: [
-      { id: "a", text: "Retention labels that mark content as a regulatory record, with disposition review enabled" },
-      { id: "b", text: "A retention policy that deletes content after 7 years" },
-      { id: "c", text: "A sensitivity label with encryption" },
-      { id: "d", text: "An eDiscovery hold" },
+      { id: "a", text: "Retention labels that mark content as a regulatory record, with disposition review" },
+      { id: "b", text: "A retention policy that deletes content after 7 years without any review" },
+      { id: "c", text: "A sensitivity label with encryption that blocks editing for all users" },
+      { id: "d", text: "An eDiscovery hold placed on the mailboxes and sites that store the declared records" },
     ],
     correct: ["a"],
     explanation:
@@ -295,10 +295,10 @@ export const sc401ExtraQuestions: Question[] = [
     prompt:
       "Insider Risk Management shows usernames as anonymised aliases for some reviewers. Which setting controls this?",
     options: [
-      { id: "a", text: "Privacy settings, which anonymise user details for investigators until an escalation requires identification" },
-      { id: "b", text: "Adaptive Protection risk levels" },
-      { id: "c", text: "Policy timeframes" },
-      { id: "d", text: "The intelligent detections threshold" },
+      { id: "a", text: "Privacy settings, which anonymise user details until escalation needs identification" },
+      { id: "b", text: "Adaptive Protection risk levels, which are assigned automatically to each user in scope" },
+      { id: "c", text: "Policy timeframes, which set the activity lookback period for each policy in place" },
+      { id: "d", text: "The intelligent detections threshold, which reduces low-value alerts and noise across policies" },
     ],
     correct: ["a"],
     explanation:
@@ -314,9 +314,9 @@ export const sc401ExtraQuestions: Question[] = [
       "Which eDiscovery capability lets you preserve, collect, review, and export content for a legal matter, including placing holds on custodians?",
     options: [
       { id: "a", text: "eDiscovery (Premium), with custodian management and review sets" },
-      { id: "b", text: "Content search alone" },
-      { id: "c", text: "Activity explorer" },
-      { id: "d", text: "A retention policy" },
+      { id: "b", text: "Content search alone, exporting the results to a PST file for review outside Purview" },
+      { id: "c", text: "Activity explorer, filtered to the matter's users and dates" },
+      { id: "d", text: "A retention policy that preserves the mailbox and site content" },
     ],
     correct: ["a"],
     explanation:
@@ -331,10 +331,10 @@ export const sc401ExtraQuestions: Question[] = [
     prompt:
       "Before DSPM for AI can report on sensitive data users send to third-party AI websites, which prerequisites must be in place?",
     options: [
-      { id: "a", text: "Microsoft Purview Audit enabled, devices onboarded to Purview, and the Purview browser extension installed" },
-      { id: "b", text: "A retention policy for Copilot interactions only" },
-      { id: "c", text: "An eDiscovery case for each AI site" },
-      { id: "d", text: "Customer Lockbox enabled" },
+      { id: "a", text: "Purview Audit enabled, devices onboarded, and the Purview browser extension installed" },
+      { id: "b", text: "A retention policy for Copilot interactions and a DLP policy for Teams chats" },
+      { id: "c", text: "An eDiscovery case for each AI site and a legal hold on every user's mailbox" },
+      { id: "d", text: "Customer Lockbox enabled together with a dedicated Azure subscription for logs" },
     ],
     correct: ["a"],
     explanation:
@@ -349,10 +349,10 @@ export const sc401ExtraQuestions: Question[] = [
     prompt:
       "A DSPM for AI data risk assessment reports that a SharePoint site contains sensitive files shared with 'anyone with the link'. Which remediation directly reduces Copilot oversharing risk for that site?",
     options: [
-      { id: "a", text: "Apply sensitivity labels to the unlabelled sensitive items and use SharePoint Restricted Content Discovery to exclude the site from Copilot" },
-      { id: "b", text: "Delete the site" },
-      { id: "c", text: "Disable Purview Audit for the site" },
-      { id: "d", text: "Publish a retention label to the site" },
+      { id: "a", text: "Label the unlabelled sensitive items and exclude the site from Copilot with Restricted Content Discovery" },
+      { id: "b", text: "Delete the entire site and all the document libraries it contains so nothing is left to find" },
+      { id: "c", text: "Disable Purview Audit for the site so that no sharing events are recorded or reported" },
+      { id: "d", text: "Publish a retention label to the site so the sensitive items are kept for seven years" },
     ],
     correct: ["a"],
     explanation:

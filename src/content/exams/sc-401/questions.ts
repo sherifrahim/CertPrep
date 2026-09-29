@@ -47,10 +47,10 @@ export const sc401Questions: Question[] = [
     prompt:
       "Which statement correctly describes what a container label applied to a Microsoft 365 Group or Teams team does?",
     options: [
-      { id: "a", text: "It encrypts every file stored in the team's SharePoint site" },
-      { id: "b", text: "It controls privacy, external user access, and unmanaged device access for the container, but does not protect the files inside it" },
-      { id: "c", text: "It applies watermarks and headers to all documents in the site" },
-      { id: "d", text: "It automatically applies the same label to all existing files in the site" },
+      { id: "a", text: "It encrypts every file stored in the team's SharePoint site and blocks external sharing of them" },
+      { id: "b", text: "It governs privacy, guest access and unmanaged device access, not the files within" },
+      { id: "c", text: "It applies watermarks and headers to all of the documents that are stored in the site" },
+      { id: "d", text: "It automatically applies the same label to every existing file in the site's libraries" },
     ],
     correct: ["b"],
     explanation:
@@ -101,10 +101,10 @@ export const sc401Questions: Question[] = [
     prompt:
       "You must identify documents that are 'source code' across the tenant. There is no reliable keyword or pattern, but you can supply many examples. What should you use?",
     options: [
-      { id: "a", text: "A trainable classifier, either the built-in Source Code classifier or a custom one trained on samples" },
-      { id: "b", text: "An exact data match SIT" },
-      { id: "c", text: "A document fingerprint" },
-      { id: "d", text: "A keyword dictionary of programming terms" },
+      { id: "a", text: "A trainable classifier, either the built-in Source Code one or a custom one" },
+      { id: "b", text: "An exact data match SIT built from a hashed table of source files" },
+      { id: "c", text: "A document fingerprint taken from a single representative code file" },
+      { id: "d", text: "A keyword dictionary of programming terms and common language keywords used in code files" },
     ],
     correct: ["a"],
     explanation:
@@ -138,9 +138,9 @@ export const sc401Questions: Question[] = [
       "A sensitivity label must let members of the Finance group edit a document while external recipients can only view it, with those rights travelling with the file wherever it goes. What must the label configure?",
     options: [
       { id: "a", text: "Encryption with assigned permissions for specific users and groups" },
-      { id: "b", text: "Content marking with a watermark only" },
-      { id: "c", text: "A container label on the Finance team" },
-      { id: "d", text: "An auto-labeling policy for Exchange" },
+      { id: "b", text: "Content marking with a watermark applied across every page" },
+      { id: "c", text: "A container label applied to the Finance team's group" },
+      { id: "d", text: "An auto-labeling policy for Exchange that scans outgoing mail for the Finance keywords" },
     ],
     correct: ["a"],
     explanation:
@@ -156,9 +156,9 @@ export const sc401Questions: Question[] = [
       "Two sensitivity labels are published to a user. Which label ordering principle applies when the service must resolve which one is more restrictive?",
     options: [
       { id: "a", text: "The label positioned lower in the label list order is treated as higher sensitivity" },
-      { id: "b", text: "The label created most recently always wins" },
-      { id: "c", text: "The label with the shortest name wins" },
-      { id: "d", text: "Sublabels always override their parent regardless of order" },
+      { id: "b", text: "The label that was created most recently always wins, whatever its position in the label list" },
+      { id: "c", text: "The label with the shortest display name wins the comparison for the user" },
+      { id: "d", text: "Sublabels always override their parent, regardless of the order of the labels" },
     ],
     correct: ["a"],
     explanation:
@@ -173,10 +173,10 @@ export const sc401Questions: Question[] = [
     prompt:
       "You must classify and label files sitting on on-premises Windows file shares using your existing sensitivity labels. What should you deploy?",
     options: [
-      { id: "a", text: "The Microsoft Purview Information Protection scanner" },
-      { id: "b", text: "The Purview browser extension" },
-      { id: "c", text: "Endpoint DLP on the file server" },
-      { id: "d", text: "An auto-labeling policy for SharePoint" },
+      { id: "a", text: "Microsoft Purview Information Protection scanner on file servers" },
+      { id: "b", text: "The Purview browser extension on each user's device" },
+      { id: "c", text: "Endpoint DLP on the file server that hosts the shares" },
+      { id: "d", text: "An auto-labeling policy for SharePoint Online sites" },
     ],
     correct: ["a"],
     explanation:
@@ -191,7 +191,7 @@ export const sc401Questions: Question[] = [
     prompt:
       "Which capability lets you revoke an encrypted email after it has been sent and set an expiration date on the recipient's access?",
     options: [
-      { id: "a", text: "Microsoft Purview Advanced Message Encryption" },
+      { id: "a", text: "Purview Advanced Message Encryption, with revocation" },
       { id: "b", text: "Microsoft Purview Message Encryption (standard)" },
       { id: "c", text: "Transport rules with TLS enforcement" },
       { id: "d", text: "S/MIME signing" },
@@ -209,10 +209,10 @@ export const sc401Questions: Question[] = [
     prompt:
       "A sensitivity label with encryption must be applied to a Power BI semantic model and follow the data when it is exported to Excel. What must be true?",
     options: [
-      { id: "a", text: "The label is published to the user and Power BI information protection is enabled, so exported files inherit the label and its encryption" },
-      { id: "b", text: "Only container labels can apply to Power BI" },
-      { id: "c", text: "Power BI ignores sensitivity labels entirely" },
-      { id: "d", text: "The file must be manually labelled after each export" },
+      { id: "a", text: "The label is published to the user and Power BI information protection is enabled" },
+      { id: "b", text: "Only container labels can apply to Power BI items, so file-level labels are ignored" },
+      { id: "c", text: "Power BI ignores sensitivity labels entirely, so exported files are always unlabelled" },
+      { id: "d", text: "The file must be manually labelled after each export, because labels never carry over" },
     ],
     correct: ["a"],
     explanation:
@@ -247,10 +247,10 @@ export const sc401Questions: Question[] = [
     prompt:
       "Two DLP policies apply to the same SharePoint content. Policy A has a rule at priority 0 that blocks access, and Policy B has a rule at priority 1 that only sends a notification. Both rules match. What is the resulting action?",
     options: [
-      { id: "a", text: "Only the notification is sent, because the lower-priority rule runs last and wins" },
-      { id: "b", text: "The most restrictive block action is enforced, and the notification from the lower-priority rule can still apply" },
-      { id: "c", text: "Both policies are skipped because of the conflict" },
-      { id: "d", text: "The user is prompted to choose which policy applies" },
+      { id: "a", text: "Only the notification is sent, because the rule that runs last takes precedence over the first one" },
+      { id: "b", text: "The most restrictive block is enforced, and the lower-priority rule's notification can still apply" },
+      { id: "c", text: "Both policies are skipped for that item, because their actions conflict with each other" },
+      { id: "d", text: "The user is prompted to choose which of the two policies should be applied to the file" },
     ],
     correct: ["b"],
     explanation:
@@ -283,10 +283,10 @@ export const sc401Questions: Question[] = [
     prompt:
       "A retention label with a 7-year retain-then-delete action and a retention policy with a 3-year delete-only action both apply to the same document. What happens to the document?",
     options: [
-      { id: "a", text: "It is deleted after 3 years, because the shortest period wins" },
-      { id: "b", text: "It is retained for 7 years and then deleted, because retention wins over deletion and the longest retention wins" },
-      { id: "c", text: "It is retained indefinitely because the settings conflict" },
-      { id: "d", text: "The retention policy is ignored entirely because labels always override policies" },
+      { id: "a", text: "It is deleted after 3 years, because the policy with the shortest period wins" },
+      { id: "b", text: "It is kept for 7 years, then deleted, because retention beats deletion" },
+      { id: "c", text: "It is retained indefinitely because the two settings conflict with each other" },
+      { id: "d", text: "The retention policy is ignored entirely because labels always override any policy" },
     ],
     correct: ["b"],
     explanation:
@@ -302,7 +302,7 @@ export const sc401Questions: Question[] = [
       "You need a retention policy whose scope automatically includes all users in the Legal department, updating as staff join and leave. What should you use?",
     options: [
       { id: "a", text: "An adaptive policy scope based on a user attribute query" },
-      { id: "b", text: "A static policy scope with a distribution group" },
+      { id: "b", text: "A static policy scope built from a distribution group that admins must update by hand" },
       { id: "c", text: "A retention label published to a security group" },
       { id: "d", text: "An eDiscovery hold on the Legal department mailboxes" },
     ],
@@ -320,9 +320,9 @@ export const sc401Questions: Question[] = [
       "A DLP policy must warn users when they share sensitive data externally but let them proceed with a documented business justification. Which configuration achieves this?",
     options: [
       { id: "a", text: "Block with override, requiring a business justification" },
-      { id: "b", text: "Block without override" },
-      { id: "c", text: "Audit only, with no notification" },
-      { id: "d", text: "Simulation mode left running permanently" },
+      { id: "b", text: "Block without override, with a policy tip shown to the user" },
+      { id: "c", text: "Audit only, with no notification or policy tip shown to the user" },
+      { id: "d", text: "Simulation mode that is left running permanently for the policy" },
     ],
     correct: ["a"],
     explanation:
@@ -338,9 +338,9 @@ export const sc401Questions: Question[] = [
       "Before enforcing a new DLP policy across the tenant, you want to see exactly what it would have matched without affecting users. What should you use?",
     options: [
       { id: "a", text: "Simulation mode, optionally with policy tips shown" },
-      { id: "b", text: "A lower rule priority" },
-      { id: "c", text: "An adaptive policy scope" },
-      { id: "d", text: "Test mode in Content explorer" },
+      { id: "b", text: "A lower rule priority so the policy runs after every other DLP policy in the tenant" },
+      { id: "c", text: "An adaptive policy scope covering a pilot group" },
+      { id: "d", text: "Test mode in Content explorer for the tenant" },
     ],
     correct: ["a"],
     explanation:
@@ -355,10 +355,10 @@ export const sc401Questions: Question[] = [
     prompt:
       "Endpoint DLP must monitor a Windows device. What is the prerequisite?",
     options: [
-      { id: "a", text: "The device must be onboarded to Microsoft Purview (device onboarding) and running a supported Windows version" },
-      { id: "b", text: "The device must have a public IP address" },
-      { id: "c", text: "The device must be in the same Active Directory forest as Exchange" },
-      { id: "d", text: "The user must have an eDiscovery role assigned" },
+      { id: "a", text: "The device must be onboarded to Microsoft Purview and run a supported Windows version" },
+      { id: "b", text: "The device must have a public IP address that Microsoft services can reach" },
+      { id: "c", text: "The device must be in the same Active Directory forest as the Exchange servers" },
+      { id: "d", text: "The signed-in user must also have an eDiscovery Manager role assigned in the Purview portal" },
     ],
     correct: ["a"],
     explanation:
@@ -374,9 +374,9 @@ export const sc401Questions: Question[] = [
       "Which Endpoint DLP setting lets you allow a browser you trust while blocking sensitive uploads from all other browsers?",
     options: [
       { id: "a", text: "Unallowed browsers, combined with the service domain allow/block list" },
-      { id: "b", text: "File path exclusions" },
-      { id: "c", text: "Printer groups" },
-      { id: "d", text: "Removable storage device groups" },
+      { id: "b", text: "File path exclusions for the trusted browser's download folder" },
+      { id: "c", text: "Printer groups that define which printers may print files containing sensitive data" },
+      { id: "d", text: "Removable storage device groups for USB drives allowed on endpoints" },
     ],
     correct: ["a"],
     explanation:
@@ -391,10 +391,10 @@ export const sc401Questions: Question[] = [
     prompt:
       "What does just-in-time protection in Endpoint DLP do?",
     options: [
-      { id: "a", text: "Blocks egress activity on a file until classification has been evaluated, preventing leakage of not-yet-scanned content" },
-      { id: "b", text: "Grants temporary administrative rights to the user" },
-      { id: "c", text: "Opens a firewall port for a limited time" },
-      { id: "d", text: "Applies a retention label at the moment of deletion" },
+      { id: "a", text: "Blocks egress of a file until its classification has been evaluated, so unscanned content can't leak" },
+      { id: "b", text: "Grants temporary administrative rights to the signed-in user while a large file is being uploaded to a cloud service" },
+      { id: "c", text: "Opens a firewall port for a limited time so that cloud uploads can complete" },
+      { id: "d", text: "Applies a retention label at the moment of deletion to keep a copy of the file" },
     ],
     correct: ["a"],
     explanation:
@@ -409,10 +409,10 @@ export const sc401Questions: Question[] = [
     prompt:
       "You must apply stricter DLP enforcement automatically to users whose behaviour indicates elevated risk, and relax it when their risk subsides. What should you configure?",
     options: [
-      { id: "a", text: "Adaptive Protection, which maps Insider Risk Management risk levels to DLP policy actions" },
+      { id: "a", text: "Adaptive Protection, which maps Insider Risk Management risk levels to DLP actions automatically" },
       { id: "b", text: "A static DLP policy scoped to a security group updated manually" },
-      { id: "c", text: "Conditional Access with sign-in risk" },
-      { id: "d", text: "A retention policy with an adaptive scope" },
+      { id: "c", text: "Conditional Access with sign-in risk applied to the accounts that show elevated risk" },
+      { id: "d", text: "A retention policy with an adaptive scope for users who have shown risky activity" },
     ],
     correct: ["a"],
     explanation:
@@ -446,9 +446,9 @@ export const sc401Questions: Question[] = [
       "A record must be reviewed by a custodian before it is permanently deleted at the end of its retention period. What should you configure on the retention label?",
     options: [
       { id: "a", text: "Disposition review, with reviewers assigned to the stage" },
-      { id: "b", text: "Auto-apply based on a sensitive info type" },
-      { id: "c", text: "A preservation lock on the policy" },
-      { id: "d", text: "An adaptive scope" },
+      { id: "b", text: "Auto-apply based on a sensitive information type match found in the record's content" },
+      { id: "c", text: "A preservation lock applied to the retention policy" },
+      { id: "d", text: "An adaptive scope that targets the record's custodian" },
     ],
     correct: ["a"],
     explanation:
@@ -482,9 +482,9 @@ export const sc401Questions: Question[] = [
       "Which two statements about retention labels versus retention policies are correct? (Choose two.)",
     options: [
       { id: "a", text: "A retention label is applied to individual items and travels with the item" },
-      { id: "b", text: "A retention policy applies at the container level, such as an entire mailbox or site" },
-      { id: "c", text: "Retention policies can trigger disposition review" },
-      { id: "d", text: "Retention labels cannot be applied automatically" },
+      { id: "b", text: "A retention policy applies at container level, such as a whole mailbox or site" },
+      { id: "c", text: "Retention policies can trigger disposition review of items at the end of retention" },
+      { id: "d", text: "Retention labels cannot be applied automatically, only by users manually" },
     ],
     correct: ["a", "b"],
     explanation:
@@ -538,9 +538,9 @@ export const sc401Questions: Question[] = [
       "Your organization is rolling out Microsoft 365 Copilot. Leadership wants visibility into what sensitive data users are submitting to AI apps and whether oversharing risk exists. Which Purview capability addresses this?",
     options: [
       { id: "a", text: "Data Security Posture Management (DSPM) for AI" },
-      { id: "b", text: "Communication compliance" },
-      { id: "c", text: "Information barriers" },
-      { id: "d", text: "Customer Lockbox" },
+      { id: "b", text: "Communication compliance for chat and email" },
+      { id: "c", text: "Information barriers between two groups of users" },
+      { id: "d", text: "Customer Lockbox for Microsoft support access" },
     ],
     correct: ["a"],
     explanation:
@@ -555,10 +555,10 @@ export const sc401Questions: Question[] = [
     prompt:
       "Which two statements about Adaptive Protection in Microsoft Purview are correct? (Choose two.)",
     options: [
-      { id: "a", text: "It uses insider risk levels to dynamically apply stricter DLP policy actions to higher-risk users" },
-      { id: "b", text: "It requires Insider Risk Management to be configured" },
+      { id: "a", text: "It uses insider risk levels to apply stricter DLP actions to higher-risk users" },
+      { id: "b", text: "It requires Insider Risk Management to be configured and running" },
       { id: "c", text: "It permanently blocks all sharing for any user who triggers one alert" },
-      { id: "d", text: "It replaces the need for sensitivity labels" },
+      { id: "d", text: "It replaces the need for sensitivity labels in the organisation" },
     ],
     correct: ["a", "b"],
     explanation:
@@ -591,10 +591,10 @@ export const sc401Questions: Question[] = [
     prompt:
       "By default, how does Insider Risk Management protect the privacy of users under investigation?",
     options: [
-      { id: "a", text: "Usernames are pseudonymized in alerts and reports until an investigator with the right role reveals them" },
-      { id: "b", text: "All alerts are anonymous and identities can never be revealed" },
-      { id: "c", text: "Alerts are visible only to the affected user" },
-      { id: "d", text: "User identity is stored only in Microsoft Entra audit logs" },
+      { id: "a", text: "Usernames are pseudonymized in alerts until an investigator with the right role reveals them" },
+      { id: "b", text: "All alerts are anonymous, and identities can never be revealed to any reviewer" },
+      { id: "c", text: "Alerts are visible only to the affected user, and to nobody in the security team" },
+      { id: "d", text: "User identity is stored only in Microsoft Entra audit logs and never in the solution itself or its reports" },
     ],
     correct: ["a"],
     explanation:
@@ -627,10 +627,10 @@ export const sc401Questions: Question[] = [
     prompt:
       "What is the correct order of the Insider Risk Management workflow?",
     options: [
-      { id: "a", text: "Policy → alert → triage → investigate (case) → action, such as a notice, escalation to eDiscovery, or resolution" },
-      { id: "b", text: "Case → policy → alert → triage" },
-      { id: "c", text: "Alert → policy → case → indicator" },
-      { id: "d", text: "Indicator → notice template → policy → alert" },
+      { id: "a", text: "Policy → alert → triage → investigate (case) → action, such as notice or escalation" },
+      { id: "b", text: "Case → policy → alert → triage → indicator, with notices sent before anything else at all" },
+      { id: "c", text: "Alert → policy → case → indicator, with triage happening after the case is closed" },
+      { id: "d", text: "Indicator → notice template → policy → alert, with cases created automatically" },
     ],
     correct: ["a"],
     explanation:
@@ -645,10 +645,10 @@ export const sc401Questions: Question[] = [
     prompt:
       "Which prerequisite must be satisfied before Insider Risk Management or DSPM for AI can report on user activity at all?",
     options: [
-      { id: "a", text: "Microsoft Purview Audit must be turned on so activity is being recorded" },
-      { id: "b", text: "Information barriers must be configured" },
-      { id: "c", text: "Customer Key must be deployed" },
-      { id: "d", text: "All users must have sensitivity labels applied" },
+      { id: "a", text: "Microsoft Purview Audit must be turned on so that user activity is being recorded" },
+      { id: "b", text: "Information barriers must be configured between all of the departments" },
+      { id: "c", text: "Customer Key must be deployed to protect the mailboxes with your own key" },
+      { id: "d", text: "All users must already have sensitivity labels applied to their documents" },
     ],
     correct: ["a"],
     explanation:
@@ -699,10 +699,10 @@ export const sc401Questions: Question[] = [
     prompt:
       "Before a Microsoft 365 Copilot rollout, leadership wants to know which SharePoint sites contain sensitive, over-permissioned content that Copilot could surface. Which DSPM for AI feature answers this?",
     options: [
-      { id: "a", text: "Data risk assessments, which run weekly by default across the top SharePoint sites by usage" },
-      { id: "b", text: "Communication compliance policies" },
-      { id: "c", text: "Retention label auto-apply policies" },
-      { id: "d", text: "Information barrier segments" },
+      { id: "a", text: "Data risk assessments, which run weekly across the top SharePoint sites by usage in the tenant" },
+      { id: "b", text: "Communication compliance policies that scan Copilot prompts for policy violations" },
+      { id: "c", text: "Retention label auto-apply policies that classify content across SharePoint" },
+      { id: "d", text: "Information barrier segments that keep the two groups of users apart" },
     ],
     correct: ["a"],
     explanation:
@@ -717,10 +717,10 @@ export const sc401Questions: Question[] = [
     prompt:
       "You must stop Microsoft 365 Copilot from summarising documents that carry a specific sensitivity label. What should you configure?",
     options: [
-      { id: "a", text: "A DLP policy for the Microsoft 365 Copilot location that restricts processing of items with that label" },
-      { id: "b", text: "A retention policy with a 1-day deletion period" },
-      { id: "c", text: "An information barrier between the users and the site" },
-      { id: "d", text: "A trainable classifier applied to the documents" },
+      { id: "a", text: "A DLP policy for the Copilot location that restricts items with that label" },
+      { id: "b", text: "A retention policy with a one-day deletion period applied to the labelled files" },
+      { id: "c", text: "An information barrier between the users and the labelled site content" },
+      { id: "d", text: "A trainable classifier applied to the documents that carry the label" },
     ],
     correct: ["a"],
     explanation:
@@ -753,10 +753,10 @@ export const sc401Questions: Question[] = [
     prompt:
       "Legal has asked you to preserve and export all mailbox and SharePoint content relating to a departing executive for outside counsel. Which solution should you use?",
     options: [
-      { id: "a", text: "Microsoft Purview eDiscovery, creating a case with holds, searches, and export" },
-      { id: "b", text: "Content explorer export" },
-      { id: "c", text: "An Insider Risk Management notice template" },
-      { id: "d", text: "A retention policy with an adaptive scope" },
+      { id: "a", text: "Microsoft Purview eDiscovery, creating a case with holds, searches and an export" },
+      { id: "b", text: "Content explorer export of the mailbox and site items in question" },
+      { id: "c", text: "An Insider Risk Management notice template sent to the departing executive" },
+      { id: "d", text: "A retention policy with an adaptive scope covering the executive's data" },
     ],
     correct: ["a"],
     explanation:
@@ -771,10 +771,10 @@ export const sc401Questions: Question[] = [
     prompt:
       "Which role should you assign to an analyst who must triage DLP alerts and investigate insider risk cases, but must not be able to change policy configuration?",
     options: [
-      { id: "a", text: "Insider Risk Management Analysts, together with a DLP investigation role, following least privilege" },
-      { id: "b", text: "Global Administrator" },
-      { id: "c", text: "Compliance Data Administrator" },
-      { id: "d", text: "Organization Management" },
+      { id: "a", text: "Insider Risk Management Analysts plus a DLP investigation role, without policy rights" },
+      { id: "b", text: "Global Administrator, so the analyst can reach every Purview solution and setting needed" },
+      { id: "c", text: "Compliance Data Administrator, which manages policies and reads all compliance data" },
+      { id: "d", text: "Organization Management, which can configure every compliance policy in the tenant" },
     ],
     correct: ["a"],
     explanation:
@@ -789,10 +789,10 @@ export const sc401Questions: Question[] = [
     prompt:
       "Where do you respond to and manage DLP alerts raised across Exchange, SharePoint, Teams, and endpoints?",
     options: [
-      { id: "a", text: "The Data loss prevention alerts dashboard in the Microsoft Purview portal, with alerts also surfacing in Microsoft Defender XDR" },
-      { id: "b", text: "The Microsoft Entra admin center" },
-      { id: "c", text: "The Exchange admin center transport rules page" },
-      { id: "d", text: "Azure Monitor alerts" },
+      { id: "a", text: "The DLP alerts dashboard in the Microsoft Purview portal, also visible in Defender XDR" },
+      { id: "b", text: "The Microsoft Entra admin center, under the Identity Protection alerts blade" },
+      { id: "c", text: "The Exchange admin center transport rules page, where mail flow rules are created and managed" },
+      { id: "d", text: "Azure Monitor alerts, configured with a Log Analytics workspace query" },
     ],
     correct: ["a"],
     explanation:
@@ -807,10 +807,10 @@ export const sc401Questions: Question[] = [
     prompt:
       "How long does Microsoft Purview Audit (Standard) retain audit records for most events by default, and what extends that retention?",
     options: [
-      { id: "a", text: "180 days by default, extended by Audit (Premium) licensing and audit retention policies to one year or more" },
-      { id: "b", text: "24 hours, extended by enabling mailbox auditing" },
-      { id: "c", text: "10 years for all tenants at no extra cost" },
-      { id: "d", text: "Retention is unlimited and cannot be configured" },
+      { id: "a", text: "180 days by default, extended by Audit (Premium) licensing and retention policies" },
+      { id: "b", text: "24 hours by default, extended by enabling mailbox auditing on each individual mailbox in the tenant" },
+      { id: "c", text: "10 years for every tenant, included at no extra cost with any subscription" },
+      { id: "d", text: "Unlimited retention that cannot be configured by administrators at all" },
     ],
     correct: ["a"],
     explanation:
@@ -827,8 +827,8 @@ export const sc401Questions: Question[] = [
     options: [
       { id: "a", text: "Create an auto-labeling policy for unlabelled sensitive files" },
       { id: "b", text: "Restrict access by label so Copilot cannot summarise the labelled items" },
-      { id: "c", text: "Delete all external users from the tenant" },
-      { id: "d", text: "Disable the unified audit log to reduce noise" },
+      { id: "c", text: "Delete all external users from the tenant to shrink the audience" },
+      { id: "d", text: "Disable the unified audit log to reduce noise in the assessment" },
     ],
     correct: ["a", "b"],
     explanation:
@@ -846,9 +846,9 @@ export const sc401Questions: Question[] = [
       "A custom sensitive information type is producing too many false positives on nine-digit numbers. Which SIT design element should you adjust to require corroborating evidence nearby?",
     options: [
       { id: "a", text: "Supporting elements within a proximity window, raising the confidence level" },
-      { id: "b", text: "The label's encryption settings" },
-      { id: "c", text: "The retention period of the policy" },
-      { id: "d", text: "The adaptive scope of the DLP policy" },
+      { id: "b", text: "The encryption settings of the sensitivity label that is applied to the matching files" },
+      { id: "c", text: "The retention period of the policy that is protecting matching content" },
+      { id: "d", text: "The adaptive scope of the DLP policy that contains the custom SIT" },
     ],
     correct: ["a"],
     explanation:
@@ -863,10 +863,10 @@ export const sc401Questions: Question[] = [
     prompt:
       "What is the difference between publishing a sensitivity label and auto-applying it?",
     options: [
-      { id: "a", text: "Publishing makes the label available for users to select; auto-applying assigns it based on content conditions without user action" },
-      { id: "b", text: "Publishing encrypts the content; auto-applying only marks it" },
-      { id: "c", text: "Publishing applies to email only; auto-applying applies to files only" },
-      { id: "d", text: "They are two names for the same operation" },
+      { id: "a", text: "Publishing makes a label available for users to select; auto-applying assigns it from content conditions" },
+      { id: "b", text: "Publishing encrypts the content itself; auto-applying only adds a visual marking to it" },
+      { id: "c", text: "Publishing applies to email messages only; auto-applying applies to stored files only" },
+      { id: "d", text: "They are two names for the same operation, used in different admin centres" },
     ],
     correct: ["a"],
     explanation:
@@ -881,10 +881,10 @@ export const sc401Questions: Question[] = [
     prompt:
       "Which sensitivity label setting requires users to supply a reason before replacing a higher-sensitivity label with a lower one?",
     options: [
-      { id: "a", text: "Require justification for changing a label, configured in the label policy settings" },
-      { id: "b", text: "Mandatory labeling" },
-      { id: "c", text: "Default label for documents" },
-      { id: "d", text: "Content marking" },
+      { id: "a", text: "Require justification for changing a label, in the label policy settings" },
+      { id: "b", text: "Mandatory labeling, configured in the label policy so that all documents must be labelled" },
+      { id: "c", text: "A default label for documents, applied when files are first saved" },
+      { id: "d", text: "Content marking that adds a header, footer or watermark to files" },
     ],
     correct: ["a"],
     explanation:
@@ -918,9 +918,9 @@ export const sc401Questions: Question[] = [
       "You want newly created documents in a specific department to receive a baseline label automatically, while still letting users raise the sensitivity. What should you configure?",
     options: [
       { id: "a", text: "A default label for documents in the label policy scoped to that department" },
-      { id: "b", text: "A service-side auto-labeling policy with a Deny action" },
-      { id: "c", text: "Mandatory labeling with no published labels" },
-      { id: "d", text: "A retention label auto-apply policy" },
+      { id: "b", text: "A service-side auto-labeling policy that uses a Deny action for newly created documents" },
+      { id: "c", text: "Mandatory labeling with no published labels for the department" },
+      { id: "d", text: "A retention label auto-apply policy for the department's SharePoint site" },
     ],
     correct: ["a"],
     explanation:
@@ -935,10 +935,10 @@ export const sc401Questions: Question[] = [
     prompt:
       "Which statement about EDM is correct?",
     options: [
-      { id: "a", text: "The sensitive data is hashed and salted before upload, so plaintext values never leave your environment" },
-      { id: "b", text: "The full plaintext database is uploaded to Microsoft for matching" },
-      { id: "c", text: "EDM can only match a single column of data" },
-      { id: "d", text: "EDM requires the Information Protection scanner" },
+      { id: "a", text: "Data is hashed and salted before upload, so plaintext values never leave your own environment" },
+      { id: "b", text: "The full plaintext database is uploaded to Microsoft and stored for matching in the cloud" },
+      { id: "c", text: "EDM can only ever match a single column of data from the uploaded table, never several" },
+      { id: "d", text: "EDM requires the Information Protection scanner to be installed on the file server" },
     ],
     correct: ["a"],
     explanation:
@@ -953,10 +953,10 @@ export const sc401Questions: Question[] = [
     prompt:
       "Which capability applies sensitivity labels to files already stored in a connected third-party cloud app such as Box or Google Drive?",
     options: [
-      { id: "a", text: "Microsoft Defender for Cloud Apps file policies that apply a sensitivity label" },
-      { id: "b", text: "Endpoint DLP" },
-      { id: "c", text: "The Information Protection scanner" },
-      { id: "d", text: "Retention label auto-apply" },
+      { id: "a", text: "Defender for Cloud Apps file policies that apply a sensitivity label" },
+      { id: "b", text: "Endpoint DLP rules that watch local files on onboarded Windows devices" },
+      { id: "c", text: "The Information Protection scanner, run against on-premises file shares" },
+      { id: "d", text: "Retention label auto-apply policies for the connected cloud storage" },
     ],
     correct: ["a"],
     explanation:
@@ -974,7 +974,7 @@ export const sc401Questions: Question[] = [
       "Which DLP condition would you use to catch sensitive content leaving the organization, while ignoring the same content shared internally?",
     options: [
       { id: "a", text: "Content is shared from Microsoft 365 with people outside my organization" },
-      { id: "b", text: "Content contains a sensitive info type, with no recipient condition" },
+      { id: "b", text: "Content contains a sensitive info type, with no condition on who receives the content" },
       { id: "c", text: "Document property is set to Confidential" },
       { id: "d", text: "File extension is .docx" },
     ],
@@ -992,9 +992,9 @@ export const sc401Questions: Question[] = [
       "A DLP rule should trigger only when a document contains at least ten credit card numbers, not one. Which setting controls this?",
     options: [
       { id: "a", text: "The instance count (minimum and maximum) on the sensitive info type condition" },
-      { id: "b", text: "The rule priority" },
-      { id: "c", text: "The confidence level only" },
-      { id: "d", text: "The policy's adaptive scope" },
+      { id: "b", text: "The rule priority, which sets the order in which the policy rules run" },
+      { id: "c", text: "The confidence level only, which controls how certain each match must be before it counts" },
+      { id: "d", text: "The policy's adaptive scope, which decides which users the policy covers" },
     ],
     correct: ["a"],
     explanation:
@@ -1028,9 +1028,9 @@ export const sc401Questions: Question[] = [
       "Which retention setting starts the retention period only when a defined business event occurs, such as an employee leaving or a contract ending?",
     options: [
       { id: "a", text: "Event-based retention, using an event type on the retention label" },
-      { id: "b", text: "Adaptive policy scope" },
-      { id: "c", text: "Preservation lock" },
-      { id: "d", text: "Disposition review" },
+      { id: "b", text: "An adaptive policy scope that targets the departing employee's account" },
+      { id: "c", text: "Preservation Lock applied to the retention policy for the mailbox" },
+      { id: "d", text: "A disposition review at the end of the label's retention period" },
     ],
     correct: ["a"],
     explanation:
@@ -1045,10 +1045,10 @@ export const sc401Questions: Question[] = [
     prompt:
       "A user deleted an email that is subject to a retention policy. Where does the item go so that retention is still honoured?",
     options: [
-      { id: "a", text: "The hidden Recoverable Items folder in the mailbox, where it is retained until the period expires" },
-      { id: "b", text: "It is permanently deleted immediately" },
-      { id: "c", text: "It moves to the user's Archive mailbox root" },
-      { id: "d", text: "It is copied to the compliance administrator's mailbox" },
+      { id: "a", text: "The hidden Recoverable Items folder in the mailbox, kept until the period ends" },
+      { id: "b", text: "It is permanently deleted immediately, and only the audit record of the deletion remains" },
+      { id: "c", text: "It moves to the root of the user's Archive mailbox and stays visible" },
+      { id: "d", text: "It is copied to the compliance administrator's mailbox as an attachment" },
     ],
     correct: ["a"],
     explanation:
@@ -1063,10 +1063,10 @@ export const sc401Questions: Question[] = [
     prompt:
       "Which statement about DLP policy scoping is correct when a policy targets both Exchange and Devices?",
     options: [
-      { id: "a", text: "Conditions and actions available differ per location, so some actions apply only to the endpoint location" },
-      { id: "b", text: "All actions apply identically to every location" },
-      { id: "c", text: "A policy can only ever target one location" },
-      { id: "d", text: "Endpoint actions automatically apply to Exchange as well" },
+      { id: "a", text: "Available conditions and actions differ per location, so some actions apply only to endpoints" },
+      { id: "b", text: "All actions apply identically to every location that the policy targets" },
+      { id: "c", text: "A policy can only ever target one location at a time, so combining Exchange and Devices is impossible" },
+      { id: "d", text: "Endpoint actions automatically apply to Exchange mail flow as well as devices" },
     ],
     correct: ["a"],
     explanation:
@@ -1083,10 +1083,10 @@ export const sc401Questions: Question[] = [
     prompt:
       "Which Insider Risk Management concept determines what must happen before a user is brought into scope for scoring at all?",
     options: [
-      { id: "a", text: "The triggering event, such as an HR resignation record or a DLP policy match" },
-      { id: "b", text: "The notice template" },
-      { id: "c", text: "The case disposition" },
-      { id: "d", text: "The anonymization setting" },
+      { id: "a", text: "The triggering event, such as an HR resignation record or a DLP match" },
+      { id: "b", text: "The notice template that is sent to users who are placed into scope of the policy" },
+      { id: "c", text: "The case disposition that is set when an investigation is closed" },
+      { id: "d", text: "The anonymization setting that hides usernames from reviewers" },
     ],
     correct: ["a"],
     explanation:

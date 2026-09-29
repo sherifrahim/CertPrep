@@ -11,10 +11,10 @@ export const sc500Questions: Question[] = [
     prompt:
       "Twelve engineers hold permanent Owner on a production subscription. You must remove standing access while still letting them work when needed, with approval and MFA required each time. What should you implement?",
     options: [
-      { id: "a", text: "Eligible assignments in Privileged Identity Management with approval and MFA required on activation" },
-      { id: "b", text: "Downgrade all twelve to Contributor" },
+      { id: "a", text: "Eligible PIM assignments with approval and MFA required on activation" },
+      { id: "b", text: "Downgrade all twelve engineers to Contributor on the subscription" },
       { id: "c", text: "A Conditional Access policy requiring MFA for the Microsoft Azure Management app" },
-      { id: "d", text: "A resource lock on the subscription" },
+      { id: "d", text: "A resource lock on the subscription that prevents any deletion" },
     ],
     correct: ["a"],
     explanation:
@@ -48,7 +48,7 @@ export const sc500Questions: Question[] = [
       "A workload running outside Azure must authenticate to Microsoft Entra ID with no stored client secret. What should you configure on the app registration?",
     options: [
       { id: "a", text: "A federated identity credential trusting the external OIDC issuer" },
-      { id: "b", text: "A client secret with a short expiry, rotated automatically" },
+      { id: "b", text: "A client secret with a short expiry, rotated automatically each week" },
       { id: "c", text: "A system-assigned managed identity" },
       { id: "d", text: "A certificate stored on the external host" },
     ],
@@ -65,10 +65,10 @@ export const sc500Questions: Question[] = [
     prompt:
       "Users are consenting to third-party applications that request permission to read all mailboxes. You must stop that while still allowing consent to low-impact permissions. What should you configure?",
     options: [
-      { id: "a", text: "An app consent policy that permits user consent only for permissions classified as low impact" },
-      { id: "b", text: "Disable user consent for all applications" },
-      { id: "c", text: "Block all app registrations tenant-wide" },
-      { id: "d", text: "Require MFA before granting consent" },
+      { id: "a", text: "An app consent policy allowing user consent only for permissions classified as low impact" },
+      { id: "b", text: "Disable user consent for all applications, so that every request needs administrator approval" },
+      { id: "c", text: "Block all app registrations tenant-wide so that no application can request permissions" },
+      { id: "d", text: "Require MFA before granting consent, leaving the permissions that can be granted unchanged" },
     ],
     correct: ["a"],
     explanation:
@@ -101,10 +101,10 @@ export const sc500Questions: Question[] = [
     prompt:
       "A key vault protects production encryption keys. You must guarantee a deleted key can be recovered and that nobody can permanently remove it during the retention period. What should you enable?",
     options: [
-      { id: "a", text: "Soft delete together with purge protection" },
-      { id: "b", text: "Soft delete alone" },
-      { id: "c", text: "Automatic key rotation" },
-      { id: "d", text: "A private endpoint on the vault" },
+      { id: "a", text: "Soft delete together with purge protection enabled on the vault" },
+      { id: "b", text: "Soft delete alone, with the default retention period" },
+      { id: "c", text: "Automatic key rotation on a 90-day schedule" },
+      { id: "d", text: "A private endpoint on the vault, with public network access disabled" },
     ],
     correct: ["a"],
     explanation:
@@ -120,9 +120,9 @@ export const sc500Questions: Question[] = [
       "Which capability scans your cloud estate for exposed secrets such as credentials committed alongside workloads?",
     options: [
       { id: "a", text: "Secrets scanning in Defender Cloud Security Posture Management" },
-      { id: "b", text: "Azure Policy with the Audit effect" },
-      { id: "c", text: "Key Vault firewall logging" },
-      { id: "d", text: "Microsoft Entra access reviews" },
+      { id: "b", text: "Azure Policy with the Audit effect applied to every resource group" },
+      { id: "c", text: "Key Vault firewall logging enabled on each vault in the subscription" },
+      { id: "d", text: "Microsoft Entra access reviews for the owners of each workload" },
     ],
     correct: ["a"],
     explanation:
@@ -156,9 +156,9 @@ export const sc500Questions: Question[] = [
       "You need to find accounts holding far more permission than they actually use, in order to right-size them. Which approach fits?",
     options: [
       { id: "a", text: "Review Azure RBAC assignments against actual usage and remove unused privilege" },
-      { id: "b", text: "Assign Owner to everyone and audit later" },
-      { id: "c", text: "Enable resource locks on all subscriptions" },
-      { id: "d", text: "Rotate all service principal secrets" },
+      { id: "b", text: "Assign Owner to everyone temporarily and audit their actual usage afterwards" },
+      { id: "c", text: "Enable resource locks on every subscription so that no assignment can be changed" },
+      { id: "d", text: "Rotate all service principal secrets and record which ones are still in use" },
     ],
     correct: ["a"],
     explanation:
@@ -176,7 +176,7 @@ export const sc500Questions: Question[] = [
       { id: "a", text: "Multi-user authorization using a Resource Guard" },
       { id: "b", text: "Geo-redundant storage replication" },
       { id: "c", text: "A read-only lock on the vault" },
-      { id: "d", text: "Longer retention on the backup policy" },
+      { id: "d", text: "Longer retention on the backup policy for every backup item" },
     ],
     correct: ["a"],
     explanation:
@@ -192,9 +192,9 @@ export const sc500Questions: Question[] = [
       "Your team defines infrastructure in Bicep. You must catch insecure configurations before deployment rather than after. What should you do?",
     options: [
       { id: "a", text: "Scan the infrastructure-as-code templates in the pipeline and gate merges on the findings" },
-      { id: "b", text: "Deploy first and rely on Defender for Cloud recommendations" },
-      { id: "c", text: "Apply resource locks after each deployment" },
-      { id: "d", text: "Grant the pipeline Owner so it can self-remediate" },
+      { id: "b", text: "Deploy first, then rely on Defender for Cloud recommendations to flag any problems" },
+      { id: "c", text: "Apply resource locks after each deployment, then review the locked resources monthly" },
+      { id: "d", text: "Grant the pipeline Owner so that it can self-remediate any finding it causes" },
     ],
     correct: ["a"],
     explanation:
@@ -212,9 +212,9 @@ export const sc500Questions: Question[] = [
       "Your baseline requires that storage account keys cannot be used to authorise any request. What should you configure?",
     options: [
       { id: "a", text: "Set allowSharedKeyAccess to false so only Microsoft Entra authorization is accepted" },
-      { id: "b", text: "Rotate the account keys every 24 hours" },
-      { id: "c", text: "Enable the storage firewall for your virtual network only" },
-      { id: "d", text: "Require secure transfer" },
+      { id: "b", text: "Rotate the account keys every 24 hours using an automation runbook, storing them in Key Vault" },
+      { id: "c", text: "Enable the storage firewall so that only the virtual network can connect" },
+      { id: "d", text: "Require secure transfer so all requests must use HTTPS connections" },
     ],
     correct: ["a"],
     explanation:
@@ -266,7 +266,7 @@ export const sc500Questions: Question[] = [
       "Regulators require that your organisation can revoke the key protecting an Azure SQL Database at any moment, immediately rendering it unreadable. What should you configure?",
     options: [
       { id: "a", text: "Transparent Data Encryption with a customer-managed key in Azure Key Vault" },
-      { id: "b", text: "Transparent Data Encryption with the service-managed key" },
+      { id: "b", text: "Transparent Data Encryption using the service-managed key left at its default" },
       { id: "c", text: "Dynamic data masking on sensitive columns" },
       { id: "d", text: "Azure Disk Encryption on the underlying host" },
     ],
@@ -302,7 +302,7 @@ export const sc500Questions: Question[] = [
       "A virtual machine must reach an Azure Storage account by private IP, and the same account must be reachable privately from on-premises over ExpressRoute. What should you implement?",
     options: [
       { id: "a", text: "A private endpoint for the storage account, with a matching private DNS zone" },
-      { id: "b", text: "A service endpoint for Microsoft.Storage on the subnet" },
+      { id: "b", text: "A service endpoint for Microsoft.Storage enabled on the virtual machine subnet" },
       { id: "c", text: "A user-defined route to a network virtual appliance" },
       { id: "d", text: "A network security group rule using the Storage service tag" },
     ],
@@ -320,9 +320,9 @@ export const sc500Questions: Question[] = [
       "You created a private endpoint but virtual machines still resolve the service's public IP address. What is missing?",
     options: [
       { id: "a", text: "A private DNS zone for the privatelink namespace, linked to the virtual network" },
-      { id: "b", text: "A service endpoint on the subnet" },
-      { id: "c", text: "An NSG rule allowing the service tag" },
-      { id: "d", text: "A route table entry for the endpoint's IP" },
+      { id: "b", text: "A service endpoint enabled on the subnet that hosts the virtual machines" },
+      { id: "c", text: "An NSG rule allowing the service tag of the target service on outbound traffic" },
+      { id: "d", text: "A route table entry that sends the private endpoint's IP through the firewall" },
     ],
     correct: ["a"],
     explanation:
@@ -338,7 +338,7 @@ export const sc500Questions: Question[] = [
       "Your organisation has 60 virtual networks and needs a baseline blocking inbound SSH from the internet that individual network owners cannot override with their own NSG rules. What should you use?",
     options: [
       { id: "a", text: "Azure Virtual Network Manager security admin rules" },
-      { id: "b", text: "An NSG deployed to every subnet by Azure Policy" },
+      { id: "b", text: "An NSG deployed to every subnet through Azure Policy" },
       { id: "c", text: "Azure Firewall network rules" },
       { id: "d", text: "A route table with next hop None" },
     ],
@@ -391,10 +391,10 @@ export const sc500Questions: Question[] = [
     prompt:
       "All outbound internet traffic from spoke virtual networks must be inspected by an Azure Firewall in a hub. What must you configure on the spoke subnets?",
     options: [
-      { id: "a", text: "A user-defined route for 0.0.0.0/0 with next hop type Virtual appliance set to the firewall's private IP" },
-      { id: "b", text: "An NSG rule denying outbound internet traffic" },
-      { id: "c", text: "A service endpoint for Microsoft.Network" },
-      { id: "d", text: "Gateway transit on the peering" },
+      { id: "a", text: "A user-defined route for 0.0.0.0/0 with next hop Virtual appliance set to the firewall's private IP" },
+      { id: "b", text: "An NSG rule on every spoke subnet that denies all outbound internet traffic and logs each of the flows" },
+      { id: "c", text: "A service endpoint for Microsoft.Network enabled on each of the spoke subnets" },
+      { id: "d", text: "Gateway transit enabled on the virtual network peering between the hub and spokes" },
     ],
     correct: ["a"],
     explanation:
@@ -428,9 +428,9 @@ export const sc500Questions: Question[] = [
       "You must protect a public web application from SQL injection and cross-site scripting. Which service should you place in front of it?",
     options: [
       { id: "a", text: "Azure Web Application Firewall on Front Door or Application Gateway" },
-      { id: "b", text: "Azure Firewall Standard" },
-      { id: "c", text: "Azure DDoS Protection" },
-      { id: "d", text: "Network security groups with service tags" },
+      { id: "b", text: "Azure Firewall Standard, with network rules that filter application traffic" },
+      { id: "c", text: "Azure DDoS Protection, sized for the application's public IP addresses" },
+      { id: "d", text: "Network security groups with service tags on the web subnet" },
     ],
     correct: ["a"],
     explanation:
@@ -466,7 +466,7 @@ export const sc500Questions: Question[] = [
       "You must ensure a virtual machine boots only signed components and can attest to its boot integrity. Which feature set provides this?",
     options: [
       { id: "a", text: "Trusted launch with secure boot, vTPM, and integrity monitoring" },
-      { id: "b", text: "Azure Disk Encryption with a customer-managed key" },
+      { id: "b", text: "Azure Disk Encryption using a customer-managed key stored in Key Vault" },
       { id: "c", text: "Encryption at host" },
       { id: "d", text: "Just-in-time VM access" },
     ],
@@ -484,9 +484,9 @@ export const sc500Questions: Question[] = [
       "You must extend Defender for Servers protections to virtual machines running in AWS and on-premises. What must you do first?",
     options: [
       { id: "a", text: "Connect the machines to Azure Arc so they can be managed as Azure resources" },
-      { id: "b", text: "Migrate the machines into Azure" },
-      { id: "c", text: "Install the legacy Log Analytics agent only" },
-      { id: "d", text: "Create a site-to-site VPN to each environment" },
+      { id: "b", text: "Migrate the machines into Azure virtual machines, then enable the plan" },
+      { id: "c", text: "Install only the legacy Log Analytics agent on each of the machines" },
+      { id: "d", text: "Create a site-to-site VPN from Azure to each environment" },
     ],
     correct: ["a"],
     explanation:
@@ -502,7 +502,7 @@ export const sc500Questions: Question[] = [
       "You must assess Azure virtual machines for vulnerabilities without deploying or maintaining an agent inside each guest. Which Defender for Servers capability provides this?",
     options: [
       { id: "a", text: "Agentless machine scanning, which analyses a disk snapshot out of band" },
-      { id: "b", text: "The Log Analytics agent with a vulnerability extension" },
+      { id: "b", text: "The Log Analytics agent with a vulnerability assessment extension on each VM" },
       { id: "c", text: "Just-in-time VM access" },
       { id: "d", text: "Adaptive application controls" },
     ],
@@ -519,10 +519,10 @@ export const sc500Questions: Question[] = [
     prompt:
       "A pod in Azure Kubernetes Service must authenticate to Key Vault as its own Entra identity, scoped to that pod's service account rather than the whole node pool. What should you configure?",
     options: [
-      { id: "a", text: "Microsoft Entra Workload ID with a federated credential bound to the Kubernetes service account" },
-      { id: "b", text: "The kubelet managed identity of the node pool" },
-      { id: "c", text: "A Kubernetes secret holding a service principal password" },
-      { id: "d", text: "An AcrPull role assignment on the cluster identity" },
+      { id: "a", text: "Microsoft Entra Workload ID with a federated credential for the Kubernetes service account" },
+      { id: "b", text: "The kubelet managed identity of the node pool, granted the Key Vault Secrets User role" },
+      { id: "c", text: "A Kubernetes secret that holds a service principal password for the pod to use" },
+      { id: "d", text: "An AcrPull role assignment on the cluster identity for the container registry" },
     ],
     correct: ["a"],
     explanation:
@@ -537,10 +537,10 @@ export const sc500Questions: Question[] = [
     prompt:
       "An AKS cluster must pull images from Azure Container Registry with no credentials stored in Kubernetes. What is the recommended approach?",
     options: [
-      { id: "a", text: "Attach the registry to the cluster so the kubelet identity holds the AcrPull role" },
-      { id: "b", text: "Create an image pull secret from the registry admin account" },
-      { id: "c", text: "Enable anonymous pull on the registry" },
-      { id: "d", text: "Store the registry password in a ConfigMap" },
+      { id: "a", text: "Attach the registry to the cluster so the kubelet identity holds AcrPull" },
+      { id: "b", text: "Create an image pull secret from the registry admin account credentials" },
+      { id: "c", text: "Enable anonymous pull on the registry so no authentication is needed" },
+      { id: "d", text: "Store the registry password in a ConfigMap that the pods can read" },
     ],
     correct: ["a"],
     explanation:
@@ -573,10 +573,10 @@ export const sc500Questions: Question[] = [
     prompt:
       "An Azure Function must be reachable only from within your virtual network. Which combination achieves this?",
     options: [
-      { id: "a", text: "A private endpoint for inbound access with public network access disabled, plus VNet integration for outbound calls" },
-      { id: "b", text: "A function-level access key only" },
-      { id: "c", text: "An NSG applied to the function app resource" },
-      { id: "d", text: "Anonymous authentication with an IP restriction" },
+      { id: "a", text: "A private endpoint with public network access disabled, plus VNet integration for outbound calls" },
+      { id: "b", text: "A function-level access key that is distributed only to callers located inside the virtual network" },
+      { id: "c", text: "An NSG applied to the function app resource, denying all inbound internet traffic" },
+      { id: "d", text: "Anonymous authentication combined with an IP restriction for the office ranges" },
     ],
     correct: ["a"],
     explanation:
@@ -592,9 +592,9 @@ export const sc500Questions: Question[] = [
       "Before deploying Microsoft 365 Copilot, leadership wants to know which SharePoint sites contain sensitive data shared too broadly. Which capability surfaces this?",
     options: [
       { id: "a", text: "Data risk assessments in Microsoft Purview DSPM for AI" },
-      { id: "b", text: "Azure Policy compliance reporting" },
-      { id: "c", text: "Defender for Storage malware scanning" },
-      { id: "d", text: "Microsoft Entra access reviews" },
+      { id: "b", text: "Azure Policy compliance reporting for the SharePoint tenant" },
+      { id: "c", text: "Defender for Storage malware scanning on the site libraries" },
+      { id: "d", text: "Microsoft Entra access reviews for the site owners" },
     ],
     correct: ["a"],
     explanation:
@@ -628,9 +628,9 @@ export const sc500Questions: Question[] = [
       "An AI agent identity is suspected of being misused. You need to understand what that agent could reach in order to prioritise containment. Which capability helps most?",
     options: [
       { id: "a", text: "Blast radius analysis for the agent identity in Microsoft Defender XDR" },
-      { id: "b", text: "A storage account access review" },
-      { id: "c", text: "Azure Policy remediation tasks" },
-      { id: "d", text: "Key Vault soft delete" },
+      { id: "b", text: "A storage account access review for the resources the agent might use" },
+      { id: "c", text: "Azure Policy remediation tasks that reconfigure the agent's resources" },
+      { id: "d", text: "Key Vault soft delete enabled on the vaults the agent can read" },
     ],
     correct: ["a"],
     explanation:
@@ -646,9 +646,9 @@ export const sc500Questions: Question[] = [
       "You must centralise authentication, rate limiting, and policy enforcement for calls that internal applications make to Microsoft Foundry model endpoints. What should you deploy?",
     options: [
       { id: "a", text: "AI Gateway capabilities in Azure API Management in front of the model endpoints" },
-      { id: "b", text: "A public load balancer with health probes" },
-      { id: "c", text: "Azure Front Door with caching enabled" },
-      { id: "d", text: "A service endpoint for Microsoft.CognitiveServices" },
+      { id: "b", text: "A public load balancer with health probes in front of the endpoints" },
+      { id: "c", text: "Azure Front Door with caching enabled for the model responses" },
+      { id: "d", text: "A service endpoint for Microsoft.CognitiveServices on the application subnets" },
     ],
     correct: ["a"],
     explanation:
@@ -702,9 +702,9 @@ export const sc500Questions: Question[] = [
       "You must find every internet-exposed virtual machine that has a high-severity vulnerability and can reach a storage account holding sensitive data, as a single query. Which capability should you use?",
     options: [
       { id: "a", text: "Cloud security explorer, which queries the cloud security graph" },
-      { id: "b", text: "Secure score recommendations" },
-      { id: "c", text: "The regulatory compliance dashboard" },
-      { id: "d", text: "Workflow automation" },
+      { id: "b", text: "Secure score recommendations filtered by severity and resource type" },
+      { id: "c", text: "The regulatory compliance dashboard for the selected industry standard" },
+      { id: "d", text: "Workflow automation rules triggered by recommendations or alerts" },
     ],
     correct: ["a"],
     explanation:
@@ -719,10 +719,10 @@ export const sc500Questions: Question[] = [
     prompt:
       "How is the Microsoft Defender for Cloud secure score calculated?",
     options: [
-      { id: "a", text: "Each security control awards points only when every recommendation in it is satisfied for a resource, weighted by the control's maximum score" },
-      { id: "b", text: "Every recommendation contributes equally regardless of grouping" },
-      { id: "c", text: "It is the percentage of resources with any Defender plan enabled" },
-      { id: "d", text: "It is 100 minus the number of open high-severity alerts" },
+      { id: "a", text: "Each control awards points only when all its recommendations are met, weighted by its maximum score" },
+      { id: "b", text: "Every recommendation contributes equally to the score, regardless of the control it belongs to" },
+      { id: "c", text: "It is the percentage of resources that have any Defender plan enabled at subscription level" },
+      { id: "d", text: "It is 100 minus the number of open high-severity alerts across all subscriptions" },
     ],
     correct: ["a"],
     explanation:
@@ -737,10 +737,10 @@ export const sc500Questions: Question[] = [
     prompt:
       "Your organisation must track compliance against an internal standard that is not one of the built-in regulatory standards. What should you do?",
     options: [
-      { id: "a", text: "Add a custom standard in Defender for Cloud backed by an Azure Policy initiative containing your controls" },
-      { id: "b", text: "Track it manually in a spreadsheet exported from the dashboard" },
-      { id: "c", text: "Use secure score as a proxy for the internal standard" },
-      { id: "d", text: "Request that Microsoft add the standard" },
+      { id: "a", text: "Add a custom standard in Defender for Cloud backed by an Azure Policy initiative of your controls" },
+      { id: "b", text: "Track it manually in a spreadsheet that is exported from the dashboard each month" },
+      { id: "c", text: "Use secure score as a proxy for the internal standard and report on that instead" },
+      { id: "d", text: "Ask Microsoft to add your internal standard to the built-in list of regulatory compliance standards" },
     ],
     correct: ["a"],
     explanation:
@@ -758,7 +758,7 @@ export const sc500Questions: Question[] = [
       { id: "a", text: "A data collection rule associated with the machines" },
       { id: "b", text: "The workspace pricing tier" },
       { id: "c", text: "A Sentinel analytics rule" },
-      { id: "d", text: "A diagnostic setting on the machine resource" },
+      { id: "d", text: "A diagnostic setting on the machine resource sending logs to the workspace" },
     ],
     correct: ["a"],
     explanation:
@@ -774,9 +774,9 @@ export const sc500Questions: Question[] = [
       "Several hundred servers cannot each run an agent, but their Windows security events must reach Microsoft Sentinel. Which approach fits?",
     options: [
       { id: "a", text: "Windows Event Forwarding to collector servers that run the Azure Monitor Agent" },
-      { id: "b", text: "The Logs Ingestion API called directly from each server" },
-      { id: "c", text: "Diagnostic settings on each server" },
-      { id: "d", text: "Syslog via AMA on each server" },
+      { id: "b", text: "The Logs Ingestion API called directly from a scheduled script on every server" },
+      { id: "c", text: "Diagnostic settings enabled on each server resource with a workspace destination" },
+      { id: "d", text: "Syslog via AMA installed on each server that forwards its security channel" },
     ],
     correct: ["a"],
     explanation:
@@ -791,10 +791,10 @@ export const sc500Questions: Question[] = [
     prompt:
       "A third-party firewall emits Common Event Format messages. What is required to ingest them into Microsoft Sentinel?",
     options: [
-      { id: "a", text: "A Linux forwarder running the Azure Monitor Agent with CEF collection configured, with the appliance sending to it" },
-      { id: "b", text: "A diagnostic setting on the firewall resource" },
-      { id: "c", text: "The Windows Security Events via AMA connector" },
-      { id: "d", text: "A summary rule over the CommonSecurityLog table" },
+      { id: "a", text: "A Linux forwarder running the Azure Monitor Agent with CEF collection, receiving from the appliance" },
+      { id: "b", text: "A diagnostic setting on the firewall resource that streams logs to the workspace" },
+      { id: "c", text: "The Windows Security Events via AMA connector installed on a Windows collection server in the network" },
+      { id: "d", text: "A summary rule over the CommonSecurityLog table that receives the appliance messages" },
     ],
     correct: ["a"],
     explanation:
@@ -809,10 +809,10 @@ export const sc500Questions: Question[] = [
     prompt:
       "A bespoke application emits JSON audit records that no built-in connector understands. What is the supported way to land them in a workspace table?",
     options: [
-      { id: "a", text: "Create a custom table and send records through a data collection endpoint and rule using the Logs Ingestion API" },
-      { id: "b", text: "Rename the fields to match an existing built-in table" },
-      { id: "c", text: "Use the Syslog via AMA connector with a custom facility" },
-      { id: "d", text: "Store them in blob storage and query with externaldata only" },
+      { id: "a", text: "Create a custom table and send records via a DCE and DCR with the Logs Ingestion API" },
+      { id: "b", text: "Rename the record fields so that they match the schema of an existing built-in table" },
+      { id: "c", text: "Use the Syslog via AMA connector, with a custom facility name for the application" },
+      { id: "d", text: "Store the records in blob storage and query them with the externaldata operator only" },
     ],
     correct: ["a"],
     explanation:
@@ -825,7 +825,7 @@ export const sc500Questions: Question[] = [
     domainId: "posture",
     type: "single",
     prompt:
-      "Which Microsoft Sentinel role lets a user create and edit analytics rules, workbooks, and playbooks, but not grant permissions to others?",
+      "Which Microsoft Sentinel role lets a user create and edit analytics rules and other Sentinel content, but not grant permissions to others?",
     options: [
       { id: "a", text: "Microsoft Sentinel Contributor" },
       { id: "b", text: "Microsoft Sentinel Reader" },
@@ -863,10 +863,10 @@ export const sc500Questions: Question[] = [
     prompt:
       "You want a Sentinel incident automatically assigned to an analyst and raised to high severity whenever a particular rule fires, with no external service involved. What should you create?",
     options: [
-      { id: "a", text: "An automation rule triggered on incident creation" },
-      { id: "b", text: "A playbook with an HTTP trigger" },
-      { id: "c", text: "A workbook with scheduled refresh" },
-      { id: "d", text: "A data collection rule" },
+      { id: "a", text: "An automation rule triggered when an incident is created" },
+      { id: "b", text: "A playbook with an HTTP trigger called by an external service" },
+      { id: "c", text: "A workbook with a scheduled refresh for the analysts" },
+      { id: "d", text: "A data collection rule for the incident table" },
     ],
     correct: ["a"],
     explanation:
@@ -881,10 +881,10 @@ export const sc500Questions: Question[] = [
     prompt:
       "Firewall logs must be retained for seven years at the lowest cost while analytics rules still query the last 60 days. What should you implement?",
     options: [
-      { id: "a", text: "Ingest into the data lake tier and use a KQL job to promote the recent window into the analytics tier" },
-      { id: "b", text: "Ingest everything into the analytics tier with seven-year retention" },
-      { id: "c", text: "Export to blob storage and query only with externaldata" },
-      { id: "d", text: "Enable a daily ingestion cap on the workspace" },
+      { id: "a", text: "Ingest into the data lake tier and use a KQL job to promote the last 60 days to analytics" },
+      { id: "b", text: "Ingest everything into the analytics tier with a seven-year retention period on the tables" },
+      { id: "c", text: "Export to blob storage and query the exported logs only with the externaldata operator" },
+      { id: "d", text: "Enable a daily ingestion cap on the workspace so that costs stay predictable" },
     ],
     correct: ["a"],
     explanation:
@@ -899,10 +899,10 @@ export const sc500Questions: Question[] = [
     prompt:
       "Microsoft Defender External Attack Surface Management is best described as a service that:",
     options: [
-      { id: "a", text: "Discovers your internet-facing assets, including ones you did not know about, and reports their exposures" },
-      { id: "b", text: "Scans internal virtual machines for missing operating system patches" },
-      { id: "c", text: "Blocks outbound connections to malicious domains" },
-      { id: "d", text: "Encrypts data at rest across storage accounts" },
+      { id: "a", text: "Discovers your internet-facing assets, including unknown ones, and reports their exposures" },
+      { id: "b", text: "Scans internal virtual machines for missing operating system patches and misconfigurations" },
+      { id: "c", text: "Blocks outbound connections from workloads to known malicious domains and addresses" },
+      { id: "d", text: "Encrypts data at rest across storage accounts using customer-managed keys" },
     ],
     correct: ["a"],
     explanation:
@@ -918,9 +918,9 @@ export const sc500Questions: Question[] = [
       "Before analysts can use Microsoft Security Copilot, which prerequisite must an administrator complete?",
     options: [
       { id: "a", text: "Provision a Security Copilot workspace with capacity, then assign roles and enable plugins" },
-      { id: "b", text: "Deploy an on-premises gateway server" },
-      { id: "c", text: "Create a Sentinel watchlist of analyst accounts" },
-      { id: "d", text: "Enable anonymous access to the Defender portal" },
+      { id: "b", text: "Deploy an on-premises gateway server that relays prompts from the analysts' browsers" },
+      { id: "c", text: "Create a Sentinel watchlist of analyst accounts and reference it in a workbook" },
+      { id: "d", text: "Enable anonymous access to the Defender portal for the analysts' group" },
     ],
     correct: ["a"],
     explanation:
@@ -936,7 +936,7 @@ export const sc500Questions: Question[] = [
       "You need Defender for Cloud recommendations to carry an owner and a due date so unaddressed items are reported as overdue. What should you configure?",
     options: [
       { id: "a", text: "Governance rules with owners and remediation timeframes" },
-      { id: "b", text: "Workflow automation on recommendation changes" },
+      { id: "b", text: "Workflow automation that runs a Logic App on recommendation changes" },
       { id: "c", text: "A custom compliance standard" },
       { id: "d", text: "Continuous export to Event Hubs" },
     ],

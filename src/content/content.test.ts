@@ -1,9 +1,29 @@
 import { describe, expect, it } from "vitest";
 import { exams } from "./index";
 import { isCorrect, randomiseAll, seedFrom } from "@/lib/quiz";
+import {
+  analyseAnswerLength,
+  MAX_LENGTH_RATIO,
+  MAX_LONGEST_SHARE,
+  MIN_LONGEST_SHARE,
+  MAX_MEAN_RATIO,
+} from "./answerLength";
 
 const allQuestions = exams.flatMap((e) => e.questions);
 const allCards = exams.flatMap((e) => e.flashcards);
+
+describe("answer length", () => {
+  for (const exam of exams) {
+    it(`${exam.code}: the longest option is not a giveaway for the key`, () => {
+      const report = analyseAnswerLength(exam.questions);
+      expect(report.outliers.map((o) => `${o.id} (${o.ratio.toFixed(2)}x)`)).toEqual([]);
+      expect(report.longestShare).toBeLessThanOrEqual(MAX_LONGEST_SHARE);
+      expect(report.longestShare).toBeGreaterThanOrEqual(MIN_LONGEST_SHARE);
+      expect(report.meanRatio).toBeLessThanOrEqual(MAX_MEAN_RATIO);
+      expect(MAX_LENGTH_RATIO).toBeGreaterThan(1);
+    });
+  }
+});
 
 describe("content integrity", () => {
   it("has globally unique question and flashcard ids", () => {

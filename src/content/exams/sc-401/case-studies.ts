@@ -35,7 +35,7 @@ export const sc401CaseStudyQuestions: Question[] = [
       "You need to detect documents containing actual customer records with minimal false positives. What should you create?",
     options: [
       { id: "a", text: "An exact data match (EDM) based sensitive information type built from the customer master database" },
-      { id: "b", text: "A custom sensitive information type using a regular expression for the account number format" },
+      { id: "b", text: "A custom sensitive information type that uses a regular expression for the customer account number format" },
       { id: "c", text: "A trainable classifier trained on 50 sample documents" },
       { id: "d", text: "A keyword dictionary containing customer surnames" },
     ],
@@ -91,10 +91,10 @@ export const sc401CaseStudyQuestions: Question[] = [
     prompt:
       "You need to meet the USB copy requirement. What should you configure?",
     options: [
-      { id: "a", text: "An Endpoint DLP rule for the 'Copy to removable USB device' activity set to Block with override, with a policy tip requiring justification" },
-      { id: "b", text: "An Endpoint DLP rule set to Block with no exceptions" },
-      { id: "c", text: "A sensitivity label that applies encryption and removes the Extract permission" },
-      { id: "d", text: "An attack surface reduction rule blocking untrusted USB processes" },
+      { id: "a", text: "An Endpoint DLP rule for copying to a removable USB device, set to Block with override and a justification" },
+      { id: "b", text: "An Endpoint DLP rule for USB copy activity set to Block with no exceptions or override" },
+      { id: "c", text: "A sensitivity label that applies encryption and removes the Extract permission from users" },
+      { id: "d", text: "An attack surface reduction rule that blocks untrusted and unsigned processes from USB drives" },
     ],
     correct: ["a"],
     explanation:
@@ -110,10 +110,10 @@ export const sc401CaseStudyQuestions: Question[] = [
     prompt:
       "You need to prevent Microsoft 365 Copilot summarising documents labelled Highly Confidential. What should you configure?",
     options: [
-      { id: "a", text: "A DLP policy for the Microsoft 365 Copilot location restricting content with the Highly Confidential label" },
-      { id: "b", text: "An insider risk policy using the risky AI usage template" },
-      { id: "c", text: "A retention label applied to all Highly Confidential documents" },
-      { id: "d", text: "A communication compliance policy scoped to Copilot" },
+      { id: "a", text: "A DLP policy for the Copilot location restricting content with the Highly Confidential label" },
+      { id: "b", text: "An insider risk policy built from the risky AI usage template, scoped to all users" },
+      { id: "c", text: "A retention label applied to all Highly Confidential documents for seven years" },
+      { id: "d", text: "A communication compliance policy that scans Copilot prompts and responses for offensive terms" },
     ],
     correct: ["a"],
     explanation:
@@ -147,10 +147,10 @@ export const sc401CaseStudyQuestions: Question[] = [
     prompt:
       "You need to meet the insider risk requirements. Which two should you configure? (Choose two.)",
     options: [
-      { id: "a", text: "The Microsoft 365 HR connector to import leaver dates, with a policy from the data theft by departing users template" },
-      { id: "b", text: "Forensic evidence capture, together with privacy settings that pseudonymise user names" },
-      { id: "c", text: "A DLP policy blocking all downloads larger than 100 MB" },
-      { id: "d", text: "A retention policy for the departing employee's mailbox" },
+      { id: "a", text: "The HR connector to import leaver dates, with the departing-user data theft template" },
+      { id: "b", text: "Forensic evidence capture, with privacy settings that pseudonymise user names" },
+      { id: "c", text: "A DLP policy that blocks every download larger than 100 MB for all users" },
+      { id: "d", text: "A retention policy for the departing employee's mailbox and OneDrive" },
     ],
     correct: ["a", "b"],
     explanation:
@@ -166,10 +166,10 @@ export const sc401CaseStudyQuestions: Question[] = [
     prompt:
       "The weekly assessment reports many SharePoint documents shared with 'anyone with the link'. Which remediation most directly reduces Copilot oversharing risk before the rollout?",
     options: [
-      { id: "a", text: "Auto-label the unlabelled sensitive items and use SharePoint Restricted Content Discovery to exclude the worst sites from Copilot" },
-      { id: "b", text: "Disable Purview Audit for those sites" },
-      { id: "c", text: "Delete every document older than three years" },
-      { id: "d", text: "Publish a retention label to all users" },
+      { id: "a", text: "Auto-label the unlabelled sensitive items and use Restricted Content Discovery on the worst sites" },
+      { id: "b", text: "Disable Purview Audit for those sites so that sharing events stop being recorded" },
+      { id: "c", text: "Delete every document older than three years across the tenant's SharePoint sites" },
+      { id: "d", text: "Publish a retention label to all users so that every document is kept for a year" },
     ],
     correct: ["a"],
     explanation:

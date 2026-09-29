@@ -30,7 +30,7 @@ export const az500Questions: Question[] = [
       "An Azure Function must read secrets from Azure Key Vault. The solution must avoid storing any credentials in application settings or code. What should you configure?",
     options: [
       { id: "a", text: "A system-assigned managed identity for the function app, granted access to the key vault" },
-      { id: "b", text: "An app registration with a client secret stored in the function app settings" },
+      { id: "b", text: "An app registration with a client secret stored in the function app's application settings" },
       { id: "c", text: "A service principal with a certificate uploaded to the function app" },
       { id: "d", text: "A shared access signature (SAS) token for the key vault" },
     ],
@@ -65,10 +65,10 @@ export const az500Questions: Question[] = [
     prompt:
       "A user is assigned Reader at the subscription scope and Contributor at a resource group inside that subscription. What effective permissions does the user have on resources in that resource group?",
     options: [
-      { id: "a", text: "Reader only, because the assignment at the higher scope wins" },
+      { id: "a", text: "Reader only, because the assignment at the higher scope takes precedence over others" },
       { id: "b", text: "Contributor, because Azure RBAC assignments are additive and the most permissive union applies" },
-      { id: "c", text: "No access, because conflicting assignments cancel each other out" },
-      { id: "d", text: "Contributor on existing resources but Reader on new resources" },
+      { id: "c", text: "No access, because conflicting assignments at different scopes cancel each other out completely" },
+      { id: "d", text: "Contributor on existing resources but only Reader on any newly created resources" },
     ],
     correct: ["b"],
     explanation:
@@ -137,9 +137,9 @@ export const az500Questions: Question[] = [
     prompt:
       "Which statement correctly distinguishes Azure RBAC roles from Microsoft Entra roles?",
     options: [
-      { id: "a", text: "Azure RBAC roles control access to Azure resources; Entra roles control access to directory objects and Microsoft 365 services" },
-      { id: "b", text: "Entra roles control access to Azure resources; Azure RBAC roles control directory objects" },
-      { id: "c", text: "They are the same roles exposed through two different portals" },
+      { id: "a", text: "Azure RBAC roles control access to Azure resources; Entra roles control directory objects and Microsoft 365" },
+      { id: "b", text: "Microsoft Entra roles control access to Azure resources; Azure RBAC roles control directory objects" },
+      { id: "c", text: "They are exactly the same set of roles, exposed through two different admin portals" },
       { id: "d", text: "Azure RBAC roles can only be assigned at subscription scope, Entra roles only at tenant scope" },
     ],
     correct: ["a"],
@@ -191,10 +191,10 @@ export const az500Questions: Question[] = [
     prompt:
       "An application registration authenticates with a client secret that expires in 30 days. Which two approaches remove the recurring expiry problem entirely? (Choose two.)",
     options: [
-      { id: "a", text: "Replace the client secret with a managed identity where the workload runs on an Azure resource that supports it" },
+      { id: "a", text: "Replace the client secret with a managed identity where the workload supports it" },
       { id: "b", text: "Configure workload identity federation so an external token is exchanged for an Entra token" },
-      { id: "c", text: "Set the client secret expiry to the maximum allowed period" },
-      { id: "d", text: "Store the client secret in Azure Key Vault" },
+      { id: "c", text: "Set the client secret expiry to the maximum period that tenant policy allows" },
+      { id: "d", text: "Store the client secret in Azure Key Vault so applications read it at runtime" },
     ],
     correct: ["a", "b"],
     explanation:
@@ -266,9 +266,9 @@ export const az500Questions: Question[] = [
       "All outbound internet traffic from a spoke virtual network must be inspected by an Azure Firewall in a hub virtual network. What must you configure on the spoke subnets?",
     options: [
       { id: "a", text: "A user-defined route for 0.0.0.0/0 with next hop type Virtual appliance set to the firewall's private IP" },
-      { id: "b", text: "A network security group rule denying all outbound internet traffic" },
-      { id: "c", text: "A service endpoint for Microsoft.Network" },
-      { id: "d", text: "Virtual network peering with gateway transit enabled" },
+      { id: "b", text: "A network security group rule that denies all outbound internet traffic from every subnet in the spoke virtual network" },
+      { id: "c", text: "A service endpoint for Microsoft.Network enabled on each spoke subnet" },
+      { id: "d", text: "Virtual network peering between the spoke and hub with gateway transit enabled" },
     ],
     correct: ["a"],
     explanation:
@@ -284,9 +284,9 @@ export const az500Questions: Question[] = [
       "You want to write NSG rules that reference groups of virtual machines by function — for example allowing the web tier to reach the database tier — without hardcoding IP addresses that change as VMs scale. What should you use?",
     options: [
       { id: "a", text: "Application security groups (ASGs)" },
-      { id: "b", text: "Service tags" },
-      { id: "c", text: "Availability sets" },
-      { id: "d", text: "Route tables" },
+      { id: "b", text: "Service tags for Azure services" },
+      { id: "c", text: "Availability sets for VM groups" },
+      { id: "d", text: "Route tables for custom routing" },
     ],
     correct: ["a"],
     explanation:
@@ -302,7 +302,7 @@ export const az500Questions: Question[] = [
       "Your organization has 60 virtual networks and needs a baseline rule blocking inbound SSH from the internet that individual network owners cannot override with their own NSG rules. What should you use?",
     options: [
       { id: "a", text: "Azure Virtual Network Manager security admin rules" },
-      { id: "b", text: "An NSG applied to every subnet by Azure Policy" },
+      { id: "b", text: "An NSG applied to every subnet by Azure Policy so owners cannot change it" },
       { id: "c", text: "Azure Firewall network rules" },
       { id: "d", text: "A route table with next hop None" },
     ],
@@ -320,7 +320,7 @@ export const az500Questions: Question[] = [
       "A partner organization must consume a service running behind a Standard Load Balancer in your virtual network, using a private endpoint in their own tenant. What must you create?",
     options: [
       { id: "a", text: "A Private Link service in front of the load balancer" },
-      { id: "b", text: "A private endpoint in your virtual network" },
+      { id: "b", text: "A private endpoint in your virtual network that the partner's tenant can use" },
       { id: "c", text: "A virtual network peering to the partner's network" },
       { id: "d", text: "A service endpoint policy" },
     ],
@@ -391,10 +391,10 @@ export const az500Questions: Question[] = [
     prompt:
       "Which statement about Azure DDoS Protection is correct?",
     options: [
-      { id: "a", text: "Basic platform protection is always on at no cost; the paid tiers add tuned per-resource mitigation, telemetry, attack analytics, and cost protection" },
-      { id: "b", text: "DDoS protection must be enabled per virtual machine and inspects application-layer payloads" },
-      { id: "c", text: "DDoS protection replaces the need for a web application firewall" },
-      { id: "d", text: "DDoS protection is only available for resources behind Azure Front Door" },
+      { id: "a", text: "Basic platform protection is always on at no cost; paid tiers add tuned mitigation and analytics" },
+      { id: "b", text: "DDoS protection must be enabled per virtual machine and inspects application-layer payloads too" },
+      { id: "c", text: "DDoS protection replaces the need for a web application firewall in front of the app" },
+      { id: "d", text: "DDoS protection is only available for resources that sit behind Azure Front Door" },
     ],
     correct: ["a"],
     explanation:
@@ -410,9 +410,9 @@ export const az500Questions: Question[] = [
       "An App Service web app must call an internal API hosted on a VM in your virtual network, and must not be reachable from the public internet. Which combination achieves this?",
     options: [
       { id: "a", text: "Regional VNet integration for outbound calls, plus a private endpoint for inbound access" },
-      { id: "b", text: "A private endpoint only" },
-      { id: "c", text: "Regional VNet integration only" },
-      { id: "d", text: "An App Service Environment is the only option" },
+      { id: "b", text: "A private endpoint only, which handles both inbound and outbound traffic for the web app" },
+      { id: "c", text: "Regional VNet integration only, which also blocks public inbound access to the app" },
+      { id: "d", text: "An App Service Environment is the only supported option for this design" },
     ],
     correct: ["a"],
     explanation:
@@ -427,10 +427,10 @@ export const az500Questions: Question[] = [
     prompt:
       "You are deploying Azure Virtual WAN and need centralized firewalling for traffic between branches, virtual networks, and the internet. What should you deploy?",
     options: [
-      { id: "a", text: "A secured virtual hub with Azure Firewall, managed through Azure Firewall Manager" },
-      { id: "b", text: "An NSG applied to the virtual hub subnet" },
-      { id: "c", text: "A network virtual appliance in each spoke virtual network" },
-      { id: "d", text: "Azure Front Door with WAF policies" },
+      { id: "a", text: "A secured virtual hub with Azure Firewall, managed through Firewall Manager" },
+      { id: "b", text: "An NSG applied to the virtual hub subnet to filter the traffic between branches" },
+      { id: "c", text: "A network virtual appliance deployed in each spoke virtual network for inspection" },
+      { id: "d", text: "Azure Front Door with WAF policies in front of the branch and cloud workloads" },
     ],
     correct: ["a"],
     explanation:
@@ -483,7 +483,7 @@ export const az500Questions: Question[] = [
     prompt:
       "A compliance requirement states that blob data must not be deletable or modifiable for seven years, including by subscription owners. What should you configure?",
     options: [
-      { id: "a", text: "Blob soft delete with a 2555-day retention period" },
+      { id: "a", text: "Blob soft delete with a 2555-day retention period on the storage account" },
       { id: "b", text: "A time-based immutability policy that has been locked" },
       { id: "c", text: "Blob versioning combined with a resource lock" },
       { id: "d", text: "A legal hold tag on the storage account" },
@@ -555,10 +555,10 @@ export const az500Questions: Question[] = [
     prompt:
       "Your security baseline requires that no one can authenticate to a storage account using its access keys. What should you configure?",
     options: [
-      { id: "a", text: "Disable shared key authorization on the storage account so only Microsoft Entra authorization is accepted" },
-      { id: "b", text: "Rotate the storage account keys every 24 hours" },
-      { id: "c", text: "Enable the storage firewall and restrict it to your virtual network" },
-      { id: "d", text: "Require secure transfer (HTTPS only)" },
+      { id: "a", text: "Disable shared key authorization on the account so only Microsoft Entra authorization is accepted" },
+      { id: "b", text: "Rotate the storage account keys every 24 hours using an automation runbook and store the new keys in Key Vault" },
+      { id: "c", text: "Enable the storage firewall and restrict it to your virtual network only" },
+      { id: "d", text: "Require secure transfer (HTTPS only) for every request to the storage account" },
     ],
     correct: ["a"],
     explanation:
@@ -573,10 +573,10 @@ export const az500Questions: Question[] = [
     prompt:
       "An Azure Kubernetes Service cluster must not expose its API server to the public internet. What should you deploy?",
     options: [
-      { id: "a", text: "A private AKS cluster, where the API server has a private endpoint in your virtual network" },
-      { id: "b", text: "A network policy denying all ingress" },
-      { id: "c", text: "An internal load balancer for the ingress controller" },
-      { id: "d", text: "A Kubernetes RBAC role binding restricting cluster-admin" },
+      { id: "a", text: "A private AKS cluster, where the API server gets a private endpoint in your virtual network" },
+      { id: "b", text: "A network policy that denies all ingress traffic to the workloads running in the cluster namespace" },
+      { id: "c", text: "An internal load balancer for the ingress controller in front of the workloads" },
+      { id: "d", text: "A Kubernetes RBAC role binding that restricts cluster-admin to a few named users" },
     ],
     correct: ["a"],
     explanation:
@@ -609,10 +609,10 @@ export const az500Questions: Question[] = [
     prompt:
       "An AKS cluster must pull images from an Azure Container Registry without any credentials being stored in Kubernetes secrets. What is the recommended approach?",
     options: [
-      { id: "a", text: "Attach the registry to the cluster so the kubelet identity is granted the AcrPull role" },
-      { id: "b", text: "Create an image pull secret from the registry admin account" },
-      { id: "c", text: "Enable anonymous pull access on the registry" },
-      { id: "d", text: "Store the registry password in a Kubernetes ConfigMap" },
+      { id: "a", text: "Attach the registry to the cluster so the kubelet identity gets the AcrPull role" },
+      { id: "b", text: "Create an image pull secret from the registry admin account credentials" },
+      { id: "c", text: "Enable anonymous pull access on the registry so that no credentials are needed by any pod" },
+      { id: "d", text: "Store the registry password in a Kubernetes ConfigMap that pods mount" },
     ],
     correct: ["a"],
     explanation:
@@ -627,10 +627,10 @@ export const az500Questions: Question[] = [
     prompt:
       "Azure Files must be accessed by domain-joined Windows clients using their existing Active Directory identities, with NTFS permissions honoured. What should you configure?",
     options: [
-      { id: "a", text: "Identity-based authentication for the file share using AD DS or Microsoft Entra Domain Services" },
-      { id: "b", text: "A storage account SAS token distributed to each user" },
-      { id: "c", text: "The storage account key configured in each client's credential manager" },
-      { id: "d", text: "A private endpoint for the file share" },
+      { id: "a", text: "Identity-based authentication for the share, using AD DS or Entra Domain Services" },
+      { id: "b", text: "A storage account SAS token that is distributed to each of the domain users" },
+      { id: "c", text: "The storage account key that is saved in each client's credential manager" },
+      { id: "d", text: "A private endpoint for the file share, reachable from the client network" },
     ],
     correct: ["a"],
     explanation:
@@ -645,10 +645,10 @@ export const az500Questions: Question[] = [
     prompt:
       "Regulatory rules require that the encryption key protecting an Azure SQL Database can be revoked by your organization at any moment, immediately rendering the database unreadable. What should you configure?",
     options: [
-      { id: "a", text: "Transparent Data Encryption with a customer-managed key in Azure Key Vault (BYOK)" },
-      { id: "b", text: "Transparent Data Encryption with the service-managed key" },
-      { id: "c", text: "Dynamic data masking on all sensitive columns" },
-      { id: "d", text: "Azure Disk Encryption on the underlying host" },
+      { id: "a", text: "Transparent Data Encryption with a customer-managed key in Key Vault (BYOK)" },
+      { id: "b", text: "Transparent Data Encryption using the service-managed key, left at the default" },
+      { id: "c", text: "Dynamic data masking applied to every column that holds sensitive data" },
+      { id: "d", text: "Azure Disk Encryption on the underlying host that stores the database" },
     ],
     correct: ["a"],
     explanation:
@@ -681,10 +681,10 @@ export const az500Questions: Question[] = [
     prompt:
       "Just-in-time VM access has been enabled for a virtual machine. What actually happens when a user requests access?",
     options: [
-      { id: "a", text: "Defender for Cloud adds a temporary allow rule to the NSG for the requester's source IP and port, which expires automatically" },
-      { id: "b", text: "The VM is started from a deallocated state for the requested period" },
-      { id: "c", text: "A Bastion session is provisioned for the requester" },
-      { id: "d", text: "The VM's public IP address is created on demand and deleted afterwards" },
+      { id: "a", text: "Defender for Cloud adds a temporary NSG allow rule for the requester's IP and port" },
+      { id: "b", text: "The VM is started from a deallocated state for the requested period of time only" },
+      { id: "c", text: "A Bastion session is provisioned for the requester for the requested duration" },
+      { id: "d", text: "The VM's public IP address is created on demand and deleted after the session" },
     ],
     correct: ["a"],
     explanation:
@@ -773,10 +773,10 @@ export const az500Questions: Question[] = [
     prompt:
       "Existing virtual machines were deployed without the required monitoring agent. You want Azure Policy to install it on non-compliant machines automatically, including those already deployed. Which effect and follow-up action are required?",
     options: [
-      { id: "a", text: "DeployIfNotExists, followed by creating a remediation task for existing resources" },
-      { id: "b", text: "Deny, followed by redeploying the machines" },
-      { id: "c", text: "Audit, followed by manual installation" },
-      { id: "d", text: "Modify, which applies retroactively without further action" },
+      { id: "a", text: "DeployIfNotExists, then a remediation task for the existing resources" },
+      { id: "b", text: "Deny, followed by redeploying each of the non-compliant machines from scratch" },
+      { id: "c", text: "Audit, followed by installing the agent manually on every non-compliant machine" },
+      { id: "d", text: "Modify, which applies retroactively to existing machines without further action" },
     ],
     correct: ["a"],
     explanation:
@@ -791,10 +791,10 @@ export const az500Questions: Question[] = [
     prompt:
       "How is the Microsoft Defender for Cloud secure score calculated?",
     options: [
-      { id: "a", text: "Each security control awards points only when every recommendation in that control is satisfied for a resource, weighted by the control's max score" },
-      { id: "b", text: "Each individual recommendation contributes equally, regardless of grouping" },
-      { id: "c", text: "It is the percentage of resources with any Defender plan enabled" },
-      { id: "d", text: "It is the count of open high-severity alerts subtracted from 100" },
+      { id: "a", text: "Each control awards points only when all its recommendations are met, weighted by its max score" },
+      { id: "b", text: "Each individual recommendation contributes equally to the score, regardless of how it is grouped" },
+      { id: "c", text: "It is the percentage of resources in the subscription with any Defender plan enabled" },
+      { id: "d", text: "It is the count of open high-severity alerts subtracted from 100 at each refresh" },
     ],
     correct: ["a"],
     explanation:
@@ -809,10 +809,10 @@ export const az500Questions: Question[] = [
     prompt:
       "Your organization must track compliance against an internal security standard that is not one of the built-in regulatory standards in Microsoft Defender for Cloud. What should you do?",
     options: [
-      { id: "a", text: "Create a custom standard in Defender for Cloud built from an Azure Policy initiative containing your controls" },
-      { id: "b", text: "Ask Microsoft to add the standard to the built-in list" },
-      { id: "c", text: "Export the regulatory compliance dashboard and track it in a spreadsheet" },
-      { id: "d", text: "Use secure score as a proxy for the internal standard" },
+      { id: "a", text: "Create a custom standard in Defender for Cloud built from an Azure Policy initiative of your controls" },
+      { id: "b", text: "Ask Microsoft to add the internal standard to the built-in list of regulatory standards" },
+      { id: "c", text: "Export the regulatory compliance dashboard and track the internal standard manually in a spreadsheet every month" },
+      { id: "d", text: "Use secure score as a proxy for the internal standard and report on that instead" },
     ],
     correct: ["a"],
     explanation:
@@ -827,10 +827,10 @@ export const az500Questions: Question[] = [
     prompt:
       "You must assess Azure virtual machines for software vulnerabilities without deploying or maintaining an agent on each machine. Which Defender for Servers capability provides this?",
     options: [
-      { id: "a", text: "Agentless scanning for machines, which uses disk snapshots to inspect the VM out of band" },
-      { id: "b", text: "The Log Analytics agent with the vulnerability assessment extension" },
-      { id: "c", text: "Just-in-time VM access" },
-      { id: "d", text: "Adaptive application controls" },
+      { id: "a", text: "Agentless scanning for machines, which inspects VM disk snapshots out of band" },
+      { id: "b", text: "The Log Analytics agent with the vulnerability assessment extension on each machine" },
+      { id: "c", text: "Just-in-time VM access on the management ports of the machine" },
+      { id: "d", text: "Adaptive application controls with an allow list of the approved software" },
     ],
     correct: ["a"],
     explanation:
@@ -845,10 +845,10 @@ export const az500Questions: Question[] = [
     prompt:
       "You need Microsoft Defender for Cloud to assess resources in an Amazon Web Services account. What must you configure?",
     options: [
-      { id: "a", text: "A multicloud connector for AWS in Defender for Cloud, which uses a role in the AWS account to collect configuration data" },
-      { id: "b", text: "An ExpressRoute circuit to the AWS account" },
-      { id: "c", text: "Azure Arc on every EC2 instance, which is the only supported method" },
-      { id: "d", text: "A Sentinel data connector for AWS CloudTrail" },
+      { id: "a", text: "A multicloud connector for AWS in Defender for Cloud, which uses a role in the AWS account" },
+      { id: "b", text: "An ExpressRoute circuit to the AWS account so that Azure can reach its resources privately" },
+      { id: "c", text: "Azure Arc on every EC2 instance, which is the only supported method for AWS" },
+      { id: "d", text: "A Sentinel data connector for AWS CloudTrail that feeds the compliance dashboard" },
     ],
     correct: ["a"],
     explanation:
@@ -863,10 +863,10 @@ export const az500Questions: Question[] = [
     prompt:
       "You want Defender for Cloud to notify a Microsoft Teams channel and open a ticket whenever a high-severity alert is raised. Which feature should you configure?",
     options: [
-      { id: "a", text: "Workflow automation, which triggers a Logic App on alert or recommendation events" },
-      { id: "b", text: "Continuous export to a Log Analytics workspace" },
-      { id: "c", text: "An Azure Policy assignment with the AuditIfNotExists effect" },
-      { id: "d", text: "An Azure Monitor metric alert" },
+      { id: "a", text: "Workflow automation, which runs a Logic App on alert or recommendation events" },
+      { id: "b", text: "Continuous export of the alerts to a Log Analytics workspace for later querying" },
+      { id: "c", text: "An Azure Policy assignment with the AuditIfNotExists effect on the subscription" },
+      { id: "d", text: "An Azure Monitor metric alert on the subscription's security score value" },
     ],
     correct: ["a"],
     explanation:
@@ -882,9 +882,9 @@ export const az500Questions: Question[] = [
       "Which Key Vault permission model should you choose to manage access with the same role assignment tooling, PIM, and conditional access used for other Azure resources?",
     options: [
       { id: "a", text: "Azure role-based access control (RBAC) for the data plane" },
-      { id: "b", text: "Vault access policies" },
-      { id: "c", text: "Shared access signatures" },
-      { id: "d", text: "Managed HSM local RBAC only" },
+      { id: "b", text: "Vault access policies configured on each individual key vault" },
+      { id: "c", text: "Shared access signatures issued for the vault's endpoints" },
+      { id: "d", text: "Managed HSM local RBAC only, without Azure role assignments" },
     ],
     correct: ["a"],
     explanation:
@@ -899,10 +899,10 @@ export const az500Questions: Question[] = [
     prompt:
       "Company policy requires encryption keys in Azure Key Vault to be replaced every 12 months with no manual intervention. What should you configure?",
     options: [
-      { id: "a", text: "A key rotation policy on the key, specifying a rotation time based on key creation or expiry" },
-      { id: "b", text: "An Azure Automation runbook that deletes and recreates the key" },
-      { id: "c", text: "Purge protection with a 12-month retention period" },
-      { id: "d", text: "A managed identity with the Key Vault Crypto Officer role" },
+      { id: "a", text: "A key rotation policy on the key, with a rotation time based on creation or expiry" },
+      { id: "b", text: "An Azure Automation runbook that deletes and recreates the key every 12 months on schedule" },
+      { id: "c", text: "Purge protection with a 12-month retention period configured on the key vault" },
+      { id: "d", text: "A managed identity with the Key Vault Crypto Officer role that a script can use" },
     ],
     correct: ["a"],
     explanation:
@@ -936,8 +936,8 @@ export const az500Questions: Question[] = [
       "You must control exactly which Windows security event IDs are collected from Azure VMs into a Log Analytics workspace using the Azure Monitor Agent. What defines that scope?",
     options: [
       { id: "a", text: "A data collection rule (DCR) associated with the target machines" },
-      { id: "b", text: "The workspace's pricing tier" },
-      { id: "c", text: "A Sentinel analytics rule" },
+      { id: "b", text: "The workspace's pricing tier and its daily cap" },
+      { id: "c", text: "A Sentinel analytics rule that watches the security events table" },
       { id: "d", text: "A diagnostic setting on the virtual machine resource" },
     ],
     correct: ["a"],
@@ -990,7 +990,7 @@ export const az500Questions: Question[] = [
       "A ransomware scenario requires that backups in a Recovery Services vault cannot be deleted by a compromised administrator account without an additional control. Which feature addresses this?",
     options: [
       { id: "a", text: "Multi-user authorization using a Resource Guard" },
-      { id: "b", text: "Soft delete alone, which is enabled by default" },
+      { id: "b", text: "Soft delete alone, which is enabled by default on the vault" },
       { id: "c", text: "Geo-redundant storage replication" },
       { id: "d", text: "A read-only lock on the recovery points" },
     ],
@@ -1043,10 +1043,10 @@ export const az500Questions: Question[] = [
     prompt:
       "Microsoft Defender External Attack Surface Management (EASM) is best described as a tool that:",
     options: [
-      { id: "a", text: "Discovers internet-facing assets belonging to your organization, including ones you did not know about, and reports their exposures" },
-      { id: "b", text: "Scans internal virtual machines for missing operating system patches" },
-      { id: "c", text: "Blocks outbound connections to malicious domains" },
-      { id: "d", text: "Encrypts data at rest across storage accounts" },
+      { id: "a", text: "Discovers your internet-facing assets, including unknown ones, and reports their exposures" },
+      { id: "b", text: "Scans internal virtual machines for missing operating system patches and misconfigurations" },
+      { id: "c", text: "Blocks outbound connections from workloads to known malicious domains and addresses" },
+      { id: "d", text: "Encrypts data at rest across storage accounts using customer-managed keys" },
     ],
     correct: ["a"],
     explanation:
@@ -1079,10 +1079,10 @@ export const az500Questions: Question[] = [
     prompt:
       "Which two actions reduce the blast radius if a Microsoft Sentinel workspace is compromised? (Choose two.)",
     options: [
-      { id: "a", text: "Assign Sentinel roles at the resource group scope following least privilege rather than granting subscription Owner" },
-      { id: "b", text: "Use table-level RBAC to restrict which analysts can read sensitive tables" },
-      { id: "c", text: "Enable all data connectors so nothing is missed" },
-      { id: "d", text: "Disable diagnostic logging on the workspace to reduce noise" },
+      { id: "a", text: "Assign Sentinel roles at resource group scope with least privilege, not subscription Owner" },
+      { id: "b", text: "Use table-level RBAC to restrict which analysts can read the sensitive tables" },
+      { id: "c", text: "Enable every available data connector so that no source is ever missed" },
+      { id: "d", text: "Disable diagnostic logging on the workspace to reduce noise for analysts" },
     ],
     correct: ["a", "b"],
     explanation:

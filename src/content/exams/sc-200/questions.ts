@@ -29,10 +29,10 @@ export const sc200Questions: Question[] = [
     prompt:
       "Security events from on-premises Windows domain controllers must be ingested into Microsoft Sentinel, and you need to control exactly which event IDs are collected. What should you configure?",
     options: [
-      { id: "a", text: "The Windows Security Events via AMA connector with a data collection rule" },
-      { id: "b", text: "The Syslog via AMA connector" },
-      { id: "c", text: "The Common Event Format (CEF) via AMA connector" },
-      { id: "d", text: "A custom log table populated by the Logs Ingestion API" },
+      { id: "a", text: "Windows Security Events via AMA, filtered by a data collection rule" },
+      { id: "b", text: "Syslog via AMA, filtered by facility and severity levels" },
+      { id: "c", text: "Common Event Format (CEF) via AMA, filtered by device vendor and product" },
+      { id: "d", text: "A custom table fed by the Logs Ingestion API and a filter" },
     ],
     correct: ["a"],
     explanation:
@@ -84,7 +84,7 @@ export const sc200Questions: Question[] = [
       "You want to deploy an attack surface reduction rule that blocks Office applications from creating child processes, but you must first confirm it will not break a line-of-business macro. What should you do?",
     options: [
       { id: "a", text: "Set the rule to Audit mode and review the resulting events before switching to Block" },
-      { id: "b", text: "Set the rule to Block and add the macro to the exclusion list pre-emptively" },
+      { id: "b", text: "Set the rule to Block and add the macro to the exclusion list in advance, just in case" },
       { id: "c", text: "Set the rule to Warn so users can bypass it permanently" },
       { id: "d", text: "Enable the rule only on a test device group and leave it there" },
     ],
@@ -104,7 +104,7 @@ export const sc200Questions: Question[] = [
       { id: "a", text: "An alert tuning (suppression) rule scoped to the scanner device and alert title" },
       { id: "b", text: "A device group with automation level set to no automated response" },
       { id: "c", text: "An indicator that allows the scanner's file hash" },
-      { id: "d", text: "A global exclusion for the scanner's IP address in Defender Antivirus" },
+      { id: "d", text: "A global exclusion for the scanner's IP address in the Defender Antivirus policy" },
     ],
     correct: ["a"],
     explanation:
@@ -137,9 +137,9 @@ export const sc200Questions: Question[] = [
     prompt:
       "An investigation requires two-year-old firewall logs that currently sit only in the Microsoft Sentinel data lake tier, and you need them available to analytics rules and hunting for the next 30 days. What should you do?",
     options: [
-      { id: "a", text: "Create a KQL job that promotes the required data from the data lake tier to the analytics tier" },
-      { id: "b", text: "Re-ingest the logs from the original firewall appliance" },
-      { id: "c", text: "Change the workspace retention setting to two years" },
+      { id: "a", text: "Create a KQL job that promotes the required data to the analytics tier" },
+      { id: "b", text: "Re-ingest the logs from the original firewall appliance again" },
+      { id: "c", text: "Change the workspace retention setting to two years and wait" },
       { id: "d", text: "Export the data to a storage account and import it as a watchlist" },
     ],
     correct: ["a"],
@@ -155,10 +155,10 @@ export const sc200Questions: Question[] = [
     prompt:
       "High-volume network logs are expensive to keep in the analytics tier, but analysts still need daily aggregate counts per source IP for trend detection. Which Sentinel feature addresses this most directly?",
     options: [
-      { id: "a", text: "Summary rules that aggregate verbose data into a compact summary table on a schedule" },
-      { id: "b", text: "A workbook with a scheduled refresh" },
-      { id: "c", text: "A watchlist populated from the logs" },
-      { id: "d", text: "An automation rule that deletes old records" },
+      { id: "a", text: "Summary rules that aggregate verbose data into a summary table on a schedule" },
+      { id: "b", text: "A workbook with a scheduled refresh that caches the query results for each day" },
+      { id: "c", text: "A watchlist that is populated from the logs each night" },
+      { id: "d", text: "An automation rule that deletes the older records automatically" },
     ],
     correct: ["a"],
     explanation:
@@ -209,10 +209,10 @@ export const sc200Questions: Question[] = [
     prompt:
       "You must collect Windows security events from several hundred servers that cannot have an agent installed individually, using an existing collector infrastructure. Which approach fits?",
     options: [
-      { id: "a", text: "Windows Event Forwarding to a collector server that runs the Azure Monitor Agent" },
-      { id: "b", text: "Installing the Azure Monitor Agent on each server anyway" },
-      { id: "c", text: "The Logs Ingestion API called from each server" },
-      { id: "d", text: "Azure Policy with a diagnostic setting on each server" },
+      { id: "a", text: "Windows Event Forwarding to a collector running the Azure Monitor Agent" },
+      { id: "b", text: "Installing the Azure Monitor Agent on each server individually, one by one" },
+      { id: "c", text: "The Logs Ingestion API called from a script on each server" },
+      { id: "d", text: "Azure Policy with a diagnostic setting deployed to each server" },
     ],
     correct: ["a"],
     explanation:
@@ -227,10 +227,10 @@ export const sc200Questions: Question[] = [
     prompt:
       "You need Azure resource activity — who created, modified, or deleted resources — flowing into Microsoft Sentinel across every subscription, applied automatically to new subscriptions. What should you use?",
     options: [
-      { id: "a", text: "The Azure Activity connector, deployed at scale using Azure Policy to configure diagnostic settings" },
-      { id: "b", text: "The Windows Security Events via AMA connector" },
-      { id: "c", text: "A summary rule over the AzureDiagnostics table" },
-      { id: "d", text: "Microsoft Defender for Cloud continuous export only" },
+      { id: "a", text: "The Azure Activity connector, deployed at scale with Azure Policy" },
+      { id: "b", text: "The Windows Security Events via AMA connector on each subscription" },
+      { id: "c", text: "A summary rule over the AzureDiagnostics table for each subscription" },
+      { id: "d", text: "Defender for Cloud continuous export to a Log Analytics workspace" },
     ],
     correct: ["a"],
     explanation:
@@ -245,10 +245,10 @@ export const sc200Questions: Question[] = [
     prompt:
       "Your threat intelligence platform must push indicators of compromise into Microsoft Sentinel so analytics rules can match them against your telemetry. Which approach is appropriate?",
     options: [
-      { id: "a", text: "Use a threat intelligence connector (TAXII or the upload API) and pair it with a Threat Intelligence analytics rule" },
-      { id: "b", text: "Upload the indicators as a watchlist and rely on Fusion to use them" },
-      { id: "c", text: "Add the indicators to a workbook parameter" },
-      { id: "d", text: "Create a custom log table and query it manually each day" },
+      { id: "a", text: "A threat intelligence connector (TAXII or upload API) with a TI analytics rule" },
+      { id: "b", text: "Upload the indicators as a watchlist and let the built-in Fusion rule match against it" },
+      { id: "c", text: "Add the indicators to a workbook parameter and refresh it daily" },
+      { id: "d", text: "Create a custom log table and query it manually each morning" },
     ],
     correct: ["a"],
     explanation:
@@ -263,10 +263,10 @@ export const sc200Questions: Question[] = [
     prompt:
       "A bespoke internal application writes JSON audit records that no built-in connector understands. What is the supported way to get them into a Log Analytics workspace table?",
     options: [
-      { id: "a", text: "Create a custom table and send records with the Logs Ingestion API through a data collection rule and endpoint" },
-      { id: "b", text: "Rename the records to match an existing built-in table schema" },
-      { id: "c", text: "Use the Syslog via AMA connector with a custom facility" },
-      { id: "d", text: "Store them in a storage account and query with externaldata only" },
+      { id: "a", text: "Create a custom table and send records via the Logs Ingestion API and a DCR" },
+      { id: "b", text: "Rename the record fields so they match an existing built-in table schema" },
+      { id: "c", text: "Use the Syslog via AMA connector with a custom facility name for the app" },
+      { id: "d", text: "Store the records in a storage account and query them with externaldata" },
     ],
     correct: ["a"],
     explanation:
@@ -281,10 +281,10 @@ export const sc200Questions: Question[] = [
     prompt:
       "You are converting an advanced hunting query into a custom detection rule in Microsoft Defender XDR. Which columns must the query return for the rule to be valid?",
     options: [
-      { id: "a", text: "Timestamp, ReportId, and at least one entity identifier column such as DeviceId or AccountObjectId" },
-      { id: "b", text: "Only Timestamp" },
-      { id: "c", text: "AlertId and Severity" },
-      { id: "d", text: "TenantId and SubscriptionId" },
+      { id: "a", text: "Timestamp, ReportId, and an entity column such as DeviceId or AccountObjectId" },
+      { id: "b", text: "Only Timestamp, because the rule adds all remaining fields itself automatically" },
+      { id: "c", text: "AlertId and Severity, matching the alert schema fields" },
+      { id: "d", text: "TenantId and SubscriptionId to scope the rule to Azure" },
     ],
     correct: ["a"],
     explanation:
@@ -317,10 +317,10 @@ export const sc200Questions: Question[] = [
     prompt:
       "Why does entity mapping matter when you author a scheduled analytics rule in Microsoft Sentinel?",
     options: [
-      { id: "a", text: "It binds query columns to entity types so incidents support investigation graphs, correlation, and grouping" },
-      { id: "b", text: "It determines how often the rule runs" },
-      { id: "c", text: "It sets the retention period of the resulting incident" },
-      { id: "d", text: "It selects which workspace the rule queries" },
+      { id: "a", text: "It binds query columns to entity types for investigation graphs and grouping" },
+      { id: "b", text: "It determines how often the rule runs and how far back its query looks each time" },
+      { id: "c", text: "It sets the retention period that applies to the resulting incident" },
+      { id: "d", text: "It selects which workspace the rule queries when several are linked" },
     ],
     correct: ["a"],
     explanation:
@@ -335,10 +335,10 @@ export const sc200Questions: Question[] = [
     prompt:
       "A playbook must isolate a device in Microsoft Defender for Endpoint when triggered by a Sentinel automation rule. What is the recommended way for the Logic App to authenticate?",
     options: [
-      { id: "a", text: "A managed identity for the Logic App, granted the required Defender API permissions" },
-      { id: "b", text: "A user account's credentials stored in the Logic App parameters" },
-      { id: "c", text: "The Sentinel workspace key" },
-      { id: "d", text: "An anonymous HTTP trigger" },
+      { id: "a", text: "A managed identity for the Logic App, granted the Defender API permissions" },
+      { id: "b", text: "A user account's credentials saved as plain text in the Logic App parameters" },
+      { id: "c", text: "The Sentinel workspace key copied into the connection settings" },
+      { id: "d", text: "An anonymous HTTP trigger that anyone with the URL can call" },
     ],
     correct: ["a"],
     explanation:
@@ -353,10 +353,10 @@ export const sc200Questions: Question[] = [
     prompt:
       "Which statement about automatic attack disruption in Microsoft Defender XDR is correct?",
     options: [
-      { id: "a", text: "It uses high-confidence signals to contain an attack in progress — for example disabling an account or isolating a device — before an analyst intervenes" },
-      { id: "b", text: "It permanently deletes any file flagged by any alert" },
-      { id: "c", text: "It requires an analyst to approve each containment action first" },
-      { id: "d", text: "It only operates on Microsoft Sentinel incidents" },
+      { id: "a", text: "It contains an in-progress attack using high-confidence signals, such as isolating a device" },
+      { id: "b", text: "It permanently deletes every file flagged by any alert on all onboarded devices in the tenant" },
+      { id: "c", text: "It needs an analyst to approve every containment action before it can be taken" },
+      { id: "d", text: "It only operates on incidents that have been synchronised into Microsoft Sentinel" },
     ],
     correct: ["a"],
     explanation:
@@ -371,10 +371,10 @@ export const sc200Questions: Question[] = [
     prompt:
       "Which Defender for Endpoint feature lets you collect additional forensic artifacts from devices by defining what should be gathered when an investigation runs?",
     options: [
-      { id: "a", text: "Custom data collection settings, used alongside the investigation package" },
-      { id: "b", text: "Attack surface reduction rules" },
-      { id: "c", text: "Web content filtering" },
-      { id: "d", text: "Network protection" },
+      { id: "a", text: "Custom data collection settings, alongside the investigation package" },
+      { id: "b", text: "Attack surface reduction rules set to audit mode for the device group" },
+      { id: "c", text: "Web content filtering with category-based blocking" },
+      { id: "d", text: "Network protection running in block mode" },
     ],
     correct: ["a"],
     explanation:
@@ -390,7 +390,7 @@ export const sc200Questions: Question[] = [
       "You want a specific SOC distribution list to receive an email whenever a high-severity incident is created in Microsoft Defender XDR. Where do you configure this?",
     options: [
       { id: "a", text: "Email notification rules in Defender XDR settings, filtered by severity" },
-      { id: "b", text: "An Azure Monitor action group on the Log Analytics workspace" },
+      { id: "b", text: "An Azure Monitor action group attached to the Log Analytics workspace alerts" },
       { id: "c", text: "The device group configuration" },
       { id: "d", text: "A data collection rule" },
     ],
@@ -425,10 +425,10 @@ export const sc200Questions: Question[] = [
     prompt:
       "Microsoft Sentinel anomaly rules differ from scheduled analytics rules mainly because they:",
     options: [
-      { id: "a", text: "Use built-in machine learning models with tunable thresholds and can be run in flighting mode before production" },
-      { id: "b", text: "Cannot generate incidents under any circumstances" },
-      { id: "c", text: "Only work on Microsoft first-party data" },
-      { id: "d", text: "Require a data lake tier subscription" },
+      { id: "a", text: "Use built-in ML models with tunable thresholds and can run in flighting mode" },
+      { id: "b", text: "Never write results to the workspace, keeping them in the Sentinel portal only" },
+      { id: "c", text: "Only work on Microsoft first-party data sources such as Entra ID" },
+      { id: "d", text: "Require the data lake tier to be enabled before they can run" },
     ],
     correct: ["a"],
     explanation:
@@ -464,7 +464,7 @@ export const sc200Questions: Question[] = [
       "A phishing email bypassed filtering and was delivered to 200 mailboxes. You must remove the message from all of those mailboxes. Which Microsoft Defender for Office 365 capability should you use?",
     options: [
       { id: "a", text: "Threat Explorer with a soft delete purge action" },
-      { id: "b", text: "A mail flow rule that blocks the sender" },
+      { id: "b", text: "A mail flow rule that blocks the sender from now on and notifies admins" },
       { id: "c", text: "Safe Links policy update" },
       { id: "d", text: "Content search in eDiscovery" },
     ],
@@ -535,10 +535,10 @@ export const sc200Questions: Question[] = [
     prompt:
       "An analyst must stop a compromised device communicating with attacker infrastructure while keeping the Defender for Endpoint agent connected so investigation can continue. Which action should they take?",
     options: [
-      { id: "a", text: "Isolate the device, which blocks other network traffic but preserves the Defender service connection" },
-      { id: "b", text: "Shut the device down remotely" },
-      { id: "c", text: "Run a full antivirus scan" },
-      { id: "d", text: "Remove the device from Microsoft Entra ID" },
+      { id: "a", text: "Isolate the device, keeping the Defender service connection" },
+      { id: "b", text: "Shut the device down remotely from the Defender portal, then wait" },
+      { id: "c", text: "Run a full antivirus scan and wait for the result" },
+      { id: "d", text: "Remove the device object from Microsoft Entra ID" },
     ],
     correct: ["a"],
     explanation:
@@ -589,10 +589,10 @@ export const sc200Questions: Question[] = [
     prompt:
       "Microsoft Entra ID Protection flags a user as high risk after impossible-travel sign-ins. Which response both contains the account and allows the user to recover access themselves?",
     options: [
-      { id: "a", text: "A Conditional Access policy requiring secure password change for high user risk" },
-      { id: "b", text: "Permanently deleting the user account" },
-      { id: "c", text: "Adding the user's device to an isolated device group" },
-      { id: "d", text: "Suppressing the risk detection" },
+      { id: "a", text: "A Conditional Access policy requiring secure password change at high risk" },
+      { id: "b", text: "Permanently deleting the user account and recreating it from scratch later" },
+      { id: "c", text: "Adding the user's device to an isolated device group in Defender" },
+      { id: "d", text: "Suppressing the risk detection and keeping the current sessions" },
     ],
     correct: ["a"],
     explanation:
@@ -625,10 +625,10 @@ export const sc200Questions: Question[] = [
     prompt:
       "You must prevent users from downloading sensitive files to unmanaged devices during an active session in a cloud app, without blocking the app entirely. What should you configure?",
     options: [
-      { id: "a", text: "A Microsoft Defender for Cloud Apps session policy using Conditional Access App Control" },
-      { id: "b", text: "A Defender for Cloud Apps file policy" },
-      { id: "c", text: "An anomaly detection policy" },
-      { id: "d", text: "A Defender for Endpoint indicator" },
+      { id: "a", text: "A Defender for Cloud Apps session policy using Conditional Access App Control" },
+      { id: "b", text: "A Defender for Cloud Apps file policy that scans the shared library for sensitivity labels" },
+      { id: "c", text: "An anomaly detection policy that watches for mass downloads" },
+      { id: "d", text: "A Defender for Endpoint indicator for the application's domain" },
     ],
     correct: ["a"],
     explanation:
@@ -679,10 +679,10 @@ export const sc200Questions: Question[] = [
     prompt:
       "How does embedded Microsoft Security Copilot most directly help an analyst triaging a Defender XDR incident?",
     options: [
-      { id: "a", text: "It summarises the incident, explains scripts and artifacts in natural language, and suggests response steps" },
-      { id: "b", text: "It replaces the need for analytics rules" },
-      { id: "c", text: "It automatically closes low-severity incidents without review" },
-      { id: "d", text: "It provides long-term log retention" },
+      { id: "a", text: "It summarises incidents, explains scripts and suggests response steps" },
+      { id: "b", text: "It replaces the need for analytics rules and custom detections" },
+      { id: "c", text: "It automatically closes low-severity incidents without any review" },
+      { id: "d", text: "It provides long-term retention for the incident's raw logs" },
     ],
     correct: ["a"],
     explanation:
@@ -734,9 +734,9 @@ export const sc200Questions: Question[] = [
       "You must block a specific malicious file across the estate immediately, based on its hash. What should you create in Microsoft Defender XDR?",
     options: [
       { id: "a", text: "An indicator of compromise with a block action for the file hash" },
-      { id: "b", text: "An attack surface reduction rule" },
-      { id: "c", text: "A custom detection rule with no response action" },
-      { id: "d", text: "A device group" },
+      { id: "b", text: "An attack surface reduction rule for the file's folder path" },
+      { id: "c", text: "A custom detection rule that raises alerts but takes no action" },
+      { id: "d", text: "A device group that contains every device holding the file" },
     ],
     correct: ["a"],
     explanation:
@@ -769,10 +769,10 @@ export const sc200Questions: Question[] = [
     prompt:
       "Which two steps are appropriate when closing a Defender XDR incident that turned out to be authorised penetration testing? (Choose two.)",
     options: [
-      { id: "a", text: "Classify the incident as a true positive with the appropriate determination such as security testing" },
-      { id: "b", text: "Create a tuning rule so identical future activity from the test range is suppressed" },
-      { id: "c", text: "Delete the incident and its alerts permanently" },
-      { id: "d", text: "Disable all analytics rules that contributed to the incident" },
+      { id: "a", text: "Classify as a true positive with the determination security testing" },
+      { id: "b", text: "Create a tuning rule that suppresses identical activity from the test range" },
+      { id: "c", text: "Delete the incident and all of its alerts permanently after the test" },
+      { id: "d", text: "Disable every analytics rule that contributed to the incident" },
     ],
     correct: ["a", "b"],
     explanation:
@@ -843,10 +843,10 @@ export const sc200Questions: Question[] = [
     prompt:
       "Which two statements about custom detection rules in Microsoft Defender XDR are correct? (Choose two.)",
     options: [
-      { id: "a", text: "They are created from an advanced hunting query that returns specific required columns" },
-      { id: "b", text: "They can trigger response actions such as isolating a device or quarantining a file" },
-      { id: "c", text: "They run only against data in Microsoft Sentinel workspaces" },
-      { id: "d", text: "They can run at most once per day" },
+      { id: "a", text: "They are created from an advanced hunting query that returns required columns" },
+      { id: "b", text: "They can trigger actions such as isolating a device or quarantining a file" },
+      { id: "c", text: "They run only against data stored in Microsoft Sentinel workspaces" },
+      { id: "d", text: "They can run at most once per day, on a fixed midnight schedule" },
     ],
     correct: ["a", "b"],
     explanation:
@@ -862,9 +862,9 @@ export const sc200Questions: Question[] = [
       "Which advanced hunting table would you query to find all messages that delivered a particular attachment hash to your organisation?",
     options: [
       { id: "a", text: "EmailAttachmentInfo, joined to EmailEvents on NetworkMessageId" },
-      { id: "b", text: "DeviceFileEvents" },
-      { id: "c", text: "CloudAppEvents" },
-      { id: "d", text: "IdentityDirectoryEvents" },
+      { id: "b", text: "DeviceFileEvents, filtered on the same hash value across every device" },
+      { id: "c", text: "CloudAppEvents, searching for the attachment file name" },
+      { id: "d", text: "IdentityDirectoryEvents, matching the sender's account" },
     ],
     correct: ["a"],
     explanation:
@@ -897,10 +897,10 @@ export const sc200Questions: Question[] = [
     prompt:
       "You need to correlate sign-in events with subsequent process executions on the same device within five minutes. Which KQL construct is most appropriate?",
     options: [
-      { id: "a", text: "A join between the two tables on DeviceId, with a timestamp difference filter" },
-      { id: "b", text: "A union of the two tables" },
-      { id: "c", text: "A distinct on DeviceId" },
-      { id: "d", text: "A render timechart" },
+      { id: "a", text: "A join on DeviceId with a filter on the time difference" },
+      { id: "b", text: "A union of the two tables followed by a sort on Timestamp per device" },
+      { id: "c", text: "A distinct on DeviceId across both tables" },
+      { id: "d", text: "A render timechart of both tables together" },
     ],
     correct: ["a"],
     explanation:
@@ -951,10 +951,10 @@ export const sc200Questions: Question[] = [
     prompt:
       "What does a hunting graph showing blast radius help an analyst determine?",
     options: [
-      { id: "a", text: "Which additional assets and identities a compromised entity could reach, revealing potential lateral movement paths" },
-      { id: "b", text: "The financial cost of an incident" },
-      { id: "c", text: "The retention period of the underlying data" },
-      { id: "d", text: "Which analytics rules are disabled" },
+      { id: "a", text: "Which assets and identities a compromised entity could reach" },
+      { id: "b", text: "The financial cost that the incident is likely to cause" },
+      { id: "c", text: "How long the underlying data is retained in the workspace" },
+      { id: "d", text: "Which analytics rules are currently disabled or failing" },
     ],
     correct: ["a"],
     explanation:
@@ -969,10 +969,10 @@ export const sc200Questions: Question[] = [
     prompt:
       "Sentinel Graph is primarily used by analysts to:",
     options: [
-      { id: "a", text: "Explore relationships between entities such as users, devices, and resources to trace attack paths" },
-      { id: "b", text: "Render bar charts of alert volume" },
-      { id: "c", text: "Manage data connector health" },
-      { id: "d", text: "Configure retention tiers" },
+      { id: "a", text: "Explore relationships among entities to trace attack paths" },
+      { id: "b", text: "Render bar charts that summarise alert volume by severity" },
+      { id: "c", text: "Manage the health and latency of data connectors" },
+      { id: "d", text: "Configure retention tiers for tables in the workspace" },
     ],
     correct: ["a"],
     explanation:
@@ -1005,10 +1005,10 @@ export const sc200Questions: Question[] = [
     prompt:
       "What does the Microsoft Sentinel MCP server enable for threat hunting?",
     options: [
-      { id: "a", text: "It exposes Sentinel data and capabilities to AI agents and development tools through the Model Context Protocol" },
-      { id: "b", text: "It replaces data connectors for log ingestion" },
-      { id: "c", text: "It provides physical infrastructure for the data lake" },
-      { id: "d", text: "It is a managed certificate provider" },
+      { id: "a", text: "It exposes Sentinel data and tools to AI agents via the Model Context Protocol" },
+      { id: "b", text: "It replaces data connectors as the supported way of ingesting logs into the workspace" },
+      { id: "c", text: "It provides the physical storage infrastructure for the data lake" },
+      { id: "d", text: "It is a managed certificate provider for connector authentication" },
     ],
     correct: ["a"],
     explanation:
@@ -1023,10 +1023,10 @@ export const sc200Questions: Question[] = [
     prompt:
       "A threat analytics report in Microsoft Defender XDR tells an analyst which of the following?",
     options: [
-      { id: "a", text: "Whether the organisation is exposed or has been impacted by a tracked campaign, with recommended mitigations" },
-      { id: "b", text: "The current secure score of Azure subscriptions" },
-      { id: "c", text: "Which users hold privileged Entra roles" },
-      { id: "d", text: "The retention configuration of the workspace" },
+      { id: "a", text: "Whether the organisation is exposed to a tracked campaign, with mitigations" },
+      { id: "b", text: "The current secure score of each Azure subscription in the tenant" },
+      { id: "c", text: "Which users hold privileged Entra roles and when they last signed in to the portal" },
+      { id: "d", text: "The retention configuration of each workspace table in Sentinel" },
     ],
     correct: ["a"],
     explanation:
@@ -1042,9 +1042,9 @@ export const sc200Questions: Question[] = [
       "Which KQL operator would you use to reduce a large result set to the 10 devices with the highest event counts?",
     options: [
       { id: "a", text: "summarize count() by DeviceName | top 10 by count_ desc" },
-      { id: "b", text: "take 10" },
-      { id: "c", text: "limit 10 by DeviceName" },
-      { id: "d", text: "distinct DeviceName | take 10" },
+      { id: "b", text: "summarize count() by DeviceName | take 10" },
+      { id: "c", text: "summarize count() by DeviceName | limit 10 by DeviceName" },
+      { id: "d", text: "distinct DeviceName | take 10 | sort by DeviceName" },
     ],
     correct: ["a"],
     explanation:
@@ -1077,10 +1077,10 @@ export const sc200Questions: Question[] = [
     prompt:
       "Which two practices make a hunting query suitable for promotion into a scheduled analytics rule? (Choose two.)",
     options: [
-      { id: "a", text: "It returns a bounded, low-volume result set rather than thousands of rows per run" },
-      { id: "b", text: "It maps output columns to entities so incidents carry investigable context" },
-      { id: "c", text: "It uses a very wide unbounded time range on every execution" },
-      { id: "d", text: "It relies on take to sample results randomly" },
+      { id: "a", text: "It returns a bounded, low-volume result set on each run" },
+      { id: "b", text: "It maps output columns to entities so incidents carry context" },
+      { id: "c", text: "It uses a very wide, unbounded time range on every execution" },
+      { id: "d", text: "It relies on take to sample results randomly on each run" },
     ],
     correct: ["a", "b"],
     explanation:

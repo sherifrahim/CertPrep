@@ -34,10 +34,10 @@ export const sc200CaseStudyQuestions: Question[] = [
     prompt:
       "You need to collect Windows security events from the domain controllers, filtered to specific event IDs. What should you configure?",
     options: [
-      { id: "a", text: "The Windows Security Events via AMA connector with a data collection rule using an XPath filter" },
-      { id: "b", text: "The Syslog via AMA connector with a facility filter" },
-      { id: "c", text: "A custom table populated by the Logs Ingestion API" },
-      { id: "d", text: "Diagnostic settings on the domain controller resources" },
+      { id: "a", text: "Windows Security Events via AMA, with a data collection rule using an XPath filter" },
+      { id: "b", text: "Syslog via AMA, with a facility filter on the domain controllers" },
+      { id: "c", text: "A custom table populated through the Logs Ingestion API and a DCE" },
+      { id: "d", text: "Diagnostic settings on each domain controller resource, filtered by category" },
     ],
     correct: ["a"],
     explanation:
@@ -53,10 +53,10 @@ export const sc200CaseStudyQuestions: Question[] = [
     prompt:
       "You need to meet the firewall log retention requirement. What should you implement?",
     options: [
-      { id: "a", text: "Ingest the CEF logs into the Microsoft Sentinel data lake tier and use a KQL job to promote the last 60 days into the analytics tier" },
-      { id: "b", text: "Ingest all CEF logs into the analytics tier and set workspace retention to seven years" },
-      { id: "c", text: "Export the firewall logs to a storage account and query them with externaldata only" },
-      { id: "d", text: "Enable a summary rule and discard the raw firewall logs" },
+      { id: "a", text: "Send CEF logs to the data lake tier and promote 60 days to analytics with a KQL job" },
+      { id: "b", text: "Ingest all CEF logs into the analytics tier with seven-year workspace retention" },
+      { id: "c", text: "Export the firewall logs to a storage account and query them using externaldata" },
+      { id: "d", text: "Use a summary rule to aggregate the logs and discard the raw firewall records" },
     ],
     correct: ["a"],
     explanation:
@@ -72,8 +72,8 @@ export const sc200CaseStudyQuestions: Question[] = [
     prompt:
       "You need to stop the nightly SCAN01 alerts while meeting the stated constraints. What should you do?",
     options: [
-      { id: "a", text: "Create an alert tuning rule that suppresses alerts with that title when the device is SCAN01" },
-      { id: "b", text: "Offboard SCAN01 from Microsoft Defender for Endpoint" },
+      { id: "a", text: "Create an alert tuning rule that suppresses the alert title for SCAN01" },
+      { id: "b", text: "Offboard SCAN01 from Defender for Endpoint to stop its telemetry" },
       { id: "c", text: "Set the automation level for SCAN01's device group to no automated response" },
       { id: "d", text: "Add SCAN01 to the exclusion list for all attack surface reduction rules" },
     ],
@@ -129,10 +129,10 @@ export const sc200CaseStudyQuestions: Question[] = [
     prompt:
       "You need to remove the phishing message from all 220 mailboxes. What should you use?",
     options: [
-      { id: "a", text: "Threat Explorer, selecting the messages and taking a soft delete or purge action" },
-      { id: "b", text: "A mail flow rule blocking the sender" },
-      { id: "c", text: "An eDiscovery content search with export" },
-      { id: "d", text: "A Safe Links policy update" },
+      { id: "a", text: "Threat Explorer, with a soft delete or purge action on the messages" },
+      { id: "b", text: "A mail flow rule that blocks the sender's address going forward" },
+      { id: "c", text: "An eDiscovery content search that exports the messages to a PST" },
+      { id: "d", text: "A Safe Links policy update covering the phishing domain" },
     ],
     correct: ["a"],
     explanation:

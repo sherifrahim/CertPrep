@@ -34,9 +34,9 @@ export const az500CaseStudyQuestions: Question[] = [
     prompt:
       "You need to satisfy the identity requirements for Sub-Prod. What should you implement?",
     options: [
-      { id: "a", text: "Convert the twelve Owner assignments to eligible assignments in Microsoft Entra Privileged Identity Management, requiring MFA and approval on activation" },
-      { id: "b", text: "Replace the Owner role with Contributor for all twelve users" },
-      { id: "c", text: "Create a Conditional Access policy requiring MFA for the Microsoft Azure Management app" },
+      { id: "a", text: "Convert the twelve Owner assignments to eligible PIM assignments requiring MFA and approval" },
+      { id: "b", text: "Replace the Owner role with Contributor for all twelve users on the subscription" },
+      { id: "c", text: "Create a Conditional Access policy requiring MFA for the Microsoft Azure Management app users" },
       { id: "d", text: "Move Sub-Prod into a new management group and assign Owner at that scope" },
     ],
     correct: ["a"],
@@ -72,10 +72,10 @@ export const az500CaseStudyQuestions: Question[] = [
     prompt:
       "You need to prevent vnet-app initiating connections directly to vnet-data while keeping both peered to vnet-hub. What should you do?",
     options: [
-      { id: "a", text: "Confirm no direct peering exists between the spokes and apply NSG rules denying vnet-data address ranges as a destination from vnet-app subnets" },
-      { id: "b", text: "Remove the peering between vnet-hub and vnet-data" },
-      { id: "c", text: "Enable Allow gateway transit on both spoke peerings" },
-      { id: "d", text: "Move vnet-data into a different subscription" },
+      { id: "a", text: "Confirm there is no direct peering between the spokes and deny vnet-data ranges from vnet-app with NSGs" },
+      { id: "b", text: "Remove the peering between vnet-hub and vnet-data so the two spoke networks cannot reach each other any more" },
+      { id: "c", text: "Enable Allow gateway transit on both spoke peerings so traffic is routed through the hub" },
+      { id: "d", text: "Move vnet-data into a different subscription so that its address ranges are unreachable" },
     ],
     correct: ["a"],
     explanation:
@@ -92,9 +92,9 @@ export const az500CaseStudyQuestions: Question[] = [
       "You need to meet the data requirement for the report PDFs in stgreports. What should you configure?",
     options: [
       { id: "a", text: "A locked time-based immutability policy with a five-year retention interval on the container" },
-      { id: "b", text: "Blob soft delete with a retention period of 1825 days" },
-      { id: "c", text: "A read-only resource lock on the storage account" },
-      { id: "d", text: "Blob versioning combined with customer-managed keys" },
+      { id: "b", text: "Blob soft delete with a retention period of 1825 days on the storage account" },
+      { id: "c", text: "A read-only resource lock on the storage account that holds the report PDFs" },
+      { id: "d", text: "Blob versioning combined with customer-managed keys on the storage account" },
     ],
     correct: ["a"],
     explanation:
@@ -110,10 +110,10 @@ export const az500CaseStudyQuestions: Question[] = [
     prompt:
       "You need to ensure SQL1 rejects connections that do not originate from vnet-app. What should you do?",
     options: [
-      { id: "a", text: "Create a private endpoint for the logical server in vnet-app and set Public network access to Disabled" },
-      { id: "b", text: "Add a virtual network rule for vnet-app and leave public network access enabled" },
-      { id: "c", text: "Enable a service endpoint for Microsoft.Sql on the vnet-data subnet" },
-      { id: "d", text: "Configure Transparent Data Encryption with a customer-managed key" },
+      { id: "a", text: "Create a private endpoint in vnet-app for the logical server and disable public network access" },
+      { id: "b", text: "Add a virtual network rule for vnet-app and leave public network access enabled for admins" },
+      { id: "c", text: "Enable a service endpoint for Microsoft.Sql on the vnet-data subnet, then update DNS" },
+      { id: "d", text: "Configure Transparent Data Encryption with a customer-managed key on the logical server" },
     ],
     correct: ["a"],
     explanation:

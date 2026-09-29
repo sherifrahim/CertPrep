@@ -1,6 +1,7 @@
 import type { Exam } from "../../types";
 import { sc500Questions } from "./questions";
 import { sc500ScenarioQuestions } from "./questions-scenario";
+import { sc500MoreQuestions } from "./questions-more";
 import { sc500CaseStudies, sc500CaseStudyQuestions } from "./case-studies";
 import { sc500Flashcards } from "./flashcards";
 
@@ -123,7 +124,7 @@ export const sc500: Exam = {
     },
   ],
 
-  questions: [...sc500Questions, ...sc500ScenarioQuestions, ...sc500CaseStudyQuestions],
+  questions: [...sc500Questions, ...sc500ScenarioQuestions, ...sc500MoreQuestions, ...sc500CaseStudyQuestions],
   caseStudies: sc500CaseStudies,
   flashcards: sc500Flashcards,
 

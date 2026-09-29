@@ -1473,4 +1473,187 @@ export const sc200DumpQuestions: Question[] = [
     difficulty: 2,
     reference: { label: "Jupyter notebooks with Microsoft Sentinel hunting", url: `${docs}/azure/sentinel/notebooks` },
   },
+
+  // ===================================== batch 3 (Measureup PDF + .docx gaps)
+  {
+    id: "sc200-d84",
+    domainId: "operations",
+    type: "single",
+    prompt:
+      "You are building a Microsoft Sentinel workbook and want users to filter its data by Azure resources chosen from a drop-down list. Which parameter type should you add?",
+    options: [
+      { id: "a", text: "Time range picker, offering preset periods for the queries" },
+      { id: "b", text: "Text, where users type the resource name by hand each time" },
+      { id: "c", text: "Resource picker, which lists Azure resources for users to select" },
+      { id: "d", text: "Subscription picker, narrowing every query to one subscription" },
+    ],
+    correct: ["c"],
+    explanation:
+      "The Resource picker parameter type presents Azure resources in a drop-down and passes the selected resource IDs into the queries. A time range picker filters by period, a text parameter needs manual entry, and a subscription picker only scopes to whole subscriptions.",
+    difficulty: 1,
+    reference: { label: "Workbook parameters", url: `${docs}/azure/azure-monitor/visualize/workbooks-parameters` },
+  },
+  {
+    id: "sc200-d85",
+    domainId: "operations",
+    type: "single",
+    prompt:
+      "Compliance requires security logs to be kept for five years. Analysts query the last 180 days every day, and older data only occasionally, when retrieval on demand at low cost is acceptable. What should you configure on the table?",
+    options: [
+      { id: "a", text: "Set analytics retention to five years so that all of the data stays interactively queryable" },
+      { id: "b", text: "Set analytics retention to 180 days and total retention to five years, then use search jobs for older data" },
+      { id: "c", text: "Export the table to blob storage each month and then delete it from the workspace afterwards" },
+      { id: "d", text: "Move the table to the Auxiliary plan and cut its total retention to 30 days to save money" },
+    ],
+    correct: ["b"],
+    explanation:
+      "Analytics retention can be at most 730 days, but total retention can be extended to 12 years. Data beyond the analytics period stays in low-cost long-term retention and is reached through search jobs or restore. Five years of analytics retention isn't possible, and the other choices either break querying or fail the five-year requirement.",
+    difficulty: 3,
+    reference: { label: "Manage data retention in a Log Analytics workspace", url: `${docs}/azure/azure-monitor/logs/data-retention-configure` },
+  },
+  {
+    id: "sc200-d86",
+    domainId: "hunting",
+    type: "ordering",
+    prompt:
+      "You want to save a new custom hunting query, with entity mapping, in Microsoft Sentinel. Arrange the steps in order.",
+    steps: [
+      { id: "a", text: "Open Hunting and select the Queries tab" },
+      { id: "b", text: "Select New query from the command bar" },
+      { id: "c", text: "Enter the name and KQL, then define the entity mappings" },
+      { id: "d", text: "Select Create to save the query" },
+    ],
+    correct: ["a", "b", "c", "d"],
+    explanation:
+      "Custom hunting queries are created from the Queries tab of the Hunting page: choose New query, fill in the query details including the entity mappings that link results to entities, and select Create.",
+    difficulty: 1,
+    reference: { label: "Create custom hunting queries in Microsoft Sentinel", url: `${docs}/azure/sentinel/hunts-custom-queries` },
+  },
+  {
+    id: "sc200-d87",
+    domainId: "response",
+    type: "single",
+    prompt:
+      "You are remediating a recommendation in Microsoft Defender for Cloud, but the recommendation has no Fix button. How should you remediate it?",
+    options: [
+      { id: "a", text: "Wait for the Fix button to appear after the next secure score refresh" },
+      { id: "b", text: "Follow the manual remediation steps listed on the recommendation" },
+      { id: "c", text: "Exempt the recommendation so that it stops affecting the secure score" },
+      { id: "d", text: "Create a workflow automation that applies the fix in the background" },
+    ],
+    correct: ["b"],
+    explanation:
+      "Fix (quick fix) is only offered for recommendations that support one-click remediation. Where it is absent, the recommendation still lists manual remediation steps. Exempting hides the item rather than fixing it, and the button does not appear later.",
+    difficulty: 1,
+    reference: { label: "Remediate recommendations in Defender for Cloud", url: `${docs}/azure/defender-for-cloud/implement-security-recommendations` },
+  },
+  {
+    id: "sc200-d88",
+    domainId: "response",
+    type: "single",
+    prompt:
+      "You want Defender for Cloud Apps to recognise your branch offices' egress IP addresses and label them in logs and alerts. Where do you define them?",
+    options: [
+      { id: "a", text: "In Settings > Cloud Apps > IP address ranges, with a name, category and CIDR range" },
+      { id: "b", text: "In a Cloud Discovery snapshot report uploaded from the branch firewall" },
+      { id: "c", text: "In a file policy that is filtered on the branch offices' IP addresses" },
+      { id: "d", text: "In an OAuth app policy that trusts sign-ins from the branch offices" },
+    ],
+    correct: ["a"],
+    explanation:
+      "IP address ranges are configured under Settings > Cloud Apps > System > IP address ranges and let you tag and categorise known addresses, such as offices, so activity and alerts are easier to interpret. Discovery reports, file policies and OAuth policies do not define address ranges.",
+    difficulty: 2,
+    reference: { label: "Organize IP addresses in Defender for Cloud Apps", url: `${docs}/defender-cloud-apps/ip-tags` },
+  },
+  {
+    id: "sc200-d89",
+    domainId: "response",
+    type: "statements",
+    scenario: "You maintain IP address ranges in Microsoft Defender for Cloud Apps.",
+    prompt: "For each statement, select Yes if it is true. Otherwise select No.",
+    statements: [
+      { id: "a", text: "Ranges are entered in CIDR notation, for example 192.168.1.0/24.", correct: true },
+      { id: "b", text: "Two custom ranges may overlap as long as they use different categories.", correct: false },
+      { id: "c", text: "A custom IP tag takes precedence over a built-in tag such as Risky for the same address.", correct: true },
+      { id: "d", text: "Ranges can only be added one at a time in the portal, with no bulk method.", correct: false },
+    ],
+    correct: ["a", "c"],
+    explanation:
+      "Ranges use CIDR prefixes, and custom tags override built-in threat-intelligence tags. Overlapping ranges are not allowed, and ranges can be added in bulk through the IP address ranges API.",
+    difficulty: 2,
+    reference: { label: "Organize IP addresses in Defender for Cloud Apps", url: `${docs}/defender-cloud-apps/ip-tags` },
+  },
+  {
+    id: "sc200-d90",
+    domainId: "response",
+    type: "single",
+    prompt:
+      "An analyst suspects a workstation was compromised and wants to reconstruct, in order, the processes, network connections and file events that took place on it. Which Defender for Endpoint view should they use first?",
+    options: [
+      { id: "a", text: "The Action center History tab for the workstation" },
+      { id: "b", text: "The device timeline on the workstation's device page" },
+      { id: "c", text: "The Threat analytics report for the suspected campaign" },
+      { id: "d", text: "The security recommendations listed for the workstation" },
+    ],
+    correct: ["b"],
+    explanation:
+      "The device timeline shows chronological events for a device, including processes, network activity and file changes, which is what reconstructing an intrusion needs. The Action center lists response actions, threat analytics describes campaigns, and recommendations describe weaknesses.",
+    difficulty: 1,
+    reference: { label: "Investigate devices in Defender for Endpoint", url: `${docs}/defender-endpoint/device-timeline-event-flag` },
+  },
+  {
+    id: "sc200-d91",
+    domainId: "hunting",
+    type: "single",
+    prompt:
+      "You have a table of known-bad IP addresses named BadIPs. You want only the SigninLogs rows whose IPAddress appears in that table, without adding any columns from BadIPs. Which query is correct?",
+    options: [
+      { id: "a", text: "SigninLogs | join kind=leftouter (BadIPs) on IPAddress" },
+      { id: "b", text: "SigninLogs | join kind=leftanti (BadIPs) on IPAddress" },
+      { id: "c", text: "SigninLogs | union BadIPs | distinct IPAddress" },
+      { id: "d", text: "SigninLogs | join kind=leftsemi (BadIPs) on IPAddress" },
+    ],
+    correct: ["d"],
+    explanation:
+      "leftsemi returns only the left-side rows that have a match on the right, and none of the right-side columns. leftouter keeps every left row, leftanti returns the rows with no match, and union with distinct just lists IP values.",
+    difficulty: 2,
+    reference: { label: "join operator", url: `${docs}/kusto/query/join-operator` },
+  },
+  {
+    id: "sc200-d92",
+    domainId: "operations",
+    type: "statements",
+    scenario:
+      "Your Microsoft Sentinel workspace holds a verbose table on the Basic plan. You plan to use a summary rule to reduce the cost of analysing it.",
+    prompt: "For each statement, select Yes if it is true. Otherwise select No.",
+    statements: [
+      { id: "a", text: "A summary rule aggregates data on a schedule and writes the results to a custom log table.", correct: true },
+      { id: "b", text: "The source table must be on the Analytics plan.", correct: false },
+      { id: "c", text: "If the destination table already exists, the results are appended to it.", correct: true },
+      { id: "d", text: "Summary rules can only be created from advanced hunting in the Defender portal.", correct: false },
+    ],
+    correct: ["a", "c"],
+    explanation:
+      "Summary rules aggregate data from Analytics or Basic tables at a regular cadence and send the results to a custom table, appending if the table exists. That lets analysts query compact, high-value data while the raw logs stay on a cheaper plan.",
+    difficulty: 2,
+    reference: { label: "Aggregate data with summary rules", url: `${docs}/azure/azure-monitor/logs/summary-rules` },
+  },
+  {
+    id: "sc200-d93",
+    domainId: "operations",
+    type: "single",
+    prompt:
+      "Windows servers forward events with Windows Event Forwarding to a collector that runs the Azure Monitor Agent, and you ingest them with the Windows Forwarded Events connector. Which statement about the ingested data is correct?",
+    options: [
+      { id: "a", text: "The events land in SecurityEvent, alongside those from the Windows Security Events connector" },
+      { id: "b", text: "The events land in Syslog, because Windows Event Forwarding uses a syslog-style transport" },
+      { id: "c", text: "The events land in WindowsEvent, so rules written against SecurityEvent will not match them" },
+      { id: "d", text: "The events land in CommonSecurityLog, because the collector normalises them to CEF" },
+    ],
+    correct: ["c"],
+    explanation:
+      "Events collected through Windows Event Forwarding are written to the WindowsEvent table, not SecurityEvent. Many built-in Windows Security Events analytics rules query SecurityEvent, so they must be adapted, for example with ASIM parsers, to cover forwarded events.",
+    difficulty: 3,
+    reference: { label: "Windows Forwarded Events connector", url: `${docs}/azure/sentinel/data-connectors/windows-forwarded-events` },
+  },
 ];

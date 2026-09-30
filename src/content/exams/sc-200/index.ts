@@ -4,6 +4,7 @@ import { sc200ScenarioQuestions } from "./questions-scenario";
 import { sc200ExtraQuestions } from "./questions-extra";
 import { sc200DumpQuestions } from "./questions-dumps";
 import { sc200MoreQuestions } from "./questions-more";
+import { sc200RealisticQuestions } from "./questions-realistic";
 import { sc200CaseStudies, sc200CaseStudyQuestions } from "./case-studies";
 import { sc200Flashcards } from "./flashcards";
 import { sc200ExtraFlashcards } from "./flashcards-extra";
@@ -85,7 +86,7 @@ export const sc200: Exam = {
     },
   ],
 
-  questions: [...sc200Questions, ...sc200ScenarioQuestions, ...sc200ExtraQuestions, ...sc200DumpQuestions, ...sc200MoreQuestions, ...sc200CaseStudyQuestions],
+  questions: [...sc200Questions, ...sc200ScenarioQuestions, ...sc200ExtraQuestions, ...sc200DumpQuestions, ...sc200MoreQuestions, ...sc200RealisticQuestions, ...sc200CaseStudyQuestions],
   caseStudies: sc200CaseStudies,
   flashcards: [...sc200Flashcards, ...sc200ExtraFlashcards],
 

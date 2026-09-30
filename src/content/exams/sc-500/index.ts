@@ -4,6 +4,8 @@ import { sc500ScenarioQuestions } from "./questions-scenario";
 import { sc500MoreQuestions } from "./questions-more";
 import { sc500RealisticQuestions } from "./questions-realistic";
 import { sc500CaseStudies, sc500CaseStudyQuestions } from "./case-studies";
+import { sc500HardCaseStudies, sc500HardCaseStudyQuestions } from "./case-studies-hard";
+import { sc500HardQuestions } from "./questions-hard";
 import { sc500Flashcards } from "./flashcards";
 
 export const sc500: Exam = {
@@ -125,8 +127,8 @@ export const sc500: Exam = {
     },
   ],
 
-  questions: [...sc500Questions, ...sc500ScenarioQuestions, ...sc500MoreQuestions, ...sc500RealisticQuestions, ...sc500CaseStudyQuestions],
-  caseStudies: sc500CaseStudies,
+  questions: [...sc500Questions, ...sc500ScenarioQuestions, ...sc500MoreQuestions, ...sc500RealisticQuestions, ...sc500HardQuestions, ...sc500CaseStudyQuestions, ...sc500HardCaseStudyQuestions],
+  caseStudies: [...sc500CaseStudies, ...sc500HardCaseStudies],
   flashcards: sc500Flashcards,
 
   resources: [

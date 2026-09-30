@@ -289,7 +289,7 @@ Each exam is a directory under `src/content/exams/` with three files:
 | `questions.ts` | The question bank |
 | `flashcards.ts` | The flashcard deck |
 
-Current bank: **101 / 102 / 225 / 115 questions** and 78 / 71 / 70 / 55 flashcards for AZ-500 / SC-401 / SC-200 / SC-500. Every domain holds enough questions to satisfy its weighted mock-exam quota, so mock papers run at their full 40-question length.
+Current bank: **101 / 102 / 254 / 143 questions** and 78 / 71 / 70 / 55 flashcards for AZ-500 / SC-401 / SC-200 / SC-500. Every domain holds enough questions to satisfy its weighted mock-exam quota, so mock papers run at their full 40-question length.
 
 To add a question, append to the array in the exam's `questions.ts`:
 
